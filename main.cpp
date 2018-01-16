@@ -412,6 +412,31 @@ void KeyboardInput()
 	UpdateCamera();
 }
 
+void movingConstBuffToGPU(ID3D11DeviceContext* gDeviceContext, XMMATRIX WVP)
+{
+	D3D11_MAPPED_SUBRESOURCE dataPtr;
+	gDeviceContext->Map(gExampleBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
+	// copy memory from CPU to GPU the entire struct
+	globalValues.WVP = XMMatrixTranspose(WVP); // Transponera alltid innna något skickas in i matrisen.
+	globalValues.worldSpace = XMMatrixTranspose(worldMatrix);
+	//Kopierar in det i buffern "constant buffern"
+	memcpy(dataPtr.pData, &globalValues, sizeof(valuesFromCpu));
+	// UnMap constant buffer so that we can use it again in the GPU
+	gDeviceContext->Unmap(gExampleBuffer, 0);
+	// set resource to Vertex Shader
+	gDeviceContext->GSSetConstantBuffers(0, 1, &gExampleBuffer);
+
+	D3D11_MAPPED_SUBRESOURCE dataPtr2;
+	gDeviceContext->Map(constPerFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr2);
+	// copy memory from CPU to GPU the entire struct
+	//Kopierar in det i buffern "constant buffern"
+	memcpy(dataPtr2.pData, &holdBuffPerFrame, sizeof(constBuffFrame));
+	// UnMap constant buffer so that we can use it again in the GPU
+	gDeviceContext->Unmap(constPerFrameBuffer, 0);
+	// set resource to Vertex Shader
+	gDeviceContext->PSSetConstantBuffers(1, 1, &constPerFrameBuffer);
+}
+
 void Render()
 {
 	ID3D11DeviceContext* gDeviceContext = windowInstance.getDeviceContext();
@@ -463,27 +488,8 @@ void Render()
 	windowInstance.setDepthStencilView(depthStencilView);
 
 	// Map constant buffer so that we can write to it.
-	D3D11_MAPPED_SUBRESOURCE dataPtr;
-	gDeviceContext->Map(gExampleBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
-	// copy memory from CPU to GPU the entire struct
-	globalValues.WVP = XMMatrixTranspose(WVP); // Transponera alltid innna något skickas in i matrisen.
-	globalValues.worldSpace = XMMatrixTranspose(worldMatrix);
-	//Kopierar in det i buffern "constant buffern"
-	memcpy(dataPtr.pData, &globalValues, sizeof(valuesFromCpu));
-	// UnMap constant buffer so that we can use it again in the GPU
-	gDeviceContext->Unmap(gExampleBuffer, 0);
-	// set resource to Vertex Shader
-	gDeviceContext->GSSetConstantBuffers(0, 1, &gExampleBuffer);
 	
-	D3D11_MAPPED_SUBRESOURCE dataPtr2;
-	gDeviceContext->Map(constPerFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr2);
-	// copy memory from CPU to GPU the entire struct
-	//Kopierar in det i buffern "constant buffern"
-	memcpy(dataPtr2.pData, &holdBuffPerFrame, sizeof(constBuffFrame));
-	// UnMap constant buffer so that we can use it again in the GPU
-	gDeviceContext->Unmap(constPerFrameBuffer, 0);
-	// set resource to Vertex Shader
-	gDeviceContext->PSSetConstantBuffers(1, 1, &constPerFrameBuffer);
+	movingConstBuffToGPU(gDeviceContext, WVP);
 	
 	// ==============================================================
 
