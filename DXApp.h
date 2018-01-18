@@ -27,7 +27,7 @@ public:
 	HRESULT CreateDirect3DContext();
 	void SetViewport();
 	void CreateShaders();
-	//void CreateConstantBufferExample();
+	void CreateConstantBuffer();
 	void setActiveShaders();
 	void CreateDepthBuffer();
 
@@ -69,6 +69,11 @@ private:
 	ID3D11VertexShader* gVertexShader = nullptr;
 	ID3D11PixelShader* gPixelShader = nullptr;
 	ID3D11GeometryShader* gGeomertyShader = nullptr;
+
+	ID3D11Buffer* gExampleBuffer = nullptr;
+	ID3D11Buffer* constPerFrameBuffer = nullptr;
+
+
 
 
 	IDirectInputDevice8* DIKeyboard;
@@ -121,6 +126,57 @@ public:
 	{
 		gVertexLayout = vertex_layout;
 	}
+
+	ID3D11Buffer* getConstPerFrameBuffer() const
+	{
+		return constPerFrameBuffer;
+	}
+
+	void setConstPerFrameBuffer(ID3D11Buffer* const_per_frame_buffer)
+	{
+		constPerFrameBuffer = const_per_frame_buffer;
+	}
+
+	ID3D11Buffer* getGExampleBuffer() const
+	{
+		return gExampleBuffer;
+	}
+
+	void setGExampleBuffer(ID3D11Buffer* example_buffer)
+	{
+		gExampleBuffer = example_buffer;
+	}
+
+private:
+	// NEW
+	struct valuesFromCpu
+	{ // NEW
+		float value1; // NEW
+		float value2; // NEW
+		float value3; // NEW
+		float value4;
+
+		XMMATRIX WVP;
+		XMMATRIX worldSpace;// NEW
+	};
+
+	struct Light
+	{
+		Light()
+		{
+			ZeroMemory(this, sizeof(Light));
+		}
+
+		XMFLOAT3 dir;
+		float pad;
+		XMFLOAT4 ambientLight;
+		XMFLOAT4 diffues;
+	};
+
+	struct constBuffFrame
+	{
+		Light light;
+	};
 
 };
 

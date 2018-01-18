@@ -21,6 +21,9 @@ DXApp::~DXApp()
 	gVertexShader->Release();
 	gPixelShader->Release();
 	gGeomertyShader->Release();
+
+	constPerFrameBuffer->Release();
+	gExampleBuffer->Release();
 }
 
 
@@ -185,6 +188,55 @@ void DXApp::CreateShaders()
 
 	pGS->Release();
 
+}
+
+void DXApp::CreateConstantBuffer()
+{
+	D3D11_BUFFER_DESC exampleBufferDesc;
+	exampleBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	exampleBufferDesc.ByteWidth = sizeof(valuesFromCpu);
+	exampleBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	exampleBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	exampleBufferDesc.MiscFlags = 0;
+	exampleBufferDesc.StructureByteStride = 0;
+
+	// check if the creation failed for any reason
+	HRESULT hr = 0;
+	hr = gDevice->CreateBuffer(&exampleBufferDesc, nullptr, &gExampleBuffer);
+	if (FAILED(hr))
+	{
+		// handle the error, could be fatal or a warning...
+		exit(-1);
+	}
+
+	exampleBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	exampleBufferDesc.ByteWidth = sizeof(constBuffFrame);
+	exampleBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	exampleBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	exampleBufferDesc.MiscFlags = 0;
+	exampleBufferDesc.StructureByteStride = 0;
+	hr = 0;
+	hr = gDevice->CreateBuffer(&exampleBufferDesc, nullptr, &constPerFrameBuffer);
+	if (FAILED(hr))
+	{
+		// handle the error, could be fatal or a warning...
+		exit(-1);
+	}
+//
+//	// init for the light
+//	exampleBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+//	exampleBufferDesc.ByteWidth = sizeof(constBuffFrame);
+//	exampleBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+//	exampleBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+//	exampleBufferDesc.MiscFlags = 0;
+//	exampleBufferDesc.StructureByteStride = 0;
+//	hr = 0;
+//	hr = gDevice->CreateBuffer(&exampleBufferDesc, nullptr, &constPerFrameBuffer);
+//	if (FAILED(hr))
+//	{
+//		// handle the error, could be fatal or a warning...
+//		exit(-1);
+//	}
 }
 
 void DXApp::setActiveShaders()

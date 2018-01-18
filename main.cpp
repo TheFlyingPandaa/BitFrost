@@ -109,7 +109,7 @@ XMMATRIX Rotationz;
 float rot = 0.01f;
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ff476898(v=vs.85).aspx
-ID3D11Buffer* gExampleBuffer = nullptr; // NEW
+//ID3D11Buffer* gExampleBuffer = nullptr; // NEW
 struct valuesFromCpu {					// NEW
 	float value1;						// NEW
 	float value2;						// NEW
@@ -137,7 +137,7 @@ struct Light
 Light light;
 
 
-ID3D11Buffer* constPerFrameBuffer = nullptr;
+//ID3D11Buffer* constPerFrameBuffer = nullptr;
 struct constBuffFrame
 {
 	Light light;
@@ -153,37 +153,37 @@ void CreateConstantBufferExample() // NEW
 
 
 	// initializing the constBuffer for the geometry shader
-	D3D11_BUFFER_DESC exampleBufferDesc;
-	exampleBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	exampleBufferDesc.ByteWidth = sizeof(valuesFromCpu);
-	exampleBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	exampleBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	exampleBufferDesc.MiscFlags = 0;
-	exampleBufferDesc.StructureByteStride = 0;
+	//D3D11_BUFFER_DESC exampleBufferDesc;
+	//exampleBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	//exampleBufferDesc.ByteWidth = sizeof(valuesFromCpu);
+	//exampleBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	//exampleBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	//exampleBufferDesc.MiscFlags = 0;
+	//exampleBufferDesc.StructureByteStride = 0;
 
-	// check if the creation failed for any reason
+	//// check if the creation failed for any reason
 	HRESULT hr = 0;
-	hr = gDevice->CreateBuffer(&exampleBufferDesc, nullptr, &gExampleBuffer);
-	if (FAILED(hr))
-	{
-		// handle the error, could be fatal or a warning...
-		exit(-1);
-	}
+	//hr = gDevice->CreateBuffer(&exampleBufferDesc, nullptr, &gExampleBuffer);
+	//if (FAILED(hr))
+	//{
+	//	// handle the error, could be fatal or a warning...
+	//	exit(-1);
+	//}
 
 	// init for the light
-	exampleBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	exampleBufferDesc.ByteWidth = sizeof(constBuffFrame);
-	exampleBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	exampleBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	exampleBufferDesc.MiscFlags = 0;
-	exampleBufferDesc.StructureByteStride = 0;
-	hr = 0;
-	hr = gDevice->CreateBuffer(&exampleBufferDesc, nullptr, &constPerFrameBuffer);
-	if (FAILED(hr))
-	{
-		// handle the error, could be fatal or a warning...
-		exit(-1);
-	}
+	//exampleBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	//exampleBufferDesc.ByteWidth = sizeof(constBuffFrame);
+	//exampleBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	//exampleBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	//exampleBufferDesc.MiscFlags = 0;
+	//exampleBufferDesc.StructureByteStride = 0;
+	//hr = 0;
+	//hr = gDevice->CreateBuffer(&exampleBufferDesc, nullptr, &constPerFrameBuffer);
+	//if (FAILED(hr))
+	//{
+	//	// handle the error, could be fatal or a warning...
+	//	exit(-1);
+	//}
 
 	//TEXTURE
 
@@ -310,6 +310,8 @@ void CreateTriangleData()
 
 void movingConstBuffToGPU(ID3D11DeviceContext* gDeviceContext, XMMATRIX WVP)
 {
+	ID3D11Buffer* constPerFrameBuffer = windowInstance.getConstPerFrameBuffer();
+	ID3D11Buffer* gExampleBuffer = windowInstance.getGExampleBuffer();
 	D3D11_MAPPED_SUBRESOURCE dataPtr;
 	gDeviceContext->Map(gExampleBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
 	// copy memory from CPU to GPU the entire struct
@@ -331,6 +333,8 @@ void movingConstBuffToGPU(ID3D11DeviceContext* gDeviceContext, XMMATRIX WVP)
 	gDeviceContext->Unmap(constPerFrameBuffer, 0);
 	// set resource to Vertex Shader
 	gDeviceContext->PSSetConstantBuffers(1, 1, &constPerFrameBuffer);
+
+	windowInstance.setGExampleBuffer(gExampleBuffer);
 }
 
 void Render()
@@ -428,6 +432,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 
 		CreateTriangleData(); //5. Definiera triangelvertiser, 6. Skapa vertex buffer, 7. Skapa input layout
 
+		windowInstance.CreateConstantBuffer();
 		CreateConstantBufferExample();
 
 		ShowWindow(windowInstance.getWndHandler(), nCmdShow);
@@ -453,7 +458,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 
 		gVertexBuffer->Release();
 
-		constPerFrameBuffer->Release();
+		//constPerFrameBuffer->Release();
 		CubesTexture->Release();
 		CubesTexSamplerState->Release();
 
