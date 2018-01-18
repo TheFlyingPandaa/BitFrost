@@ -34,10 +34,10 @@ using namespace DirectX;
 
 DXApp windowInstance;
 
-HWND InitWindow(HINSTANCE hInstance);
+//HWND InitWindow(HINSTANCE hInstance);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
-HRESULT CreateDirect3DContext(HWND wndHandle);
+//HRESULT CreateDirect3DContext(HWND wndHandle);
 
 
 ID3D11Buffer* gVertexBuffer = nullptr;
@@ -56,8 +56,7 @@ bool textureFromFile = true;
 
 ID3D11Buffer* cbPerFrameBuffer; //Light buffern
 
-XMMATRIX lastMatrix;
-
+//XMMATRIX lastMatrix;
 XMMATRIX worldMatrix;
 
 XMMATRIX camView;
@@ -107,12 +106,7 @@ XMMATRIX Rotationz;
 
 //----------------------------------------------\\
 
-
 float rot = 0.01f;
-
-
-
-
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ff476898(v=vs.85).aspx
 ID3D11Buffer* gExampleBuffer = nullptr; // NEW
@@ -151,30 +145,6 @@ struct constBuffFrame
 
 constBuffFrame holdBuffPerFrame;
 
-bool InitInput(HINSTANCE hInstance, HWND hwnd)
-{
-	DirectInput8Create(hInstance,
-		DIRECTINPUT_VERSION,
-		IID_IDirectInput8,
-		(void**)&DirectInput,
-		NULL);
-
-	DirectInput->CreateDevice(GUID_SysKeyboard,
-		&DIKeyboard,
-		NULL);
-
-	DirectInput->CreateDevice(GUID_SysMouse,
-		&DIMouse,
-		NULL);
-
-	DIKeyboard->SetDataFormat(&c_dfDIKeyboard);
-	DIKeyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-
-	DIMouse->SetDataFormat(&c_dfDIMouse);
-	DIMouse->SetCooperativeLevel(hwnd, DISCL_EXCLUSIVE | DISCL_NOWINKEY | DISCL_FOREGROUND);
-
-	return true;
-}
 
 void CreateConstantBufferExample() // NEW
 {
@@ -338,80 +308,6 @@ void CreateTriangleData()
 }
 
 
-void UpdateCamera()
-{
-	camRotationMatrix = XMMatrixRotationRollPitchYaw(camPitch, camYaw, 0);
-	camTarget = XMVector3TransformCoord(DefaultForward, camRotationMatrix);
-	camTarget = XMVector3Normalize(camTarget);
-
-	XMMATRIX RotateYTempMatrix;
-	RotateYTempMatrix = XMMatrixRotationY(camYaw);
-
-	camRight = XMVector3TransformCoord(DefaultRight, RotateYTempMatrix);
-	UP = XMVector3TransformCoord(UP, RotateYTempMatrix);
-	camForward = XMVector3TransformCoord(DefaultForward, RotateYTempMatrix);
-
-	cameraPos += moveLeftRight*camRight;
-	cameraPos += moveBackForward*camForward;
-
-	moveLeftRight = 0.0f;
-	moveBackForward = 0.0f;
-
-	camTarget = cameraPos + camTarget;
-
-	camView = XMMatrixLookAtLH(cameraPos, camTarget, UP);
-}
-
-void KeyboardInput()
-{
-	DIMOUSESTATE mouseCurrState;
-
-	BYTE keyboardState[256];
-
-	DIKeyboard->Acquire();
-	DIMouse->Acquire();
-
-	DIMouse->GetDeviceState(sizeof(DIMOUSESTATE), &mouseCurrState);
-
-	DIKeyboard->GetDeviceState(sizeof(keyboardState), (LPVOID)&keyboardState);
-
-	float speed = 0.0001f;
-
-
-	if (keyboardState[DIK_ESCAPE] & 0x80)
-	{
-		superQuit = true;
-	}
-	if (keyboardState[DIK_A] & 0x80)
-	{
-		moveLeftRight -= speed;
-	}
-	if (keyboardState[DIK_D] & 0x80)
-	{
-		moveLeftRight += speed;
-	}
-	if (keyboardState[DIK_W] & 0x80)
-	{
-		moveBackForward += speed;
-	}
-	if (keyboardState[DIK_S] & 0x80)
-	{
-		moveBackForward -= speed;
-	}
-	if ((mouseCurrState.lX != mouseLastState.lX) || (mouseCurrState.lY != mouseLastState.lY))
-	{
-		camYaw += mouseLastState.lX * 0.001f;
-
-		camPitch += mouseCurrState.lY * 0.001f;
-
-		mouseLastState = mouseCurrState;
-	}
-
-	
-
-	UpdateCamera();
-}
-
 void movingConstBuffToGPU(ID3D11DeviceContext* gDeviceContext, XMMATRIX WVP)
 {
 	D3D11_MAPPED_SUBRESOURCE dataPtr;
@@ -443,7 +339,9 @@ void Render()
 
 	float clearColor[] = { 0.1f, 0.1f, 0.1f, 1 };
 
-	KeyboardInput();
+	//KeyboardInput();
+	windowInstance.KeyBoardInput();
+	windowInstance.UpdateCamera(camRotationMatrix, camTarget, cameraPos, camView, UP);
 	//Få saken att rotera
 	//rot += .0001f;
 	//if (rot > 6.26f)
@@ -482,9 +380,7 @@ void Render()
 	holdBuffPerFrame.light = light;
 
 	depthStencilView = windowInstance.getDepthStencilView();
-
 	gDeviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
 	windowInstance.setDepthStencilView(depthStencilView);
 
 	// Map constant buffer so that we can write to it.
@@ -520,7 +416,9 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 
 		//2.5 COOL AS 3D KAMERA WOSH WOSH 
 		//NEEDS FIXING GUD KOMMER MÖRDA OSS
-		InitInput(hInstance, windowInstance.getWndHandler());
+		//InitInput(hInstance, windowInstance.getWndHandler());
+
+		windowInstance.InitGameInput(hInstance);
 
 		//SetViewport(); //3. Sätt viewport
 		windowInstance.SetViewport();

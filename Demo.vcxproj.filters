@@ -29,9 +29,6 @@
     <FxCompile Include="Vertex.hlsl">
       <Filter>Source Files</Filter>
     </FxCompile>
-    <FxCompile Include="Geometry1.hlsl">
-      <Filter>Source Files</Filter>
-    </FxCompile>
     <FxCompile Include="Geometry.hlsl">
       <Filter>Source Files</Filter>
     </FxCompile>

@@ -3,10 +3,17 @@
 #include <Windows.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>
-
+#include "DirectX/include/dinput.h"
+#include "DirectX/include/dwrite.h"
+#include <DirectXMath.h>
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
+#pragma comment (lib, "DirectX/lib/dinput8.lib")
+#pragma comment (lib, "DirectX/lib/dwrite.lib")
+#pragma comment (lib, "DirectX/lib/dxguid.lib")
+
+using namespace DirectX;
 
 class DXApp
 {
@@ -15,14 +22,20 @@ public:
 	DXApp();
 	~DXApp();
 
+
 	HWND InitWindow(HINSTANCE hInstance);
 	HRESULT CreateDirect3DContext();
 	void SetViewport();
 	void CreateShaders();
 	//void CreateConstantBufferExample();
 	void setActiveShaders();
+	void CreateDepthBuffer();
 
-	void createDepthBuffer();
+	void InitGameInput(HINSTANCE hInstance);
+	void KeyBoardInput();
+	void UpdateCamera(XMMATRIX & camRotationMatrix, XMVECTOR & camTarget, XMVECTOR & cameraPos, XMMATRIX  &camView, XMVECTOR& UP);
+
+
 
 	void setWndHandler(HWND wndHandle);
 	HWND getWndHandler();
@@ -57,6 +70,28 @@ private:
 	ID3D11PixelShader* gPixelShader = nullptr;
 	ID3D11GeometryShader* gGeomertyShader = nullptr;
 
+
+	IDirectInputDevice8* DIKeyboard;
+	IDirectInputDevice8* DIMouse;
+
+	DIMOUSESTATE mouseLastState;
+	LPDIRECTINPUT8 DirectInput;
+
+	float rotx = 0;
+	float rotz = 0;
+	float scaleX = 1.0f;
+	float scaleY = 1.0f;
+	DirectX::XMMATRIX Rotationx;
+	DirectX::XMMATRIX Rotationz;
+	float moveLeftRight = 0.0f;
+	float moveBackForward = 0.0f;
+	float camYaw = 0.0f;
+	float camPitch = 0.0f;
+
+	XMVECTOR DefaultForward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	XMVECTOR DefaultRight = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+	XMVECTOR camForward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	XMVECTOR camRight = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 
 public:
 	ID3D11RenderTargetView * getGBackbufferRtv() const
