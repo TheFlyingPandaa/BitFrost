@@ -24,6 +24,16 @@ DXApp::~DXApp()
 
 	constPerFrameBuffer->Release();
 	gExampleBuffer->Release();
+	
+	DIKeyboard->Unacquire();
+	DIMouse->Unacquire();
+	DirectInput->Release();
+
+	gVertexBuffer->Release();
+
+	constPerFrameBuffer->Release();
+	CubesTexture->Release();
+	CubesTexSamplerState->Release();
 }
 
 
@@ -289,12 +299,7 @@ void DXApp::CreateDepthBuffer() {
 
 void DXApp::CreateTriangleData()
 {
-	struct TriangleVertex
-	{
-		float x, y, z;		//Cordinates for triangle
-		float r, g;			//u,v cordinates
-		float nx, ny, nz;	//Normals
-	};
+	
 
 	TriangleVertex triangleVertices[6] =
 	{
@@ -337,6 +342,10 @@ void DXApp::CreateTriangleData()
 
 	camProjection = XMMatrixPerspectiveFovLH(XM_PI * 0.45f, 640.0f / 480.0f, 0.1f, 20.0f);
 
+	light.dir = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	light.ambientLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	light.diffues = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+
 	D3D11_BUFFER_DESC bufferDesc;
 	memset(&bufferDesc, 0, sizeof(bufferDesc));
 	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -353,6 +362,95 @@ void DXApp::CreateTriangleData()
 }
 
 
+
+void DXApp::Render()
+{
+	float clearColor[] = { 0.1f, 0.1f, 0.1f, 1 };
+
+	//KeyboardInput();
+	KeyBoardInput();
+	UpdateCamera(camRotationMatrix, camTarget, cameraPos, camView, UP);
+	//Få saken att rotera
+	float rot = 0;
+	//if (rot > 6.26f)
+	//	rot = 0.0f;
+	//rot = 1.50f;
+	//Tom världsmatris
+	worldMatrix = XMMatrixIdentity();
+
+	XMVECTOR rotaxis = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+	XMMATRIX Rotation = XMMatrixRotationAxis(rotaxis, rot);
+	XMMATRIX Translation = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
+	XMMATRIX Scale = XMMatrixScaling(1.0f, 1.0f, 1.0f); -
+
+	worldMatrix = Scale * Rotation * Translation;
+
+	
+
+	WVP = worldMatrix * camView * camProjection;
+
+	ID3D11ShaderResourceView* CubesTexture = getCubesTexture();
+	ID3D11SamplerState* CubesTexSamplerState = getCubesTexSamplerState();
+
+	
+	
+	gDeviceContext->PSSetShaderResources(0, 1, &CubesTexture);
+	gDeviceContext->PSSetSamplers(0, 1, &CubesTexSamplerState);
+
+	UINT32 vertexSize = sizeof(float) * 8; //The const (5) is the amount of vertexes
+	UINT32 offset = 0;
+
+	gDeviceContext->IASetVertexBuffers(0, 1, &gVertexBuffer, &vertexSize, &offset);
+	gDeviceContext->IASetInputLayout(getGVertexLayout());
+
+	holdBuffPerFrame.light = light;
+
+	depthStencilView = getDepthStencilView();
+	gDeviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	setDepthStencilView(depthStencilView);
+
+	// Map constant buffer so that we can write to it.
+
+	MovingBuffersToGPU();
+	
+
+	// ==============================================================
+
+	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// clear screen
+
+	ID3D11RenderTargetView* gBackbufferRTV = getGBackbufferRtv();
+	gDeviceContext->ClearRenderTargetView(gBackbufferRTV, clearColor);
+	setGBackbufferRtv(gBackbufferRTV);
+	// draw geometry
+	gDeviceContext->Draw(6, 0);
+}
+
+void DXApp::MovingBuffersToGPU()
+{
+	D3D11_MAPPED_SUBRESOURCE dataPtr;
+	gDeviceContext->Map(gExampleBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
+	// copy memory from CPU to GPU the entire struct
+	globalValues.WVP = XMMatrixTranspose(WVP); // Transponera alltid innna något skickas in i matrisen.
+	globalValues.worldSpace = XMMatrixTranspose(worldMatrix);
+	//Kopierar in det i buffern "constant buffern"
+	memcpy(dataPtr.pData, &globalValues, sizeof(valuesFromCpu));
+	// UnMap constant buffer so that we can use it again in the GPU
+	gDeviceContext->Unmap(gExampleBuffer, 0);
+	// set resource to Vertex Shader
+	gDeviceContext->GSSetConstantBuffers(0, 1, &gExampleBuffer);
+
+	D3D11_MAPPED_SUBRESOURCE dataPtr2;
+	gDeviceContext->Map(constPerFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr2);
+	// copy memory from CPU to GPU the entire struct
+	//Kopierar in det i buffern "constant buffern"
+	memcpy(dataPtr2.pData, &holdBuffPerFrame, sizeof(constBuffFrame));
+	// UnMap constant buffer so that we can use it again in the GPU
+	gDeviceContext->Unmap(constPerFrameBuffer, 0);
+	// set resource to Vertex Shader
+	gDeviceContext->PSSetConstantBuffers(1, 1, &constPerFrameBuffer);
+}
 
 void DXApp::CreateTexture()
 {
@@ -464,6 +562,8 @@ void DXApp::UpdateCamera(XMMATRIX & camRotationMatrix, XMVECTOR  &camTarget, XMV
 
 	camView = XMMatrixLookAtLH(cameraPos, camTarget, UP);
 }
+
+
 
 void DXApp::setWndHandler(HWND wndHandle)
 {

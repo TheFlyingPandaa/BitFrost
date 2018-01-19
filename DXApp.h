@@ -34,23 +34,16 @@ public:
 	void CreateDepthBuffer();
 
 	void CreateTriangleData();
-	ID3D11Buffer* gVertexBuffer = nullptr;
-
-	XMVECTOR cameraPos;
-	XMVECTOR lookAt;
-	XMVECTOR UP;
-
-	XMMATRIX camView;
-	XMMATRIX camProjection;
-	//void Render();
-
+	
+	void Render();
+	
 	void CreateTexture();
 
 	void InitGameInput(HINSTANCE hInstance);
 	void KeyBoardInput();
 	void UpdateCamera(XMMATRIX & camRotationMatrix, XMVECTOR & camTarget, XMVECTOR & cameraPos, XMMATRIX  &camView, XMVECTOR& UP);
 
-
+	void MovingBuffersToGPU();
 
 	void setWndHandler(HWND wndHandle);
 	HWND getWndHandler();
@@ -91,27 +84,24 @@ private:
 	ID3D11ShaderResourceView* CubesTexture;
 	ID3D11SamplerState* CubesTexSamplerState;
 
+	XMMATRIX worldMatrix;
+	XMVECTOR camTarget;
+	XMMATRIX camRotationMatrix;
+	valuesFromCpu globalValues{ 0.0,0.0,0.0,0.0 };
+	Light light;
 
-public:
-	ID3D11ShaderResourceView* getCubesTexture() const
-	{
-		return CubesTexture;
-	}
+	constBuffFrame holdBuffPerFrame;
 
-	void setCubesTexture(ID3D11ShaderResourceView* cubes_texture)
-	{
-		CubesTexture = cubes_texture;
-	}
+	ID3D11Buffer* gVertexBuffer = nullptr;
 
-	ID3D11SamplerState* getCubesTexSamplerState() const
-	{
-		return CubesTexSamplerState;
-	}
+	XMVECTOR cameraPos;
+	XMVECTOR lookAt;
+	XMVECTOR UP;
 
-	void setCubesTexSamplerState(ID3D11SamplerState* cubes_tex_sampler_state)
-	{
-		CubesTexSamplerState = cubes_tex_sampler_state;
-	}
+	XMMATRIX camView;
+	XMMATRIX camProjection;
+
+	XMMATRIX WVP;
 
 private:
 	IDirectInputDevice8* DIKeyboard;
@@ -185,6 +175,25 @@ public:
 		gExampleBuffer = example_buffer;
 	}
 
+	ID3D11ShaderResourceView* getCubesTexture() const
+	{
+		return CubesTexture;
+	}
+
+	void setCubesTexture(ID3D11ShaderResourceView* cubes_texture)
+	{
+		CubesTexture = cubes_texture;
+	}
+
+	ID3D11SamplerState* getCubesTexSamplerState() const
+	{
+		return CubesTexSamplerState;
+	}
+
+	void setCubesTexSamplerState(ID3D11SamplerState* cubes_tex_sampler_state)
+	{
+		CubesTexSamplerState = cubes_tex_sampler_state;
+	}
 };
 
 
