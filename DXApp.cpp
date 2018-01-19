@@ -287,6 +287,73 @@ void DXApp::CreateDepthBuffer() {
 	gDeviceContext->OMSetRenderTargets(1, &gBackbufferRTV, depthStencilView);
 }
 
+void DXApp::CreateTriangleData()
+{
+	struct TriangleVertex
+	{
+		float x, y, z;		//Cordinates for triangle
+		float r, g;			//u,v cordinates
+		float nx, ny, nz;	//Normals
+	};
+
+	TriangleVertex triangleVertices[6] =
+	{
+		-0.5f, 0.5f, 0.0f,	//v0 pos
+		0.0f, 0.0f,	//v0 color
+		1.0f, -1.0f, -1.0f,
+
+		0.5f, -0.5f, 0.0f,	//v1
+		1.0f, 1.0f,	//v1 color
+		1.0f, 1.0f, 1.0f,
+
+		-0.5f, -0.5f, 0.0f, //v2
+		0.0f, 1.0f, 	//v2 color
+		1.0f, 1.0f, 1.0f,
+
+		-0.5f, 0.5f, 0.0f,	//v0 pos
+		0.0f, 0.0f, 	//v0 color
+		1.0f, -1.0f, -1.0f,
+
+		0.5f, 0.5f, 0.0f,	//v1
+		1.0f, 0.0f, 	//v1 color
+		1.0f, 1.0f, 1.0f,
+
+		0.5f, -0.5f, 0.0f, //v2
+		1.0f, 1.0f,	//v2 color
+		1.0f, 1.0f, 1.0f,
+	};
+
+
+
+	XMFLOAT3 cameraStored = XMFLOAT3(0, 0, -2);
+	XMFLOAT3 lookAtStored = XMFLOAT3(0, 0, 0);
+	XMFLOAT3 UP_STORED = XMFLOAT3(0, 1, 0);
+
+	cameraPos = XMLoadFloat3(&cameraStored);
+	lookAt = XMLoadFloat3(&lookAtStored);
+	UP = XMLoadFloat3(&UP_STORED);
+
+	camView = XMMatrixLookAtLH(cameraPos, lookAt, UP);
+
+	camProjection = XMMatrixPerspectiveFovLH(XM_PI * 0.45f, 640.0f / 480.0f, 0.1f, 20.0f);
+
+	D3D11_BUFFER_DESC bufferDesc;
+	memset(&bufferDesc, 0, sizeof(bufferDesc));
+	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	bufferDesc.ByteWidth = sizeof(triangleVertices);
+
+	D3D11_SUBRESOURCE_DATA data;
+	data.pSysMem = triangleVertices;
+
+	//Need fix
+	
+	gDevice->CreateBuffer(&bufferDesc, &data, &gVertexBuffer);
+
+}
+
+
+
 void DXApp::CreateTexture()
 {
 	D3D11_SAMPLER_DESC sampDesc;

@@ -40,7 +40,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 //HRESULT CreateDirect3DContext(HWND wndHandle);
 
 
-ID3D11Buffer* gVertexBuffer = nullptr;
+//ID3D11Buffer* gVertexBuffer = nullptr;
 
 
 ID3D11ShaderResourceView* gTextureView = NULL;
@@ -59,12 +59,12 @@ ID3D11Buffer* cbPerFrameBuffer; //Light buffern
 //XMMATRIX lastMatrix;
 XMMATRIX worldMatrix;
 
-XMMATRIX camView;
-XMMATRIX camProjection;
+//XMMATRIX camView;
+//XMMATRIX camProjection;
 
-XMVECTOR cameraPos;
-XMVECTOR lookAt;
-XMVECTOR UP;
+//XMVECTOR cameraPos;
+//XMVECTOR lookAt;
+//XMVECTOR UP;
 
 
 //FIRST PERSON
@@ -90,19 +90,19 @@ float camPitch = 0.0f;
 
 //Keyboard input
 
-IDirectInputDevice8* DIKeyboard;
-IDirectInputDevice8* DIMouse;
-
-DIMOUSESTATE mouseLastState;
-LPDIRECTINPUT8 DirectInput;
-
-float rotx = 0;
-float rotz = 0;
-float scaleX = 1.0f;
-float scaleY = 1.0f;
-
-XMMATRIX Rotationx;
-XMMATRIX Rotationz;
+//IDirectInputDevice8* DIKeyboard;
+//IDirectInputDevice8* DIMouse;
+//
+//DIMOUSESTATE mouseLastState;
+//LPDIRECTINPUT8 DirectInput;
+//
+//float rotx = 0;
+//float rotz = 0;
+//float scaleX = 1.0f;
+//float scaleY = 1.0f;
+//
+//XMMATRIX Rotationx;
+//XMMATRIX Rotationz;
 
 //----------------------------------------------\\
 
@@ -110,38 +110,38 @@ float rot = 0.01f;
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ff476898(v=vs.85).aspx
 //ID3D11Buffer* gExampleBuffer = nullptr; // NEW
-struct valuesFromCpu {					// NEW
-	float value1;						// NEW
-	float value2;						// NEW
-	float value3;						// NEW
-	float value4;
-	
-	XMMATRIX WVP;
-	XMMATRIX worldSpace;// NEW
-};
+//struct valuesFromCpu {					// NEW
+//	float value1;						// NEW
+//	float value2;						// NEW
+//	float value3;						// NEW
+//	float value4;
+//	
+//	XMMATRIX WVP;
+//	XMMATRIX worldSpace;// NEW
+//};
 valuesFromCpu globalValues{ 0.0,0.0,0.0,0.0 }; // NEW
 
-struct Light
-{
-	Light()
-	{
-		ZeroMemory(this, sizeof(Light));
-	}
-	XMFLOAT3 dir;
-	float pad;
-	XMFLOAT4 ambientLight;
-	XMFLOAT4 diffues;
-
-};
+//struct Light
+//{
+//	Light()
+//	{
+//		ZeroMemory(this, sizeof(Light));
+//	}
+//	XMFLOAT3 dir;
+//	float pad;
+//	XMFLOAT4 ambientLight;
+//	XMFLOAT4 diffues;
+//
+//};
 
 Light light;
 
 
 //ID3D11Buffer* constPerFrameBuffer = nullptr;
-struct constBuffFrame
-{
-	Light light;
-};
+//struct constBuffFrame
+//{
+//	Light light;
+//};
 
 constBuffFrame holdBuffPerFrame;
 
@@ -240,71 +240,70 @@ void CreateConstantBufferExample() // NEW
 
 void CreateTriangleData()
 {
-	struct TriangleVertex
-	{
-		float x, y, z;		//Cordinates for triangle
-		float r, g;			//u,v cordinates
-		float nx, ny, nz;	//Normals
-	};
+	//struct TriangleVertex
+	//{
+	//	float x, y, z;		//Cordinates for triangle
+	//	float r, g;			//u,v cordinates
+	//	float nx, ny, nz;	//Normals
+	//};
 
-	TriangleVertex triangleVertices[6] =
-	{
-		-0.5f, 0.5f, 0.0f,	//v0 pos
-		0.0f, 0.0f,	//v0 color
-		1.0f, -1.0f, -1.0f,
+	//TriangleVertex triangleVertices[6] =
+	//{
+	//	-0.5f, 0.5f, 0.0f,	//v0 pos
+	//	0.0f, 0.0f,	//v0 color
+	//	1.0f, -1.0f, -1.0f,
 
-		0.5f, -0.5f, 0.0f,	//v1
-		1.0f, 1.0f,	//v1 color
-		1.0f, 1.0f, 1.0f,
+	//	0.5f, -0.5f, 0.0f,	//v1
+	//	1.0f, 1.0f,	//v1 color
+	//	1.0f, 1.0f, 1.0f,
 
-		-0.5f, -0.5f, 0.0f, //v2
-		0.0f, 1.0f, 	//v2 color
-		1.0f, 1.0f, 1.0f,
+	//	-0.5f, -0.5f, 0.0f, //v2
+	//	0.0f, 1.0f, 	//v2 color
+	//	1.0f, 1.0f, 1.0f,
 
-		-0.5f, 0.5f, 0.0f,	//v0 pos
-		0.0f, 0.0f, 	//v0 color
-		1.0f, -1.0f, -1.0f,
+	//	-0.5f, 0.5f, 0.0f,	//v0 pos
+	//	0.0f, 0.0f, 	//v0 color
+	//	1.0f, -1.0f, -1.0f,
 
-		0.5f, 0.5f, 0.0f,	//v1
-		1.0f, 0.0f, 	//v1 color
-		1.0f, 1.0f, 1.0f,
+	//	0.5f, 0.5f, 0.0f,	//v1
+	//	1.0f, 0.0f, 	//v1 color
+	//	1.0f, 1.0f, 1.0f,
 
-		0.5f, -0.5f, 0.0f, //v2
-		1.0f, 1.0f,	//v2 color
-		1.0f, 1.0f, 1.0f,
-	};
+	//	0.5f, -0.5f, 0.0f, //v2
+	//	1.0f, 1.0f,	//v2 color
+	//	1.0f, 1.0f, 1.0f,
+	//};
 
-	
-	
-	XMFLOAT3 cameraStored = XMFLOAT3(0, 0, -2);
-	XMFLOAT3 lookAtStored = XMFLOAT3(0, 0, 0);
-	XMFLOAT3 UP_STORED = XMFLOAT3(0, 1, 0);
+	//
+	//
+	//XMFLOAT3 cameraStored = XMFLOAT3(0, 0, -2);
+	//XMFLOAT3 lookAtStored = XMFLOAT3(0, 0, 0);
+	//XMFLOAT3 UP_STORED = XMFLOAT3(0, 1, 0);
 
-	cameraPos = XMLoadFloat3(&cameraStored);
-	lookAt = XMLoadFloat3(&lookAtStored);
-	UP = XMLoadFloat3(&UP_STORED);
+	//cameraPos = XMLoadFloat3(&cameraStored);
+	//lookAt = XMLoadFloat3(&lookAtStored);
+	//UP = XMLoadFloat3(&UP_STORED);
 
-	camView = XMMatrixLookAtLH(cameraPos, lookAt, UP);
+	//camView = XMMatrixLookAtLH(cameraPos, lookAt, UP);
 
-	camProjection = XMMatrixPerspectiveFovLH(XM_PI * 0.45f, 640.0f / 480.0f, 0.1f, 20.0f);
-
+	//camProjection = XMMatrixPerspectiveFovLH(XM_PI * 0.45f, 640.0f / 480.0f, 0.1f, 20.0f);
 	light.dir = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	light.ambientLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	light.diffues = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	
-	D3D11_BUFFER_DESC bufferDesc;
-	memset(&bufferDesc, 0, sizeof(bufferDesc));
-	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.ByteWidth = sizeof(triangleVertices);
+	//
+	//D3D11_BUFFER_DESC bufferDesc;
+	//memset(&bufferDesc, 0, sizeof(bufferDesc));
+	//bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	//bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	//bufferDesc.ByteWidth = sizeof(triangleVertices);
 
-	D3D11_SUBRESOURCE_DATA data;
-	data.pSysMem = triangleVertices;
+	//D3D11_SUBRESOURCE_DATA data;
+	//data.pSysMem = triangleVertices;
 
-	//Need fix
-	ID3D11Device* gDevice = windowInstance.getDevice();
-	gDevice->CreateBuffer(&bufferDesc, &data, &gVertexBuffer);
-	windowInstance.setDevice(gDevice);
+	////Need fix
+	//ID3D11Device* gDevice = windowInstance.getDevice();
+	////gDevice->CreateBuffer(&bufferDesc, &data, &gVertexBuffer);
+	//windowInstance.setDevice(gDevice);
 }
 
 
@@ -345,7 +344,7 @@ void Render()
 
 	//KeyboardInput();
 	windowInstance.KeyBoardInput();
-	windowInstance.UpdateCamera(camRotationMatrix, camTarget, cameraPos, camView, UP);
+	windowInstance.UpdateCamera(camRotationMatrix, camTarget, windowInstance.cameraPos, windowInstance.camView, windowInstance.UP);
 	//Få saken att rotera
 	//rot += .0001f;
 	//if (rot > 6.26f)
@@ -363,7 +362,7 @@ void Render()
 	
 	XMMATRIX WVP;
 
-	WVP = worldMatrix * camView * camProjection;
+	WVP = worldMatrix * windowInstance.camView * windowInstance.camProjection;
 
 	ID3D11ShaderResourceView* CubesTexture = windowInstance.getCubesTexture();
 	ID3D11SamplerState* CubesTexSamplerState = windowInstance.getCubesTexSamplerState();
@@ -380,7 +379,7 @@ void Render()
 	UINT32 vertexSize = sizeof(float) * 8; //The const (5) is the amount of vertexes
 	UINT32 offset = 0;
 
-	gDeviceContext->IASetVertexBuffers(0, 1, &gVertexBuffer, &vertexSize, &offset);
+	gDeviceContext->IASetVertexBuffers(0, 1, &windowInstance.gVertexBuffer, &vertexSize, &offset);
 	gDeviceContext->IASetInputLayout(windowInstance.getGVertexLayout());
 
 	holdBuffPerFrame.light = light;
@@ -432,6 +431,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 		//CreateShaders(); //4. Skapa vertex- och pixel-shaders
 		windowInstance.CreateShaders();
 
+		windowInstance.CreateTriangleData();
 		CreateTriangleData(); //5. Definiera triangelvertiser, 6. Skapa vertex buffer, 7. Skapa input layout
 
 		windowInstance.CreateConstantBuffer();
@@ -459,15 +459,15 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 			}
 		}
 
-		gVertexBuffer->Release();
+		//gVertexBuffer->Release();
 
 		//constPerFrameBuffer->Release();
 		//CubesTexture->Release();
 		//CubesTexSamplerState->Release();
 
-		DIKeyboard->Unacquire();
+		/*DIKeyboard->Unacquire();
 		DIMouse->Unacquire();
-		DirectInput->Release();
+		DirectInput->Release();*/
 		DestroyWindow(windowInstance.getWndHandler());
 	}
 

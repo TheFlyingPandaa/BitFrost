@@ -33,6 +33,17 @@ public:
 	void setActiveShaders();
 	void CreateDepthBuffer();
 
+	void CreateTriangleData();
+	ID3D11Buffer* gVertexBuffer = nullptr;
+
+	XMVECTOR cameraPos;
+	XMVECTOR lookAt;
+	XMVECTOR UP;
+
+	XMMATRIX camView;
+	XMMATRIX camProjection;
+	//void Render();
+
 	void CreateTexture();
 
 	void InitGameInput(HINSTANCE hInstance);
@@ -173,10 +184,6 @@ public:
 	{
 		gExampleBuffer = example_buffer;
 	}
-
-private:
-	// NEW
-	
 
 };
 

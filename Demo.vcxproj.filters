@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{89410f3e-9315-4b2c-a827-03f956b8293f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -23,18 +26,21 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Fragment.hlsl">
-      <Filter>Source Files</Filter>
-    </FxCompile>
     <FxCompile Include="Vertex.hlsl">
-      <Filter>Source Files</Filter>
+      <Filter>shaders</Filter>
     </FxCompile>
     <FxCompile Include="Geometry.hlsl">
-      <Filter>Source Files</Filter>
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Fragment.hlsl">
+      <Filter>shaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DXApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Structs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
