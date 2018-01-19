@@ -7,6 +7,7 @@
 #include "DirectX/include/dwrite.h"
 #include "DirectX/include/d3dx11tex.h"
 #include <DirectXMath.h>
+#include "Structs.h"
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
@@ -175,34 +176,7 @@ public:
 
 private:
 	// NEW
-	struct valuesFromCpu
-	{ // NEW
-		float value1; // NEW
-		float value2; // NEW
-		float value3; // NEW
-		float value4;
-
-		XMMATRIX WVP;
-		XMMATRIX worldSpace;// NEW
-	};
-
-	struct Light
-	{
-		Light()
-		{
-			ZeroMemory(this, sizeof(Light));
-		}
-
-		XMFLOAT3 dir;
-		float pad;
-		XMFLOAT4 ambientLight;
-		XMFLOAT4 diffues;
-	};
-
-	struct constBuffFrame
-	{
-		Light light;
-	};
+	
 
 };
 
