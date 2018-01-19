@@ -4,6 +4,7 @@
 
 DXApp::DXApp()
 {
+	//gameInput = KeyboardInput();
 }
 
 DXApp::~DXApp()
@@ -25,9 +26,7 @@ DXApp::~DXApp()
 	constPerFrameBuffer->Release();
 	gExampleBuffer->Release();
 	
-	DIKeyboard->Unacquire();
-	DIMouse->Unacquire();
-	DirectInput->Release();
+	
 
 	gVertexBuffer->Release();
 
@@ -45,7 +44,8 @@ void DXApp::DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 		
 		CreateDirect3DContext();	//2. Skapa och koppla SwapChain, Device och Device Context
 
-		InitGameInput(hInstance);	//2.5 kontroller
+		//InitGameInput(hInstance);	//2.5 kontroller
+		gameInput.InitKeyboardInput(hInstance, wndHandle);//, DirectInput); //, DIKeyboard, DIMouse);
 
 		SetViewport();				//3 viewPort
 
@@ -407,8 +407,9 @@ void DXApp::Render()
 {
 	float clearColor[] = { 0.1f, 0.1f, 0.1f, 1 };
 
-	//KeyboardInput();
-	KeyBoardInput();
+	//KeyBoardInput();
+	gameInput.GameInput(/*DIKeyboard, DIMouse, moveLeftRight, moveBackForward, camYaw, camPitch,*/ mouseLastState);//,DirectInput);
+
 	UpdateCamera(camRotationMatrix, camTarget, cameraPos, camView, UP);
 	//Få saken att rotera
 	float rot = 0;
@@ -506,95 +507,28 @@ void DXApp::CreateTexture()
 	gDevice->CreateSamplerState(&sampDesc, &CubesTexSamplerState);
 }
 
-void DXApp::InitGameInput(HINSTANCE hInstance)
-{
-	DirectInput8Create(hInstance,
-		DIRECTINPUT_VERSION,
-		IID_IDirectInput8,
-		(void**)&DirectInput,
-		NULL);
-
-	DirectInput->CreateDevice(GUID_SysKeyboard,
-		&DIKeyboard,
-		NULL);
-
-	DirectInput->CreateDevice(GUID_SysMouse,
-		&DIMouse,
-		NULL);
-
-	DIKeyboard->SetDataFormat(&c_dfDIKeyboard);
-	DIKeyboard->SetCooperativeLevel(this->wndHandle, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-
-	DIMouse->SetDataFormat(&c_dfDIMouse);
-	DIMouse->SetCooperativeLevel(this->wndHandle, DISCL_EXCLUSIVE | DISCL_NOWINKEY | DISCL_FOREGROUND);
-
-}
-
-void DXApp::KeyBoardInput()
-{
-	DIMOUSESTATE mouseCurrState;
-
-	BYTE keyboardState[256];
-
-	DIKeyboard->Acquire();
-	DIMouse->Acquire();
-
-	DIMouse->GetDeviceState(sizeof(DIMOUSESTATE), &mouseCurrState);
-
-	DIKeyboard->GetDeviceState(sizeof(keyboardState), (LPVOID)&keyboardState);
-
-	float speed = 0.0001f;
-
-
-	if (keyboardState[DIK_ESCAPE] & 0x80)
-	{
-		//superQuit = true;
-	}
-	if (keyboardState[DIK_A] & 0x80)
-	{
-		moveLeftRight -= speed;
-	}
-	if (keyboardState[DIK_D] & 0x80)
-	{
-		moveLeftRight += speed;
-	}
-	if (keyboardState[DIK_W] & 0x80)
-	{
-		moveBackForward += speed;
-	}
-	if (keyboardState[DIK_S] & 0x80)
-	{
-		moveBackForward -= speed;
-	}
-	if ((mouseCurrState.lX != mouseLastState.lX) || (mouseCurrState.lY != mouseLastState.lY))
-	{
-		camYaw += mouseLastState.lX * 0.001f;
-
-		camPitch += mouseCurrState.lY * 0.001f;
-
-		mouseLastState = mouseCurrState;
-	}
-}
-
 void DXApp::UpdateCamera(XMMATRIX & camRotationMatrix, XMVECTOR  &camTarget, XMVECTOR &cameraPos, XMMATRIX &camView, XMVECTOR &UP)
 {
-	camRotationMatrix = XMMatrixRotationRollPitchYaw(camPitch, camYaw, 0);
-	camTarget = XMVector3TransformCoord(DefaultForward, camRotationMatrix);
+
+	XMVECTOR camForward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	XMVECTOR camRight = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+
+	camRotationMatrix = XMMatrixRotationRollPitchYaw(gameInput.getCamPitch(), gameInput.getCamYaw(), 0);
+	camTarget = XMVector3TransformCoord(gameInput.DefaultForward, camRotationMatrix);
 	camTarget = XMVector3Normalize(camTarget);
 
 	XMMATRIX RotateYTempMatrix;
-	RotateYTempMatrix = XMMatrixRotationY(camYaw);
+	RotateYTempMatrix = XMMatrixRotationY(gameInput.getCamYaw());
 
-	camRight = XMVector3TransformCoord(DefaultRight, RotateYTempMatrix);
+	camRight = XMVector3TransformCoord(gameInput.DefaultRight, RotateYTempMatrix);
 	UP = XMVector3TransformCoord(UP, RotateYTempMatrix);
-	camForward = XMVector3TransformCoord(DefaultForward, RotateYTempMatrix);
+	camForward = XMVector3TransformCoord(gameInput.DefaultForward, RotateYTempMatrix);
 
-	cameraPos += moveLeftRight * camRight;
-	cameraPos += moveBackForward * camForward;
+	cameraPos += gameInput.getMoveLeftRight() * camRight;
+	cameraPos += gameInput.getMoveBackForward() * camForward;
 
-	moveLeftRight = 0.0f;
-	moveBackForward = 0.0f;
-
+	gameInput.setMoveLeftRight(0);
+	gameInput.setMoveBackForward(0);
 	camTarget = cameraPos + camTarget;
 
 	camView = XMMatrixLookAtLH(cameraPos, camTarget, UP);

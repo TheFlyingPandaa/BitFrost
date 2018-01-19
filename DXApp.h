@@ -8,6 +8,7 @@
 #include "DirectX/include/d3dx11tex.h"
 #include <DirectXMath.h>
 #include "Structs.h"
+#include "KeyboardInput.h"
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
@@ -41,8 +42,6 @@ public:
 	
 	void CreateTexture();
 
-	void InitGameInput(HINSTANCE hInstance);
-	void KeyBoardInput();
 	void UpdateCamera(XMMATRIX & camRotationMatrix, XMVECTOR & camTarget, XMVECTOR & cameraPos, XMMATRIX  &camView, XMVECTOR& UP);
 
 	void MovingBuffersToGPU();
@@ -55,6 +54,8 @@ private:
 
 	const int WINDOW_WIDTH = 640;
 	const int WINDOW_HEIGHT = 480;
+
+	KeyboardInput gameInput;
 
 	HWND wndHandle = NULL;
 
@@ -97,28 +98,7 @@ private:
 
 	XMMATRIX WVP;
 
-private:
-	IDirectInputDevice8* DIKeyboard;
-	IDirectInputDevice8* DIMouse;
-
 	DIMOUSESTATE mouseLastState;
-	LPDIRECTINPUT8 DirectInput;
-
-	float rotx = 0;
-	float rotz = 0;
-	float scaleX = 1.0f;
-	float scaleY = 1.0f;
-	DirectX::XMMATRIX Rotationx;
-	DirectX::XMMATRIX Rotationz;
-	float moveLeftRight = 0.0f;
-	float moveBackForward = 0.0f;
-	float camYaw = 0.0f;
-	float camPitch = 0.0f;
-
-	XMVECTOR DefaultForward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-	XMVECTOR DefaultRight = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
-	XMVECTOR camForward = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-	XMVECTOR camRight = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 
 public:
 	IDXGISwapChain* getGSwapChain() const

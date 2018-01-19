@@ -57,6 +57,7 @@ struct GS_IN
 void GS_main(triangle GS_IN input[3]  ,inout TriangleStream< GSOutput > output)
 {
 
+
 	GSOutput element = (GSOutput)0;
 	for (uint i = 0; i < 3; i++)
 	{
