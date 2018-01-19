@@ -48,10 +48,10 @@ ID3D11ShaderResourceView* gTextureView = NULL;
 ID3D11DepthStencilView* depthStencilView;
 ID3D11Texture2D* depthStencilBuffer;
 
-ID3D11Texture2D *pTexture = NULL;
+//ID3D11Texture2D *pTexture = NULL;
 
-ID3D11ShaderResourceView* CubesTexture;
-ID3D11SamplerState* CubesTexSamplerState;
+//ID3D11ShaderResourceView* CubesTexture;
+//ID3D11SamplerState* CubesTexSamplerState;
 bool textureFromFile = true;
 
 ID3D11Buffer* cbPerFrameBuffer; //Light buffern
@@ -149,7 +149,7 @@ constBuffFrame holdBuffPerFrame;
 void CreateConstantBufferExample() // NEW
 {
 
-	ID3D11Device* gDevice = windowInstance.getDevice();
+	//ID3D11Device* gDevice = windowInstance.getDevice();
 
 
 	// initializing the constBuffer for the geometry shader
@@ -220,7 +220,7 @@ void CreateConstantBufferExample() // NEW
 		pTexture->Release();*/
 	}
 	else {
-		D3D11_SAMPLER_DESC sampDesc;
+		/*D3D11_SAMPLER_DESC sampDesc;
 		ZeroMemory(&sampDesc, sizeof(sampDesc));
 		sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 		sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -232,10 +232,10 @@ void CreateConstantBufferExample() // NEW
 
 		D3DX11CreateShaderResourceViewFromFile(gDevice, L"grass.jpg", NULL, NULL, &CubesTexture, NULL);
 
-		hr = gDevice->CreateSamplerState(&sampDesc, &CubesTexSamplerState);
+		hr = gDevice->CreateSamplerState(&sampDesc, &CubesTexSamplerState);*/
 	}
 
-	windowInstance.setDevice(gDevice);
+	//windowInstance.setDevice(gDevice);
 }
 
 void CreateTriangleData()
@@ -357,7 +357,7 @@ void Render()
 	XMVECTOR rotaxis = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 	XMMATRIX Rotation = XMMatrixRotationAxis(rotaxis, rot);
  	XMMATRIX Translation = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
-	XMMATRIX Scale = XMMatrixScaling(1.0f, 1.0f, 1.0f);
+	XMMATRIX Scale = XMMatrixScaling(1.0f, 1.0f, 1.0f);-
 
 	worldMatrix = Scale * Rotation * Translation;
 	
@@ -365,6 +365,8 @@ void Render()
 
 	WVP = worldMatrix * camView * camProjection;
 
+	ID3D11ShaderResourceView* CubesTexture = windowInstance.getCubesTexture();
+	ID3D11SamplerState* CubesTexSamplerState = windowInstance.getCubesTexSamplerState();
 
 	if (textureFromFile == false)
 	{
@@ -433,7 +435,8 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 		CreateTriangleData(); //5. Definiera triangelvertiser, 6. Skapa vertex buffer, 7. Skapa input layout
 
 		windowInstance.CreateConstantBuffer();
-		CreateConstantBufferExample();
+		windowInstance.CreateTexture();
+		//CreateConstantBufferExample();
 
 		ShowWindow(windowInstance.getWndHandler(), nCmdShow);
 
@@ -459,8 +462,8 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 		gVertexBuffer->Release();
 
 		//constPerFrameBuffer->Release();
-		CubesTexture->Release();
-		CubesTexSamplerState->Release();
+		//CubesTexture->Release();
+		//CubesTexSamplerState->Release();
 
 		DIKeyboard->Unacquire();
 		DIMouse->Unacquire();

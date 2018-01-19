@@ -287,6 +287,23 @@ void DXApp::CreateDepthBuffer() {
 	gDeviceContext->OMSetRenderTargets(1, &gBackbufferRTV, depthStencilView);
 }
 
+void DXApp::CreateTexture()
+{
+	D3D11_SAMPLER_DESC sampDesc;
+	ZeroMemory(&sampDesc, sizeof(sampDesc));
+	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	sampDesc.MinLOD = 0;
+	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	D3DX11CreateShaderResourceViewFromFile(gDevice, L"grass.jpg", NULL, NULL, &CubesTexture, NULL);
+
+	gDevice->CreateSamplerState(&sampDesc, &CubesTexSamplerState);
+}
+
 void DXApp::InitGameInput(HINSTANCE hInstance)
 {
 	DirectInput8Create(hInstance,

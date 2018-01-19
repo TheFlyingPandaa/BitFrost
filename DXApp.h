@@ -5,6 +5,7 @@
 #include <d3dcompiler.h>
 #include "DirectX/include/dinput.h"
 #include "DirectX/include/dwrite.h"
+#include "DirectX/include/d3dx11tex.h"
 #include <DirectXMath.h>
 
 #pragma comment (lib, "d3d11.lib")
@@ -30,6 +31,8 @@ public:
 	void CreateConstantBuffer();
 	void setActiveShaders();
 	void CreateDepthBuffer();
+
+	void CreateTexture();
 
 	void InitGameInput(HINSTANCE hInstance);
 	void KeyBoardInput();
@@ -73,9 +76,32 @@ private:
 	ID3D11Buffer* gExampleBuffer = nullptr;
 	ID3D11Buffer* constPerFrameBuffer = nullptr;
 
+	ID3D11ShaderResourceView* CubesTexture;
+	ID3D11SamplerState* CubesTexSamplerState;
 
 
+public:
+	ID3D11ShaderResourceView* getCubesTexture() const
+	{
+		return CubesTexture;
+	}
 
+	void setCubesTexture(ID3D11ShaderResourceView* cubes_texture)
+	{
+		CubesTexture = cubes_texture;
+	}
+
+	ID3D11SamplerState* getCubesTexSamplerState() const
+	{
+		return CubesTexSamplerState;
+	}
+
+	void setCubesTexSamplerState(ID3D11SamplerState* cubes_tex_sampler_state)
+	{
+		CubesTexSamplerState = cubes_tex_sampler_state;
+	}
+
+private:
 	IDirectInputDevice8* DIKeyboard;
 	IDirectInputDevice8* DIMouse;
 
