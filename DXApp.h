@@ -24,6 +24,8 @@ public:
 	DXApp();
 	~DXApp();
 
+	void DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow);
+	void Update(float dt);
 
 	HWND InitWindow(HINSTANCE hInstance);
 	HRESULT CreateDirect3DContext();
@@ -45,24 +47,16 @@ public:
 
 	void MovingBuffersToGPU();
 
-	void setWndHandler(HWND wndHandle);
-	HWND getWndHandler();
+	HWND getWndHandler() const;
 
-	void setDepthStencilView(ID3D11DepthStencilView* depthStencilView);
-	ID3D11DepthStencilView * getDepthStencilView();
-
-	void setDeviceContext(ID3D11DeviceContext* getDeviceContext);
-	ID3D11DeviceContext* getDeviceContext();
 	
-	void setDevice(ID3D11Device* gDevice);
-	ID3D11Device* getDevice();
 
 private:
 
 	const int WINDOW_WIDTH = 640;
 	const int WINDOW_HEIGHT = 480;
 
-	HWND wndHandle;
+	HWND wndHandle = NULL;
 
 	IDXGISwapChain* gSwapChain = nullptr;
 	ID3D11Device* gDevice = nullptr;
@@ -127,15 +121,6 @@ private:
 	XMVECTOR camRight = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 
 public:
-	ID3D11RenderTargetView * getGBackbufferRtv() const
-	{
-		return gBackbufferRTV;
-	}
-
-	void setGBackbufferRtv(ID3D11RenderTargetView* backbuffer_rtv)
-	{
-		gBackbufferRTV = backbuffer_rtv;
-	}
 	IDXGISwapChain* getGSwapChain() const
 	{
 		return gSwapChain;
@@ -145,55 +130,7 @@ public:
 	{
 		gSwapChain = swap_chain;
 	}
-	ID3D11InputLayout * getGVertexLayout() const
-	{
-		return gVertexLayout;
-	}
-
-	void setGVertexLayout(ID3D11InputLayout* vertex_layout)
-	{
-		gVertexLayout = vertex_layout;
-	}
-
-	ID3D11Buffer* getConstPerFrameBuffer() const
-	{
-		return constPerFrameBuffer;
-	}
-
-	void setConstPerFrameBuffer(ID3D11Buffer* const_per_frame_buffer)
-	{
-		constPerFrameBuffer = const_per_frame_buffer;
-	}
-
-	ID3D11Buffer* getGExampleBuffer() const
-	{
-		return gExampleBuffer;
-	}
-
-	void setGExampleBuffer(ID3D11Buffer* example_buffer)
-	{
-		gExampleBuffer = example_buffer;
-	}
-
-	ID3D11ShaderResourceView* getCubesTexture() const
-	{
-		return CubesTexture;
-	}
-
-	void setCubesTexture(ID3D11ShaderResourceView* cubes_texture)
-	{
-		CubesTexture = cubes_texture;
-	}
-
-	ID3D11SamplerState* getCubesTexSamplerState() const
-	{
-		return CubesTexSamplerState;
-	}
-
-	void setCubesTexSamplerState(ID3D11SamplerState* cubes_tex_sampler_state)
-	{
-		CubesTexSamplerState = cubes_tex_sampler_state;
-	}
+	
 };
 
 

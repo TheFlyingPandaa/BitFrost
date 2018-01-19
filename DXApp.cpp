@@ -36,6 +36,46 @@ DXApp::~DXApp()
 	CubesTexSamplerState->Release();
 }
 
+void DXApp::DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
+{
+	wndHandle = InitWindow(hInstance); //Skapa fönster
+
+	if (wndHandle != NULL)
+	{
+		
+		CreateDirect3DContext();	//2. Skapa och koppla SwapChain, Device och Device Context
+
+		InitGameInput(hInstance);	//2.5 kontroller
+
+		SetViewport();				//3 viewPort
+
+		CreateShaders();			//4. Shaders vertex osv
+
+		CreateTriangleData();		//5. Triangeln. kommer bytas
+
+		CreateConstantBuffer();
+
+		CreateTexture();
+
+		setActiveShaders();
+		
+		ShowWindow(wndHandle, nCmdShow);
+
+	}
+
+
+
+}
+
+void DXApp::Update(float dt)
+{
+	
+	Render();
+
+	gSwapChain->Present(0, 0);
+
+}
+
 
 HWND DXApp::InitWindow(HINSTANCE hInstance)
 {
@@ -64,7 +104,7 @@ HWND DXApp::InitWindow(HINSTANCE hInstance)
 		hInstance,
 		nullptr);
 
-	InitGameInput(hInstance);
+	//InitGameInput(hInstance);
 
 	return handle;
 }
@@ -389,8 +429,8 @@ void DXApp::Render()
 
 	WVP = worldMatrix * camView * camProjection;
 
-	ID3D11ShaderResourceView* CubesTexture = getCubesTexture();
-	ID3D11SamplerState* CubesTexSamplerState = getCubesTexSamplerState();
+	//ID3D11ShaderResourceView* CubesTexture = getCubesTexture();
+	//ID3D11SamplerState* CubesTexSamplerState = getCubesTexSamplerState();
 
 	
 	
@@ -401,13 +441,11 @@ void DXApp::Render()
 	UINT32 offset = 0;
 
 	gDeviceContext->IASetVertexBuffers(0, 1, &gVertexBuffer, &vertexSize, &offset);
-	gDeviceContext->IASetInputLayout(getGVertexLayout());
+	gDeviceContext->IASetInputLayout(gVertexLayout);
 
 	holdBuffPerFrame.light = light;
 
-	depthStencilView = getDepthStencilView();
 	gDeviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	setDepthStencilView(depthStencilView);
 
 	// Map constant buffer so that we can write to it.
 
@@ -420,9 +458,8 @@ void DXApp::Render()
 
 	// clear screen
 
-	ID3D11RenderTargetView* gBackbufferRTV = getGBackbufferRtv();
 	gDeviceContext->ClearRenderTargetView(gBackbufferRTV, clearColor);
-	setGBackbufferRtv(gBackbufferRTV);
+
 	// draw geometry
 	gDeviceContext->Draw(6, 0);
 }
@@ -563,47 +600,7 @@ void DXApp::UpdateCamera(XMMATRIX & camRotationMatrix, XMVECTOR  &camTarget, XMV
 	camView = XMMatrixLookAtLH(cameraPos, camTarget, UP);
 }
 
-
-
-void DXApp::setWndHandler(HWND wndHandle)
-{
-
-	this->wndHandle = wndHandle;
-
-}
-
-HWND DXApp::getWndHandler()
+HWND DXApp::getWndHandler() const
 {
 	return this->wndHandle;
-}
-
-void DXApp::setDepthStencilView(ID3D11DepthStencilView * depthStencilView)
-{
-
-	this->depthStencilView = depthStencilView;
-}
-
-ID3D11DepthStencilView * DXApp::getDepthStencilView()
-{
-	return depthStencilView;
-}
-
-void DXApp::setDeviceContext(ID3D11DeviceContext * getDeviceContext)
-{
-	gDeviceContext = getDeviceContext;
-}
-
-ID3D11DeviceContext * DXApp::getDeviceContext()
-{
-	return gDeviceContext;
-}
-
-void DXApp::setDevice(ID3D11Device * gDevice)
-{
-	this->gDevice = gDevice;
-}
-
-ID3D11Device * DXApp::getDevice()
-{
-	return this->gDevice;
 }

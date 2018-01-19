@@ -1,23 +1,17 @@
 //--------------------------------------------------------------------------------------
-// BTH - Stefan Petersson 2014.
+// BTH - Joakim Trossvik 2018
 //--------------------------------------------------------------------------------------
 #include <windows.h>
 
 #include <d3d11.h>
-#include <d3dcompiler.h>
 #include <DirectXMath.h>
-#include <memory.h>
 #include "DirectX/include/D3DX11.h"
-//#include <C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include/D3DX11.h>
-//#include <dinput.h>
-#include "DirectX/include/dinput.h"
 #include "DirectX/include/dwrite.h"
 #include "DXApp.h"
+#include <ctime>
 
 #pragma comment (lib, "d3d11.lib")
-#pragma comment (lib, "d3dcompiler.lib")
 #pragma comment (lib, "DirectX/lib/d3dx11.lib")
-#pragma comment (lib, "DirectX/lib/dinput8.lib")
 #pragma comment (lib, "DirectX/lib/dwrite.lib")
 #pragma comment (lib, "DirectX/lib/dxguid.lib")
 
@@ -34,58 +28,27 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 {
 	
 	MSG msg = { 0 };
-	windowInstance.setWndHandler(windowInstance.InitWindow(hInstance));//1. Skapa fönster
-	
-	if (windowInstance.getWndHandler())
+
+	windowInstance.DxAppInit(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
+	float newTime = clock();
+	float oldTime = 0;
+	while (WM_QUIT != msg.message)
 	{
-		//2. Skapa och koppla SwapChain, Device och Device Context
-		windowInstance.CreateDirect3DContext();
-
-		//2.5 COOL AS 3D KAMERA WOSH WOSH 
-		//NEEDS FIXING GUD KOMMER MÖRDA OSS
-		//InitInput(hInstance, windowInstance.getWndHandler());
-
-		windowInstance.InitGameInput(hInstance);
-
-		//SetViewport(); //3. Sätt viewport
-		windowInstance.SetViewport();
-
-		//CreateShaders(); //4. Skapa vertex- och pixel-shaders
-		windowInstance.CreateShaders();
-
-		windowInstance.CreateTriangleData();
-		//CreateTriangleData(); //5. Definiera triangelvertiser, 6. Skapa vertex buffer, 7. Skapa input layout
-
-		windowInstance.CreateConstantBuffer();
-		windowInstance.CreateTexture();
-		//CreateConstantBufferExample();
-
-		ShowWindow(windowInstance.getWndHandler(), nCmdShow);
-
-		//setActiveShaders();
-		windowInstance.setActiveShaders();
-
-		while (WM_QUIT != msg.message)
+		if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 		{
-			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-			else
-			{
-				windowInstance.Render(); //8. Rendera
-				IDXGISwapChain* gSwapChain = windowInstance.getGSwapChain();
-				gSwapChain->Present(0, 0); //9. Växla front- och back-buffer
-				windowInstance.setGSwapChain(gSwapChain);
-			}
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
-
-		
-
-		
-		DestroyWindow(windowInstance.getWndHandler());
+		else
+		{
+			oldTime = newTime;
+			newTime = clock();
+			float dt = newTime - oldTime;
+			windowInstance.Update(dt);
+		}
 	}
+
+	DestroyWindow(windowInstance.getWndHandler());
 
 	return (int) msg.wParam;
 }
