@@ -84,7 +84,7 @@ HWND DXApp::InitWindow(HINSTANCE hInstance)
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
 	wcex.lpfnWndProc = WndProc;
 	wcex.hInstance = hInstance;
-	wcex.lpszClassName = L"BTH_D3D_DEMO";
+	wcex.lpszClassName = gameName;
 	if (!RegisterClassEx(&wcex))
 		return false;
 
@@ -92,8 +92,8 @@ HWND DXApp::InitWindow(HINSTANCE hInstance)
 	AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
 
 	HWND handle = CreateWindow(
-		L"BTH_D3D_DEMO",
-		L"BTH Direct3D Demo",
+		gameName,
+		gameNameP,
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
@@ -380,7 +380,7 @@ void DXApp::CreateTriangleData()
 
 	camView = XMMatrixLookAtLH(cameraPos, lookAt, UP);
 
-	camProjection = XMMatrixPerspectiveFovLH(XM_PI * 0.45f, 640.0f / 480.0f, 0.1f, 20.0f);
+	camProjection = XMMatrixPerspectiveFovLH(XM_PI * 0.45f, WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 20.0f);
 
 	light.dir = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	light.ambientLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
@@ -408,7 +408,7 @@ void DXApp::Render()
 	float clearColor[] = { 0.1f, 0.1f, 0.1f, 1 };
 
 	//KeyBoardInput();
-	gameInput.GameInput(/*DIKeyboard, DIMouse, moveLeftRight, moveBackForward, camYaw, camPitch,*/ mouseLastState);//,DirectInput);
+	gameInput.GameInput(mouseLastState);
 
 	UpdateCamera(camRotationMatrix, camTarget, cameraPos, camView, UP);
 	//Få saken att rotera
@@ -422,23 +422,16 @@ void DXApp::Render()
 	XMVECTOR rotaxis = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
 	XMMATRIX Rotation = XMMatrixRotationAxis(rotaxis, rot);
 	XMMATRIX Translation = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
-	XMMATRIX Scale = XMMatrixScaling(1.0f, 1.0f, 1.0f); -
+	XMMATRIX Scale = XMMatrixScaling(1.0f, 1.0f, 1.0f);
 
 	worldMatrix = Scale * Rotation * Translation;
-
-	
-
 	WVP = worldMatrix * camView * camProjection;
-
-	//ID3D11ShaderResourceView* CubesTexture = getCubesTexture();
-	//ID3D11SamplerState* CubesTexSamplerState = getCubesTexSamplerState();
-
 	
 	
 	gDeviceContext->PSSetShaderResources(0, 1, &CubesTexture);
 	gDeviceContext->PSSetSamplers(0, 1, &CubesTexSamplerState);
 
-	UINT32 vertexSize = sizeof(float) * 8; //The const (5) is the amount of vertexes
+	UINT32 vertexSize = sizeof(float) * amountOfValuesInVertex; //The const (5) is the amount of vertexes
 	UINT32 offset = 0;
 
 	gDeviceContext->IASetVertexBuffers(0, 1, &gVertexBuffer, &vertexSize, &offset);
@@ -451,14 +444,11 @@ void DXApp::Render()
 	// Map constant buffer so that we can write to it.
 
 	MovingBuffersToGPU();
-	
-
 	// ==============================================================
 
 	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// clear screen
-
 	gDeviceContext->ClearRenderTargetView(gBackbufferRTV, clearColor);
 
 	// draw geometry
@@ -479,11 +469,11 @@ void DXApp::MovingBuffersToGPU()
 	// set resource to Vertex Shader
 	gDeviceContext->GSSetConstantBuffers(0, 1, &gExampleBuffer);
 
-	D3D11_MAPPED_SUBRESOURCE dataPtr2;
-	gDeviceContext->Map(constPerFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr2);
+	//D3D11_MAPPED_SUBRESOURCE dataPtr;
+	gDeviceContext->Map(constPerFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
 	// copy memory from CPU to GPU the entire struct
 	//Kopierar in det i buffern "constant buffern"
-	memcpy(dataPtr2.pData, &holdBuffPerFrame, sizeof(constBuffFrame));
+	memcpy(dataPtr.pData, &holdBuffPerFrame, sizeof(constBuffFrame));
 	// UnMap constant buffer so that we can use it again in the GPU
 	gDeviceContext->Unmap(constPerFrameBuffer, 0);
 	// set resource to Vertex Shader
