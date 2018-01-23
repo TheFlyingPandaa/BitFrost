@@ -22,11 +22,17 @@ using namespace DirectX;
 
 DXApp windowInstance;
 
+//test
+#include "Mesh.h"
+//test end
+
 
 
 int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow )
 {
-	
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	//Mesh mesh("r8.obj");
+
 	MSG msg = { 0 };
 
 	windowInstance.DxAppInit(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
