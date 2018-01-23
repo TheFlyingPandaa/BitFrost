@@ -9,6 +9,7 @@
 #include <DirectXMath.h>
 #include "Structs.h"
 #include "KeyboardInput.h"
+#include <string>
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
@@ -52,8 +53,12 @@ public:
 
 private:
 
-	const int WINDOW_WIDTH = 640;
-	const int WINDOW_HEIGHT = 480;
+	LPCWSTR gameName = L"wop";
+	LPCWSTR gameNameP = L"bitFrost Cuz Names are stupid";
+	const float WINDOW_WIDTH = 640;
+	const float WINDOW_HEIGHT = 480;
+	int amountOfValuesInVertex = 8;
+
 
 	KeyboardInput gameInput;
 
