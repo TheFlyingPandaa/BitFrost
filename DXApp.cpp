@@ -60,6 +60,8 @@ void DXApp::DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
 		setActiveShaders();
 		
+		InitGBuffer();
+
 		ShowWindow(wndHandle, nCmdShow);
 
 	}
@@ -239,6 +241,43 @@ void DXApp::CreateShaders()
 
 	pGS->Release();
 
+	ID3DBlob* dVS = nullptr;
+	D3DCompileFromFile(
+		L"deferredVertex.hlsl", // filename
+		nullptr,		// optional macros
+		nullptr,		// optional include files
+		"main",		// entry point
+		"vs_5_0",		// shader model (target)
+		0,				// shader compile options			// here DEBUGGING OPTIONS
+		0,				// effect compile options
+		&dVS,			// double pointer to ID3DBlob		
+		nullptr			// pointer for Error Blob messages.
+						// how to use the Error blob, see here
+						// https://msdn.microsoft.com/en-us/library/windows/desktop/hh968107(v=vs.85).aspx
+	);
+
+	gDevice->CreateVertexShader(dVS->GetBufferPointer(), dVS->GetBufferSize(), nullptr, &deferredVertex);
+
+	dVS->Release();
+
+	ID3DBlob* dPS = nullptr;
+	D3DCompileFromFile(
+		L"deferredPixel.hlsl", // filename
+		nullptr,		// optional macros
+		nullptr,		// optional include files
+		"main",		// entry point
+		"ps_5_0",		// shader model (target)
+		0,				// shader compile options			// here DEBUGGING OPTIONS
+		0,				// effect compile options
+		&dPS,			// double pointer to ID3DBlob		
+		nullptr			// pointer for Error Blob messages.
+						// how to use the Error blob, see here
+						// https://msdn.microsoft.com/en-us/library/windows/desktop/hh968107(v=vs.85).aspx
+	);
+
+	gDevice->CreatePixelShader(dPS->GetBufferPointer(), dPS->GetBufferSize(), nullptr, &deferredPixel);
+
+	dPS->Release();
 }
 
 void DXApp::CreateConstantBuffer()
@@ -440,28 +479,29 @@ void DXApp::Render()
 	UINT32 offset = 0;
 
 	gDeviceContext->IASetVertexBuffers(0, 1, &gVertexBuffer, &vertexSize, &offset);
-	
 	gDeviceContext->IASetInputLayout(gVertexLayout);
 
 	holdBuffPerFrame.light = light;
 
-	gDeviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	//gDeviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Map constant buffer so that we can write to it.
 	
 
 	MovingBuffersToGPU();
 	// ==============================================================
-	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	
+	//gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	FirstDrawPass();
+
+	SecondDrawPass();
 
 	// clear screen
-	gDeviceContext->ClearRenderTargetView(gBackbufferRTV, clearColor);
+	//gDeviceContext->ClearRenderTargetView(gBackbufferRTV, clearColor);
 	
 	// draw geometry
-	gDeviceContext->Draw(6, 0);
+	//gDeviceContext->Draw(6, 0);
 
-	mesh.draw(gDeviceContext); 
+	//mesh.draw(gDeviceContext); 
 	
 }
 
@@ -537,4 +577,111 @@ void DXApp::UpdateCamera(XMMATRIX & camRotationMatrix, XMVECTOR  &camTarget, XMV
 HWND DXApp::getWndHandler() const
 {
 	return this->wndHandle;
+}
+
+void DXApp::DrawGeometry()
+{
+	gDeviceContext->Draw(6, 0);
+	mesh.draw(gDeviceContext);
+}
+
+
+void DXApp::FirstDrawPass()
+{
+	UINT32 vertexSize = sizeof(float) * amountOfValuesInVertex; //The const (5) is the amount of vertexes
+	UINT32 offset = 0;
+
+	gDeviceContext->IASetVertexBuffers(0, 1, &gVertexBuffer, &vertexSize, &offset);
+	gDeviceContext->IASetInputLayout(gVertexLayout);
+
+	gDeviceContext->VSSetShader(this->gVertexShader, nullptr, 0);
+	gDeviceContext->HSSetShader(nullptr, nullptr, 0);
+	gDeviceContext->DSSetShader(nullptr, nullptr, 0);
+	gDeviceContext->GSSetShader(this->gGeomertyShader, nullptr, 0);
+	gDeviceContext->PSSetShader(this->gPixelShader, nullptr, 0);
+
+	float Color1[] = { 0.0f,0.0f, 1.0f, 1 };
+	float Color2[] = { 0.0f, 0.0f, 0.0f, 1 };
+
+	ID3D11RenderTargetView* renderTargets[]{
+		graphicsBuffer[0].renderTargetView,
+		graphicsBuffer[1].renderTargetView,
+		graphicsBuffer[2].renderTargetView
+	};
+
+	gDeviceContext->OMSetRenderTargets(BUFFER_COUNT, renderTargets, depthStencilView);
+
+	gDeviceContext->ClearRenderTargetView(graphicsBuffer[0].renderTargetView, Color1);
+	gDeviceContext->ClearRenderTargetView(graphicsBuffer[1].renderTargetView, Color2);
+	gDeviceContext->ClearRenderTargetView(graphicsBuffer[2].renderTargetView, Color2);
+	gDeviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	DrawGeometry();
+	
+}
+
+void DXApp::SecondDrawPass()
+{
+	float Color1[] = { 1.0f, 0.1f, 0.1f, 1 };
+	gDeviceContext->VSSetShader(this->deferredVertex, nullptr, 0);
+	gDeviceContext->HSSetShader(nullptr, nullptr, 0);
+	gDeviceContext->DSSetShader(nullptr, nullptr, 0);
+	gDeviceContext->GSSetShader(nullptr, nullptr, 0);
+	gDeviceContext->PSSetShader(this->deferredPixel, nullptr, 0);
+
+	gDeviceContext->OMSetRenderTargets(1, &gBackbufferRTV, nullptr);
+	gDeviceContext->ClearRenderTargetView(gBackbufferRTV, Color1);
+	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	gDeviceContext->PSSetShaderResources(1, 1, &graphicsBuffer[0].shaderResourceView);
+	gDeviceContext->PSSetShaderResources(2, 1, &graphicsBuffer[1].shaderResourceView);
+	gDeviceContext->PSSetShaderResources(3, 1, &graphicsBuffer[2].shaderResourceView);
+
+	static const UINT stride = sizeof(Vertex);
+	static const UINT offset = 0;
+
+	//gDeviceContext->IASetVertexBuffers(0, 1, &screenQuad.vertexBuffer, &stride, &offset);
+	//gDeviceContext->IASetIndexBuffer(screenQuad.indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	gDeviceContext->Draw(4, 0);
+}
+
+void DXApp::InitGBuffer()
+{
+	D3D11_TEXTURE2D_DESC textureDesc{};
+	textureDesc.Width = WINDOW_WIDTH;
+	textureDesc.Height = WINDOW_HEIGHT;
+	textureDesc.MipLevels = 1;
+	textureDesc.ArraySize = 1;
+	textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+
+	for (size_t i = 0; i < BUFFER_COUNT; i++)
+	{
+		gDevice->CreateTexture2D(&textureDesc, NULL, &graphicsBuffer[i].texture);
+	}
+
+	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc{};
+	renderTargetViewDesc.Format = textureDesc.Format;
+	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+
+	for (size_t i = 0; i < BUFFER_COUNT; i++)
+	{
+		gDevice->CreateRenderTargetView(graphicsBuffer[i].texture, &renderTargetViewDesc, &graphicsBuffer[i].renderTargetView);
+	}
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc{};
+	shaderResourceViewDesc.Format = textureDesc.Format;
+	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderResourceViewDesc.Texture2D.MipLevels = 1;
+
+	for (size_t i = 0; i < BUFFER_COUNT; i++)
+	{
+		gDevice->CreateShaderResourceView(graphicsBuffer[i].texture, &shaderResourceViewDesc, &graphicsBuffer[i].shaderResourceView);
+	}
+
 }

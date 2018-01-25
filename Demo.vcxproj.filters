@@ -41,6 +41,12 @@
     <FxCompile Include="Fragment.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
+    <FxCompile Include="deferredPixel.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="deferredVertex.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DXApp.h">

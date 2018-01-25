@@ -40,5 +40,12 @@ struct TriangleVertex
 	//float nx, ny, nz;	//Normals
 };
 
+struct TextureRenderTarget
+{
+	ID3D11Texture2D*			texture = nullptr;
+	ID3D11RenderTargetView*		renderTargetView = nullptr;
+	ID3D11ShaderResourceView*	shaderResourceView = nullptr;
+};
+
 #endif
 

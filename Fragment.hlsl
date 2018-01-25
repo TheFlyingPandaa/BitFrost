@@ -19,17 +19,32 @@ cbuffer PER_FRAME_BUFF : register(b1)
     Light light;
 };
 
-float4 PS_main(GS_OUT input) : SV_Target
+struct PixelOutDeferred
 {
-    float3 normal = normalize(input.Normal);
+    float4 diffuse : SV_Target0;
+    float4 normal : SV_Target1;
+    float4 position : SV_Target2;
+};
 
-    float4 diffuse = txDiffuse.Sample(sampAni, input.Tex);
+PixelOutDeferred PS_main(GS_OUT input) : SV_Target
+{
+    //float3 normal = normalize(input.Normal);
+
+    //float4 diffuse = txDiffuse.Sample(sampAni, input.Tex);
 	
 
-    float3 finalColor;
+    //float3 finalColor;
 
-    finalColor = diffuse * light.ambient;
-    finalColor += saturate(dot(light.dir, input.Normal) * light.diffuse * diffuse);
+    //finalColor = diffuse * light.ambient;
+    //finalColor += saturate(dot(light.dir, input.Normal) * light.diffuse * diffuse);
     
-    return float4(finalColor, diffuse.a);
+    //return float4(finalColor, diffuse.a);
+
+    PixelOutDeferred pOut;
+
+    pOut.diffuse = txDiffuse.Sample(sampAni, input.Tex);
+    pOut.normal = (input.Normal, 1.0f);
+    pOut.position = input.Pos;
+    return pOut;
+
 };

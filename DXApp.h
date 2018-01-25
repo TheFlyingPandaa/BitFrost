@@ -21,6 +21,8 @@ using namespace DirectX;
 
 #include "Mesh.h"
 
+const UINT BUFFER_COUNT = 3;
+
 class DXApp
 {
 	
@@ -51,7 +53,11 @@ public:
 
 	HWND getWndHandler() const;
 
-	
+	void DrawGeometry();
+
+	void InitGBuffer();
+	void FirstDrawPass();
+	void SecondDrawPass();
 
 private:
 
@@ -61,6 +67,9 @@ private:
 	const float WINDOW_HEIGHT = 480;
 	int amountOfValuesInVertex = 5;
 
+	TextureRenderTarget graphicsBuffer[BUFFER_COUNT];
+	ID3D11VertexShader* deferredVertex = nullptr;
+	ID3D11PixelShader* deferredPixel = nullptr;
 
 	KeyboardInput gameInput;
 
