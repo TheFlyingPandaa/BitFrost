@@ -97,6 +97,7 @@
     <ClCompile Include="DXApp.cpp" />
     <ClCompile Include="KeyboardInput.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Fragment.hlsl">
@@ -161,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="DXApp.h" />
     <ClInclude Include="KeyboardInput.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Structs.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

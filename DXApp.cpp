@@ -5,6 +5,7 @@
 DXApp::DXApp()
 {
 	//gameInput = KeyboardInput();
+	mesh = Mesh("r8.obj");
 }
 
 DXApp::~DXApp()
@@ -345,27 +346,27 @@ void DXApp::CreateTriangleData()
 	{
 		-0.5f, 0.5f, 0.0f,	//v0 pos
 		0.0f, 0.0f,	//v0 color
-		1.0f, -1.0f, -1.0f,
+		//1.0f, -1.0f, -1.0f,
 
 		0.5f, -0.5f, 0.0f,	//v1
 		1.0f, 1.0f,	//v1 color
-		1.0f, 1.0f, 1.0f,
+		//1.0f, 1.0f, 1.0f,
 
 		-0.5f, -0.5f, 0.0f, //v2
 		0.0f, 1.0f, 	//v2 color
-		1.0f, 1.0f, 1.0f,
+		//1.0f, 1.0f, 1.0f,
 
 		-0.5f, 0.5f, 0.0f,	//v0 pos
 		0.0f, 0.0f, 	//v0 color
-		1.0f, -1.0f, -1.0f,
+		//1.0f, -1.0f, -1.0f,
 
 		0.5f, 0.5f, 0.0f,	//v1
 		1.0f, 0.0f, 	//v1 color
-		1.0f, 1.0f, 1.0f,
+		//1.0f, 1.0f, 1.0f,
 
 		0.5f, -0.5f, 0.0f, //v2
-		1.0f, 1.0f,	//v2 color
-		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f	//v2 color
+		//1.0f, 1.0f, 1.0f,
 	};
 
 
@@ -391,13 +392,19 @@ void DXApp::CreateTriangleData()
 	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	bufferDesc.ByteWidth = sizeof(triangleVertices);
+	//bufferDesc.ByteWidth = sizeof(mesh.floatArr());
 
 	D3D11_SUBRESOURCE_DATA data;
 	data.pSysMem = triangleVertices;
+	
+	//data.pSysMem = mesh.floatArr();
 
 	//Need fix
 	
 	gDevice->CreateBuffer(&bufferDesc, &data, &gVertexBuffer);
+
+	mesh.loadBuffer(gDevice);
+	
 
 }
 
@@ -413,10 +420,7 @@ void DXApp::Render()
 	UpdateCamera(camRotationMatrix, camTarget, cameraPos, camView, UP);
 	//Få saken att rotera
 	float rot = 0;
-	//if (rot > 6.26f)
-	//	rot = 0.0f;
-	//rot = 1.50f;
-	//Tom världsmatris
+
 	worldMatrix = XMMatrixIdentity();
 
 	XMVECTOR rotaxis = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
@@ -426,7 +430,8 @@ void DXApp::Render()
 
 	worldMatrix = Scale * Rotation * Translation;
 	WVP = worldMatrix * camView * camProjection;
-	
+
+	mesh.setMatrix(globalValues.worldSpace, globalValues.WVP, camView, camProjection);
 	
 	gDeviceContext->PSSetShaderResources(0, 1, &CubesTexture);
 	gDeviceContext->PSSetSamplers(0, 1, &CubesTexSamplerState);
@@ -435,6 +440,7 @@ void DXApp::Render()
 	UINT32 offset = 0;
 
 	gDeviceContext->IASetVertexBuffers(0, 1, &gVertexBuffer, &vertexSize, &offset);
+	
 	gDeviceContext->IASetInputLayout(gVertexLayout);
 
 	holdBuffPerFrame.light = light;
@@ -442,17 +448,21 @@ void DXApp::Render()
 	gDeviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Map constant buffer so that we can write to it.
+	
 
 	MovingBuffersToGPU();
 	// ==============================================================
-
 	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	
 
 	// clear screen
 	gDeviceContext->ClearRenderTargetView(gBackbufferRTV, clearColor);
-
+	
 	// draw geometry
 	gDeviceContext->Draw(6, 0);
+
+	mesh.draw(gDeviceContext); 
+	
 }
 
 void DXApp::MovingBuffersToGPU()

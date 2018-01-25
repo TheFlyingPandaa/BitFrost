@@ -50,7 +50,7 @@ struct GS_IN
 {
 	float4 Pos : SV_POSITION;
 	float2 Tex : TEXCOORD;
-    float3 Normal : NORMAL;
+    //float3 Normal : NORMAL;
 };
 
 [maxvertexcount(6)]
@@ -63,7 +63,7 @@ void GS_main(triangle GS_IN input[3]  ,inout TriangleStream< GSOutput > output)
 	{
 		
 		element.pos = input[i].Pos;
-        element.Normal = input[i].Normal;
+		element.Normal = normalize(cross(input[0].Pos - input[1].Pos, input[0].Pos - input[2].Pos));
 		element.Tex = input[i].Tex;
 
 		element.pos = mul(element.pos, WVP);

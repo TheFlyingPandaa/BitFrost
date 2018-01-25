@@ -33,16 +33,21 @@ void Mesh::loadMesh(const char * fileName)
 			sscanf(coord[i]->c_str(), "%*s %f %f", &tmpX, &tmpY);
 			texCoord.push_back(new TexCoord(tmpX, tmpY));
 		}
-		else if ((*coord[i])[0] == 'f' && false)
+		else if ((*coord[i])[0] == 'f')
 		{
 			int f[12];
-			if (std::count(coord[i]->begin(), coord[i]->end(), ' ') == 4) {
+			if (std::count(coord[i]->begin(), coord[i]->end(), ' ') == 4 && false) {
 				sscanf(coord[i]->c_str(), "f %d %d %d %d %d %d %d %d", &f[0], &f[1], &f[2], &f[3], &f[4], &f[5], &f[6], &f[7]);
 				faces.push_back(new Faces(f[1], f[0], f[2], f[3], f[4]));
 			}
-			else if (std::count(coord[i]->begin(), coord[i]->end(), ' ') == 4) {
+			else if (std::count(coord[i]->begin(), coord[i]->end(), ' ') == 4 || true) {
 				sscanf(coord[i]->c_str(), "%*s %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d", &f[0], &f[1], &f[2], &f[3], &f[4], &f[5], &f[6], &f[7], &f[8], &f[9], &f[10], &f[11]);
-				faces.push_back(new Faces(f[1], f[0], f[2], f[3], f[4]));
+				Faces * vf = new Faces(f[2], f[0], f[3], f[6], f[9]);
+				vf->texCord[0] = f[1];
+				vf->texCord[1] = f[4];
+				vf->texCord[2] = f[7];
+				vf->texCord[3] = f[10];
+				faces.push_back(vf);
 			}
 			else
 			{
@@ -54,15 +59,37 @@ void Mesh::loadMesh(const char * fileName)
 	for (int i = 0; i < coord.size(); i++)
 		delete coord[i];
 		
-	this->m_vertex = new Vertex[vertex.size()];
-	this->nrOfVertexes = vertex.size();
-	for (int i = 0; i < vertex.size(); i++)
+	this->m_vertex = new Vertex[faces.size() * 6];
+	this->nrOfVertexes = 0;
+	for (int i = 0; i < this->faces.size(); i++)
 	{
-		m_vertex[i] = Vertex(vertex[i]->x, vertex[i]->y, vertex[i]->z, texCoord[i]->x, texCoord[i]->y);
+		for (int j = 0; j < 3; j++) {
+			m_vertex[this->nrOfVertexes++] = Vertex(vertex[faces[i]->face[j] - 1]->x,
+													vertex[faces[i]->face[j] - 1]->y,
+													vertex[faces[i]->face[j] - 1]->z,
+													texCoord[faces[i]->texCord[j] - 1]->x,
+													texCoord[faces[i]->texCord[j] - 1]->y);
+		}
+		m_vertex[this->nrOfVertexes++] = Vertex(vertex[faces[i]->face[2] - 1]->x,
+												vertex[faces[i]->face[2] - 1]->y,
+												vertex[faces[i]->face[2] - 1]->z,
+												texCoord[faces[i]->texCord[2] - 1]->x,
+												texCoord[faces[i]->texCord[2] - 1]->y);
+		m_vertex[this->nrOfVertexes++] = Vertex(vertex[faces[i]->face[3] - 1]->x,
+												vertex[faces[i]->face[3] - 1]->y,
+												vertex[faces[i]->face[3] - 1]->z,
+												texCoord[faces[i]->texCord[3] - 1]->x,
+												texCoord[faces[i]->texCord[3] - 1]->y);
+		m_vertex[this->nrOfVertexes++] = Vertex(vertex[faces[i]->face[0] - 1]->x,
+												vertex[faces[i]->face[0] - 1]->y,
+												vertex[faces[i]->face[0] - 1]->z,
+												texCoord[faces[i]->texCord[0] - 1]->x,
+												texCoord[faces[i]->texCord[0] - 1]->y);
 	}
+	//231 123 321 132 312
 
 	std::ofstream out("Debug.txt");
-	out << "vertex " << this->nrOfVertexes << std::endl;
+	out << "vertex " << vertex.size() << std::endl;
 	for (int i = 0; i < vertex.size(); i++)
 	{
 		out << vertex[i]->x << " " << vertex[i]->y << " " << vertex[i]->z << std::endl;
@@ -80,11 +107,12 @@ void Mesh::loadMesh(const char * fileName)
 	out << "Face " << faces.size() << std::endl;
 	for (int i = 0; i < faces.size(); i++)
 	{
+		
 		if (faces[i]->quad)
 		{
 			for (int j = 0; j < 4; j++)
 			{
-				out << faces[i]->face[j] << " ";
+				out << faces[i]->face[j] << " " << faces[i]->texCord[j] << " " << faces[i]->facenum << "/";
 			}
 		}
 		else {
@@ -95,6 +123,7 @@ void Mesh::loadMesh(const char * fileName)
 		}			
 		out << std::endl;
 	}
+	out << this->nrOfVertexes;
 	out.close();
 }
 
@@ -165,7 +194,7 @@ void Mesh::setMatrix(DirectX::XMMATRIX worldSpace, DirectX::XMMATRIX wvp, XMMATR
 	XMMATRIX rotation = XMMatrixRotationRollPitchYawFromVector(quat);
 
 
-	XMMATRIX scale = XMMatrixScaling(1,1,1);
+	XMMATRIX scale = XMMatrixScaling(.5f, .5f, .5f);
 	XMMATRIX m_worldMatrix = rotation * scale * translate;
 
 	matrixBuffer.worldSpace = DirectX::XMMatrixTranspose(m_worldMatrix);

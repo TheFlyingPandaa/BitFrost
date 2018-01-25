@@ -8,14 +8,14 @@ struct VS_IN
 {
 	float3 Pos : POSITION;
 	float2 Tex : TEXCOORD;
-    float3 Normal : NORMAL;
+    //float3 Normal : NORMAL;
 };
 
 struct VS_OUT
 {
 	float4 Pos : SV_POSITION;
 	float2 Tex : TEXCOORD;
-    float3 Normal : NORMAL;
+    //float3 Normal : NORMAL;
 	//float4x4 mulMatrix;
 };
 //-----------------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ VS_OUT VS_main(VS_IN input)
 	//output.Pos = mul(output.Pos, tes);
 	output.Tex = input.Tex;
 
-    output.Normal = input.Normal;
+    //output.Normal = input.Normal;
 	//output.mulMatrix = tes;
 	return output;
 }

@@ -19,6 +19,8 @@
 
 using namespace DirectX;
 
+#include "Mesh.h"
+
 class DXApp
 {
 	
@@ -57,7 +59,7 @@ private:
 	LPCWSTR gameNameP = L"bitFrost Cuz Names are stupid";
 	const float WINDOW_WIDTH = 640;
 	const float WINDOW_HEIGHT = 480;
-	int amountOfValuesInVertex = 8;
+	int amountOfValuesInVertex = 5;
 
 
 	KeyboardInput gameInput;
@@ -104,6 +106,9 @@ private:
 	XMMATRIX WVP;
 
 	DIMOUSESTATE mouseLastState;
+
+
+	Mesh mesh;
 
 public:
 	IDXGISwapChain* getGSwapChain() const

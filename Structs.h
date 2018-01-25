@@ -37,7 +37,7 @@ struct TriangleVertex
 {
 	float x, y, z;		//Cordinates for triangle
 	float r, g;			//u,v cordinates
-	float nx, ny, nz;	//Normals
+	//float nx, ny, nz;	//Normals
 };
 
 #endif

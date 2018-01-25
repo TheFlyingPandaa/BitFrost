@@ -33,6 +33,7 @@ struct Faces
 	int facenum;
 	bool quad;
 	int face[4];
+	int texCord[4];
 	Faces(int face, int f1, int f2, int f3) : facenum(face) {
 		this->face[0] = f1;
 		this->face[1] = f2;
@@ -44,6 +45,11 @@ struct Faces
 		this->face[1] = f2;
 		this->face[2] = f3;
 		this->face[3] = f4;
+
+		this->texCord[0] = 0;
+		this->texCord[1] = 0;
+		this->texCord[2] = 0;
+		this->texCord[3] = 0;
 		quad = true;
 	};
 };
