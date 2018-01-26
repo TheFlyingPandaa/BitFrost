@@ -58,7 +58,7 @@ void DXApp::DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
 		CreateConstantBuffer();
 
-		CreateTexture();
+		CreateTexture(L"grass.jpg");
 
 		setActiveShaders();
 		
@@ -477,34 +477,16 @@ void DXApp::Render()
 	gDeviceContext->PSSetShaderResources(0, 1, &CubesTexture);
 	gDeviceContext->PSSetSamplers(0, 1, &CubesTexSamplerState);
 
-	UINT32 vertexSize = sizeof(float) * amountOfValuesInVertex; //The const (5) is the amount of vertexes
-	UINT32 offset = 0;
-
-	gDeviceContext->IASetVertexBuffers(0, 1, &gVertexBuffer, &vertexSize, &offset);
-	gDeviceContext->IASetInputLayout(gVertexLayout);
 
 	holdBuffPerFrame.light = light;
 
-	//gDeviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-	// Map constant buffer so that we can write to it.
-	
+	//=========DRAW TO SCREEN==========\\
 
 	MovingBuffersToGPU();
-	// ==============================================================
-	//gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 	FirstDrawPass();
 
 	SecondDrawPass();
-
-	// clear screen
-	//gDeviceContext->ClearRenderTargetView(gBackbufferRTV, clearColor);
-	
-	// draw geometry
-	//gDeviceContext->Draw(6, 0);
-
-	//mesh.draw(gDeviceContext); 
-	//renderObject->draw(gDeviceContext);
 	
 }
 
@@ -533,7 +515,7 @@ void DXApp::MovingBuffersToGPU()
 	gDeviceContext->PSSetConstantBuffers(1, 1, &constPerFrameBuffer);
 }
 
-void DXApp::CreateTexture()
+void DXApp::CreateTexture(LPCWSTR textureName)
 {
 	D3D11_SAMPLER_DESC sampDesc;
 	ZeroMemory(&sampDesc, sizeof(sampDesc));
@@ -545,7 +527,12 @@ void DXApp::CreateTexture()
 	sampDesc.MinLOD = 0;
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-	D3DX11CreateShaderResourceViewFromFile(gDevice, L"grass.jpg", NULL, NULL, &CubesTexture, NULL);
+	HRESULT hr;
+	hr = D3DX11CreateShaderResourceViewFromFile(gDevice, textureName, NULL, NULL, &CubesTexture, NULL);
+	if (hr != S_OK)
+	{
+		D3DX11CreateShaderResourceViewFromFile(gDevice, L"dick.jpg", NULL, NULL, &CubesTexture, NULL);
+	}
 
 	gDevice->CreateSamplerState(&sampDesc, &CubesTexSamplerState);
 }
@@ -621,6 +608,8 @@ void DXApp::FirstDrawPass()
 
 	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+	//=====THIS IS THE DRAW FUNCTION=====\\
+
 	DrawGeometry();
 	
 }
@@ -642,11 +631,7 @@ void DXApp::SecondDrawPass()
 	gDeviceContext->PSSetShaderResources(2, 1, &graphicsBuffer[1].shaderResourceView);
 	gDeviceContext->PSSetShaderResources(3, 1, &graphicsBuffer[2].shaderResourceView);
 
-	static const UINT stride = sizeof(Vertex);
-	static const UINT offset = 0;
-
-	//gDeviceContext->IASetVertexBuffers(0, 1, &screenQuad.vertexBuffer, &stride, &offset);
-	//gDeviceContext->IASetIndexBuffer(screenQuad.indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	
 	gDeviceContext->Draw(4, 0);
 }
 

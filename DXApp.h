@@ -46,7 +46,7 @@ public:
 	
 	void Render();
 	
-	void CreateTexture();
+	void CreateTexture(LPCWSTR textureName);
 
 	void UpdateCamera(XMMATRIX & camRotationMatrix, XMVECTOR & camTarget, XMVECTOR & cameraPos, XMMATRIX  &camView, XMVECTOR& UP);
 

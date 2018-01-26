@@ -34,7 +34,7 @@ float4 main(VS_OUT input) : SV_Target
 
     if (length(normal) > 0.0f)
     {
-        float3 lightDir = normalize(float3(1.0f, 1.0f, 1.0f));
+        float3 lightDir = normalize(light.dir);
         float3 position = gTexPosition.Sample(sampAni, input.Pos).rgb; //float3(1, 1, 1); //float3(view._41, view._42, view._43);
 
         float lambertian = max(dot(lightDir, normal), 0.0f);
@@ -46,7 +46,7 @@ float4 main(VS_OUT input) : SV_Target
             float3 viewDir = normalize(-position);
             float3 halfDir = normalize(lightDir + viewDir);
             float specAngle = max(dot(halfDir, normal), 0.0f);
-            specular = pow(specAngle, 100.0f);
+            specular = pow(specAngle, 30.0f);
         }
 
         float3 colorLinear = lambertian * diffuse + specular * float3(1.0f, 1.0f, 1.0f);
