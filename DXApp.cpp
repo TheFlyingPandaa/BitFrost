@@ -6,6 +6,7 @@ DXApp::DXApp()
 {
 	//gameInput = KeyboardInput();
 	renderObject = new RenderObject("r8.obj");
+
 }
 
 DXApp::~DXApp()
@@ -32,8 +33,6 @@ DXApp::~DXApp()
 	gVertexBuffer->Release();
 
 	constPerFrameBuffer->Release();
-	CubesTexture->Release();
-	CubesTexSamplerState->Release();
 
 	delete renderObject;
 }
@@ -58,13 +57,13 @@ void DXApp::DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
 		CreateConstantBuffer();
 
-		CreateTexture(L"grass.jpg");
-
 		setActiveShaders();
 		
 		InitGBuffer();
 
 		ShowWindow(wndHandle, nCmdShow);
+
+		cubeTexture.createTexture(gDevice, L"grass.jpg");
 
 	}
 
@@ -474,8 +473,8 @@ void DXApp::Render()
 
 	renderObject->setMatrix(camView, camProjection);
 	
-	gDeviceContext->PSSetShaderResources(0, 1, &CubesTexture);
-	gDeviceContext->PSSetSamplers(0, 1, &CubesTexSamplerState);
+	gDeviceContext->PSSetShaderResources(0, 1, &cubeTexture.getTexture());
+	gDeviceContext->PSSetSamplers(0, 1, &cubeTexture.getSampleState());
 
 
 	holdBuffPerFrame.light = light;
@@ -515,27 +514,6 @@ void DXApp::MovingBuffersToGPU()
 	gDeviceContext->PSSetConstantBuffers(1, 1, &constPerFrameBuffer);
 }
 
-void DXApp::CreateTexture(LPCWSTR textureName)
-{
-	D3D11_SAMPLER_DESC sampDesc;
-	ZeroMemory(&sampDesc, sizeof(sampDesc));
-	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-	sampDesc.MinLOD = 0;
-	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-	HRESULT hr;
-	hr = D3DX11CreateShaderResourceViewFromFile(gDevice, textureName, NULL, NULL, &CubesTexture, NULL);
-	if (hr != S_OK)
-	{
-		D3DX11CreateShaderResourceViewFromFile(gDevice, L"dick.jpg", NULL, NULL, &CubesTexture, NULL);
-	}
-
-	gDevice->CreateSamplerState(&sampDesc, &CubesTexSamplerState);
-}
 
 void DXApp::UpdateCamera(XMMATRIX & camRotationMatrix, XMVECTOR  &camTarget, XMVECTOR &cameraPos, XMMATRIX &camView, XMVECTOR &UP)
 {

@@ -99,6 +99,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="RenderObject.cpp" />
+    <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="deferredPixel.hlsl">
@@ -173,6 +174,7 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="RenderObject.h" />
     <ClInclude Include="Structs.h" />
+    <ClInclude Include="Texture.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

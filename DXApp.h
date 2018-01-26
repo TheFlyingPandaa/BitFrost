@@ -10,6 +10,7 @@
 #include "Structs.h"
 #include "KeyboardInput.h"
 #include <string>
+#include "Texture.h"
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
@@ -45,8 +46,6 @@ public:
 	void CreateTriangleData();
 	
 	void Render();
-	
-	void CreateTexture(LPCWSTR textureName);
 
 	void UpdateCamera(XMMATRIX & camRotationMatrix, XMVECTOR & camTarget, XMVECTOR & cameraPos, XMMATRIX  &camView, XMVECTOR& UP);
 
@@ -72,6 +71,8 @@ private:
 	ID3D11VertexShader* deferredVertex = nullptr;
 	ID3D11PixelShader* deferredPixel = nullptr;
 
+	Texture cubeTexture;
+
 	KeyboardInput gameInput;
 
 	HWND wndHandle = NULL;
@@ -92,9 +93,6 @@ private:
 
 	ID3D11Buffer* gExampleBuffer = nullptr;
 	ID3D11Buffer* constPerFrameBuffer = nullptr;
-
-	ID3D11ShaderResourceView* CubesTexture;
-	ID3D11SamplerState* CubesTexSamplerState;
 
 	XMMATRIX worldMatrix;
 	XMVECTOR camTarget;
