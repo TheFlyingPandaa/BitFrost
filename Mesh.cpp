@@ -4,6 +4,16 @@ using namespace DirectX;
 
 void Mesh::loadMesh(const char * fileName)
 {
+	std::vector<Coords*> vertex;
+	std::vector<Faces*> faces;
+	std::vector<Coords*> normals;
+	std::vector<TexCoord*> texCoord;
+
+	vertex = std::vector<Coords*>();
+	faces = std::vector<Faces*>();
+	normals = std::vector<Coords*>();
+	texCoord = std::vector<TexCoord*>();
+
 	std::vector<std::string*> coord;
 	std::ifstream in(fileName);
 
@@ -61,7 +71,7 @@ void Mesh::loadMesh(const char * fileName)
 		
 	this->m_vertex = new Vertex[faces.size() * 6];
 	this->nrOfVertexes = 0;
-	for (int i = 0; i < this->faces.size(); i++)
+	for (int i = 0; i < faces.size(); i++)
 	{
 		for (int j = 0; j < 3; j++) {
 			m_vertex[this->nrOfVertexes++] = Vertex(vertex[faces[i]->face[j] - 1]->x,
@@ -70,25 +80,17 @@ void Mesh::loadMesh(const char * fileName)
 													texCoord[faces[i]->texCord[j] - 1]->x,
 													texCoord[faces[i]->texCord[j] - 1]->y);
 		}
-		m_vertex[this->nrOfVertexes++] = Vertex(vertex[faces[i]->face[2] - 1]->x,
-												vertex[faces[i]->face[2] - 1]->y,
-												vertex[faces[i]->face[2] - 1]->z,
-												texCoord[faces[i]->texCord[2] - 1]->x,
-												texCoord[faces[i]->texCord[2] - 1]->y);
-		m_vertex[this->nrOfVertexes++] = Vertex(vertex[faces[i]->face[3] - 1]->x,
-												vertex[faces[i]->face[3] - 1]->y,
-												vertex[faces[i]->face[3] - 1]->z,
-												texCoord[faces[i]->texCord[3] - 1]->x,
-												texCoord[faces[i]->texCord[3] - 1]->y);
-		m_vertex[this->nrOfVertexes++] = Vertex(vertex[faces[i]->face[0] - 1]->x,
-												vertex[faces[i]->face[0] - 1]->y,
-												vertex[faces[i]->face[0] - 1]->z,
-												texCoord[faces[i]->texCord[0] - 1]->x,
-												texCoord[faces[i]->texCord[0] - 1]->y);
+		for (int j = 0; j < 3; j++)
+		{
+			m_vertex[this->nrOfVertexes++] = Vertex(vertex[faces[i]->face[(j + 2) % 4] - 1]->x,
+													vertex[faces[i]->face[(j + 2) % 4] - 1]->y,
+													vertex[faces[i]->face[(j + 2) % 4] - 1]->z,
+													texCoord[faces[i]->texCord[(j + 2) % 4] - 1]->x,
+													texCoord[faces[i]->texCord[(j + 2) % 4] - 1]->y);
+		}
 	}
-	//231 123 321 132 312
 
-	std::ofstream out("Debug.txt");
+	/*std::ofstream out("Debug.txt");
 	out << "vertex " << vertex.size() << std::endl;
 	for (int i = 0; i < vertex.size(); i++)
 	{
@@ -124,86 +126,27 @@ void Mesh::loadMesh(const char * fileName)
 		out << std::endl;
 	}
 	out << this->nrOfVertexes;
-	out.close();
+	out.close();*/
+
+	for (int i = 0; i < faces.size(); i++)
+		delete faces[i];
+	for (int i = 0; i < normals.size(); i++)
+		delete normals[i];
+	for (int i = 0; i < vertex.size(); i++)
+		delete vertex[i];
+	for (int i = 0; i < texCoord.size(); i++)
+		delete texCoord[i];
 }
 
-std::vector<Coords*> Mesh::getVertex() const
+int Mesh::getNrOfVertexes() const
 {
-	return this->vertex;
+	return this->nrOfVertexes;
 }
 
-std::vector<Faces*> Mesh::getFaces() const
+Vertex * Mesh::GetMesh()
 {
-	return this->faces;
+	return this->m_vertex;
 }
-
-std::vector<Coords*> Mesh::getNormals() const
-{
-	return this->normals;
-}
-
-void Mesh::loadBuffer(ID3D11Device *& device)
-{
-	D3D11_BUFFER_DESC bufferDesc;
-	memset(&bufferDesc, 0, sizeof(bufferDesc));
-	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.ByteWidth = sizeof(Vertex) * this->nrOfVertexes;
-
-	D3D11_SUBRESOURCE_DATA vertexData;
-	vertexData.pSysMem = m_vertex;
-	HRESULT hr = device->CreateBuffer(&bufferDesc, &vertexData, &vertexBuffer);
-
-	D3D11_BUFFER_DESC cBufferDesc;
-	cBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	cBufferDesc.ByteWidth = sizeof(MatrixBuffert);
-	cBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	cBufferDesc.MiscFlags = 0;
-	cBufferDesc.StructureByteStride = 0;
-
-	hr = device->CreateBuffer(&cBufferDesc, nullptr, &constantBuffer);
-}
-
-void Mesh::draw(ID3D11DeviceContext *& deviceContext) const
-{
-	UINT32 vertexSize = sizeof(float) * 5;
-	UINT offset = 0;
-	deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &vertexSize, &offset);
-	
-	D3D11_MAPPED_SUBRESOURCE dataPtr;
-	deviceContext->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
-
-	//	Copy memory from CPU to GPU
-	memcpy(dataPtr.pData, &matrixBuffer, sizeof(MatrixBuffert));
-
-	// Unmap constant buffer so that we can use it again in the GPU
-	deviceContext->Unmap(constantBuffer, 0);
-	// set resources to shaders
-	
-	deviceContext->GSSetConstantBuffers(0, 1, &constantBuffer);
-	
-	deviceContext->Draw(nrOfVertexes, 0);
-}
-
-void Mesh::setMatrix(DirectX::XMMATRIX worldSpace, DirectX::XMMATRIX wvp, XMMATRIX view, XMMATRIX proj)
-{
-	DirectX::XMMATRIX translate = DirectX::XMMatrixTranslation(1, 1, 1);
-	
-	XMVECTOR quat = XMVECTOR();
-	XMMATRIX rotation = XMMatrixRotationRollPitchYawFromVector(quat);
-
-
-	XMMATRIX scale = XMMatrixScaling(.5f, .5f, .5f);
-	XMMATRIX m_worldMatrix = rotation * scale * translate;
-
-	matrixBuffer.worldSpace = DirectX::XMMatrixTranspose(m_worldMatrix);
-	matrixBuffer.WVP = DirectX::XMMatrixTranspose(m_worldMatrix * view * proj);
-}
-
-
-
-
 
 Mesh::Mesh()
 {
@@ -212,23 +155,10 @@ Mesh::Mesh()
 Mesh::Mesh(const char * fileName)
 {
 	this->fileName = fileName;
-	vertex = std::vector<Coords*>();
-	faces = std::vector<Faces*>();
-	normals = std::vector<Coords*>();
-
-	texCoord = std::vector<TexCoord*>();
-	loadMesh(fileName);
-
-	matrixBuffer = { 0.0f,0.0f,0.0f,0.0f };
+	loadMesh(fileName);	
 }
-
 
 Mesh::~Mesh()
 {	
-	for (int i = 0; i < faces.size(); i++)
-		delete faces[i];
-	for (int i = 0; i < normals.size(); i++)
-		delete normals[i];
-	for (int i = 0; i < vertex.size(); i++)
-		delete vertex[i];
+	delete[] this->m_vertex;
 }

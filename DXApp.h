@@ -19,7 +19,8 @@
 
 using namespace DirectX;
 
-#include "Mesh.h"
+
+#include "RenderObject.h"
 
 const UINT BUFFER_COUNT = 3;
 
@@ -98,7 +99,7 @@ private:
 	XMMATRIX worldMatrix;
 	XMVECTOR camTarget;
 	XMMATRIX camRotationMatrix;
-	valuesFromCpu globalValues{ 0.0,0.0,0.0,0.0 };
+	valuesFromCpu globalValues{ };
 	Light light;
 
 	constBuffFrame holdBuffPerFrame;
@@ -117,7 +118,8 @@ private:
 	DIMOUSESTATE mouseLastState;
 
 
-	Mesh mesh;
+	//Mesh mesh;
+	RenderObject * renderObject;
 
 public:
 	IDXGISwapChain* getGSwapChain() const

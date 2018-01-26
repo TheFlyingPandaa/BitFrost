@@ -5,7 +5,7 @@
 DXApp::DXApp()
 {
 	//gameInput = KeyboardInput();
-	mesh = Mesh("r8.obj");
+	renderObject = new RenderObject("r8.obj");
 }
 
 DXApp::~DXApp()
@@ -34,6 +34,8 @@ DXApp::~DXApp()
 	constPerFrameBuffer->Release();
 	CubesTexture->Release();
 	CubesTexSamplerState->Release();
+
+	delete renderObject;
 }
 
 void DXApp::DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
@@ -442,7 +444,7 @@ void DXApp::CreateTriangleData()
 	
 	gDevice->CreateBuffer(&bufferDesc, &data, &gVertexBuffer);
 
-	mesh.loadBuffer(gDevice);
+	renderObject->loadBuffer(gDevice);
 	
 
 }
@@ -470,7 +472,7 @@ void DXApp::Render()
 	worldMatrix = Scale * Rotation * Translation;
 	WVP = worldMatrix * camView * camProjection;
 
-	mesh.setMatrix(globalValues.worldSpace, globalValues.WVP, camView, camProjection);
+	renderObject->setMatrix(camView, camProjection);
 	
 	gDeviceContext->PSSetShaderResources(0, 1, &CubesTexture);
 	gDeviceContext->PSSetSamplers(0, 1, &CubesTexSamplerState);
@@ -502,6 +504,7 @@ void DXApp::Render()
 	//gDeviceContext->Draw(6, 0);
 
 	//mesh.draw(gDeviceContext); 
+	//renderObject->draw(gDeviceContext);
 	
 }
 
@@ -582,7 +585,7 @@ HWND DXApp::getWndHandler() const
 void DXApp::DrawGeometry()
 {
 	gDeviceContext->Draw(6, 0);
-	mesh.draw(gDeviceContext);
+	renderObject->draw(gDeviceContext);
 }
 
 

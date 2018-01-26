@@ -5,14 +5,9 @@
 #include <winnt.h>
 
 struct valuesFromCpu
-{ // NEW
-	float value1; // NEW
-	float value2; // NEW
-	float value3; // NEW
-	float value4;
-
+{ 
 	DirectX::XMMATRIX WVP;
-	DirectX::XMMATRIX worldSpace;// NEW
+	DirectX::XMMATRIX worldSpace;
 };
 
 struct Light

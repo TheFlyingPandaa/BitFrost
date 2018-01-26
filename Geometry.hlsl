@@ -1,40 +1,5 @@
-/*struct GS_OUT
-{
-	float4 Pos : SV_POSITION;
-	float3 Color : COLOR;
-};
-
-struct VS_OUT
-{
-	float4 Pos : SV_POSITION;
-	float3 Color : COLOR;
-};
-
-[maxvertexcount(3)]
-GS_OUT GS_main(triangle float4 input[3] : SV_POSITION, float3 color[3] : COLOR ,inout TriangleStream< GS_OUT > output)
-{
-	//GS_OUT output = (GS_OUT)0;
-
-	//output.Pos = input.Pos;
-	//output.Color = input.Color;
-
-	for (uint i = 0; i < 3; i++)
-	{
-		GS_OUT element;
-		element.Pos = input[i];
-		output.Append(element);
-	}
-
-	return output;
-}*/
-
 cbuffer EXAMPLE_BUFFER : register(b0)
 {
-	float value1;
-	float value2;
-	float value3;
-	float value4;
-
 	float4x4 WVP;
     float4x4 worldSpace;
 };
