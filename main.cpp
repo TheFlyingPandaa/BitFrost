@@ -3,6 +3,7 @@
 //--------------------------------------------------------------------------------------
 #include <windows.h>
 
+#include <iostream>
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include "DirectX/include/D3DX11.h"
@@ -32,6 +33,11 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	//Mesh mesh("r8.obj");
+	AllocConsole();
+	freopen("conin$", "r", stdin);
+	freopen("conout$", "w", stdout);
+	
+	std::cout << "What can I say except you're welcome" << std::endl;
 
 	MSG msg = { 0 };
 
@@ -55,6 +61,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 	}
 
 	DestroyWindow(windowInstance.getWndHandler());
+	FreeConsole();
 
 	return (int) msg.wParam;
 }
