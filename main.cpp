@@ -33,6 +33,8 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	//Mesh mesh("r8.obj");
+
+	//IF YOU EXIT BY EXITING THE CONSOLE IT WILL CAUSE MEMORY LEAKS
 	AllocConsole();
 	freopen("conin$", "r", stdin);
 	freopen("conout$", "w", stdout);

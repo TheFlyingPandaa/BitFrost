@@ -169,6 +169,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CreateShader.h" />
     <ClInclude Include="DXApp.h" />
     <ClInclude Include="KeyboardInput.h" />
     <ClInclude Include="Mesh.h" />

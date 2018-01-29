@@ -52,7 +52,7 @@ void KeyboardInput::GameInput( DIMOUSESTATE & mouseLastState)
 
 	if (keyboardState[DIK_ESCAPE] & 0x80)
 	{
-		//superQuit = true;
+		//exit(-1); //För insta exit vid alt+shift eller esc key
 	}
 	if (keyboardState[DIK_A] & 0x80)
 	{

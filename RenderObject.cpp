@@ -74,4 +74,7 @@ RenderObject::RenderObject(const char * meshDirr)
 RenderObject::~RenderObject()
 {
 	delete mesh;
+
+	this->vertexBuffer->Release();
+	this->constantBuffer->Release();
 }

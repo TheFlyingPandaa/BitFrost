@@ -11,6 +11,8 @@
 #include "KeyboardInput.h"
 #include <string>
 #include "Texture.h"
+#include "CreateShader.h"
+
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
@@ -38,7 +40,6 @@ public:
 	HWND InitWindow(HINSTANCE hInstance);
 	HRESULT CreateDirect3DContext();
 	void SetViewport();
-	void CreateShaders();
 	void CreateConstantBuffer();
 	void setActiveShaders();
 	void CreateDepthBuffer();
