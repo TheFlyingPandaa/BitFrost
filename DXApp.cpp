@@ -6,7 +6,7 @@ DXApp::DXApp()
 {
 	//gameInput = KeyboardInput();
 	renderObject = new RenderObject("r8.obj");
-
+	heightMap = HeightMap();
 }
 
 DXApp::~DXApp()

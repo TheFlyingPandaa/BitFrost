@@ -12,6 +12,7 @@
 #include <string>
 #include "Texture.h"
 #include "CreateShader.h"
+#include "HeightMap.h"
 //#include "HeightMap.h"
 
 #pragma comment (lib, "d3d11.lib")
@@ -63,7 +64,11 @@ public:
 	void HeghtMaping(); //Will be moved to a heightMap class
 
 private:
+	HeightMapInfo hmInfo;
+	int NumVertices = 0;
+	int NumFaces = 0;
 
+	HeightMap heightMap;
 	LPCWSTR gameName = L"wop";
 	LPCWSTR gameNameP = L"bitFrost Cuz Names are stupid";
 	const float WINDOW_WIDTH = 640;

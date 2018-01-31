@@ -4,11 +4,7 @@
 #include <minwinbase.h>
 #include <winnt.h>
 
-struct HeightMapInfo {
-	int terrainWidth;
-	int terrainHeight;
-	DirectX::XMFLOAT3 *heightMap;
-};
+
 
 struct valuesFromCpu
 { 

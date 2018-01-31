@@ -95,6 +95,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DXApp.cpp" />
+    <ClCompile Include="HeightMap.cpp" />
     <ClCompile Include="KeyboardInput.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -171,6 +172,7 @@
   <ItemGroup>
     <ClInclude Include="CreateShader.h" />
     <ClInclude Include="DXApp.h" />
+    <ClInclude Include="HeightMap.h" />
     <ClInclude Include="KeyboardInput.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="RenderObject.h" />
