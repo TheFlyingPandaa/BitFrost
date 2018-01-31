@@ -12,7 +12,7 @@
 #include <string>
 #include "Texture.h"
 #include "CreateShader.h"
-
+#include "HeightMap.h"
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
@@ -60,7 +60,12 @@ public:
 	void FirstDrawPass();
 	void SecondDrawPass();
 
+	void HeghtMaping(); //Will be moved to the heightMap class
+
 private:
+	HeightMapInfo hmInfo;
+	int NumVertices = 0;
+	int NumFaces = 0;
 
 	LPCWSTR gameName = L"wop";
 	LPCWSTR gameNameP = L"bitFrost Cuz Names are stupid";
@@ -115,7 +120,7 @@ private:
 	XMMATRIX WVP;
 
 	DIMOUSESTATE mouseLastState;
-
+	HeightMap heightMap;
 
 	//Mesh mesh;
 	RenderObject * renderObject;

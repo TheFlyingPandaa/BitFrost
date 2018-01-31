@@ -497,6 +497,63 @@ void DXApp::SecondDrawPass()
 	gDeviceContext->Draw(4, 0);
 }
 
+void DXApp::HeghtMaping()
+{
+	int cols = hmInfo.terrainWidth;
+	int rows = hmInfo.terrainHeight;
+
+	//Create the grid
+	NumVertices = rows * cols;
+	NumFaces = (rows - 1)*(cols - 1) * 2;
+
+	std::vector<Vertex> v(NumVertices);
+
+	for (DWORD i = 0; i < rows; ++i)
+	{
+		for (DWORD j = 0; j < cols; ++j)
+		{
+			v[i*cols + j].pos = hmInfo.heightMap[i*cols + j];
+			v[i*cols + j].normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		}
+	}
+
+	std::vector<DWORD> indices(NumFaces * 3);
+
+	int k = 0;
+	int texUIndex = 0;
+	int texVIndex = 0;
+	for (DWORD i = 0; i < rows - 1; i++)
+	{
+		for (DWORD j = 0; j < cols - 1; j++)
+		{
+			indices[k] = i * cols + j;        // Bottom left of quad
+			v[i*cols + j].texCoord = XMFLOAT2(texUIndex + 0.0f, texVIndex + 1.0f);
+
+			indices[k + 1] = i * cols + j + 1;        // Bottom right of quad
+			v[i*cols + j + 1].texCoord = XMFLOAT2(texUIndex + 1.0f, texVIndex + 1.0f);
+
+			indices[k + 2] = (i + 1)*cols + j;    // Top left of quad
+			v[(i + 1)*cols + j].texCoord = XMFLOAT2(texUIndex + 0.0f, texVIndex + 0.0f);
+
+
+			indices[k + 3] = (i + 1)*cols + j;    // Top left of quad
+			v[(i + 1)*cols + j].texCoord = XMFLOAT2(texUIndex + 0.0f, texVIndex + 0.0f);
+
+			indices[k + 4] = i * cols + j + 1;        // Bottom right of quad
+			v[i*cols + j + 1].texCoord = XMFLOAT2(texUIndex + 1.0f, texVIndex + 1.0f);
+
+			indices[k + 5] = (i + 1)*cols + j + 1;    // Top right of quad
+			v[(i + 1)*cols + j + 1].texCoord = XMFLOAT2(texUIndex + 1.0f, texVIndex + 0.0f);
+
+			k += 6; // next quad
+
+			texUIndex++;
+		}
+		texUIndex = 0;
+		texVIndex++;
+	}
+}
+
 void DXApp::InitGBuffer()
 {
 	D3D11_TEXTURE2D_DESC textureDesc{};
