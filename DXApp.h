@@ -98,6 +98,8 @@ private:
 	ID3D11VertexShader* gVertexShader = nullptr;
 	ID3D11PixelShader* gPixelShader = nullptr;
 	ID3D11GeometryShader* gGeomertyShader = nullptr;
+	ID3D11HullShader* gHullShader = nullptr;
+	ID3D11DomainShader* gDomainShader = nullptr;
 
 	ID3D11Buffer* gExampleBuffer = nullptr;
 	ID3D11Buffer* constPerFrameBuffer = nullptr;

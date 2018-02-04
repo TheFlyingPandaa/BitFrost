@@ -59,6 +59,12 @@
     <FxCompile Include="deferredVertex.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
+    <FxCompile Include="DomainS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="HullS.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DXApp.h">

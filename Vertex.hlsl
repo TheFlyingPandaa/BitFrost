@@ -8,7 +8,7 @@ struct VS_IN
 
 struct VS_OUT
 {
-	float4 Pos : SV_POSITION;
+	float4 Pos : POSITION;
 	float2 Tex : TEXCOORD;
     //float3 Normal : NORMAL;
 	//float4x4 mulMatrix;

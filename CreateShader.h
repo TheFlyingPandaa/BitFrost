@@ -11,14 +11,14 @@ class CreateShader
 public:
 	
 
-	static void CreateShaders(ID3D11Device* gDevice, ID3D11VertexShader*& gVertexShader, ID3D11PixelShader*& gPixelShader, ID3D11GeometryShader*& gGeomertyShader, ID3D11InputLayout*& gVertexLayout, ID3D11VertexShader*& deferredVertex, ID3D11PixelShader*& deferredPixel);
+	static void CreateShaders(ID3D11Device* gDevice, ID3D11VertexShader*& gVertexShader, ID3D11PixelShader*& gPixelShader, ID3D11GeometryShader*& gGeomertyShader, ID3D11InputLayout*& gVertexLayout, ID3D11VertexShader*& deferredVertex, ID3D11PixelShader*& deferredPixel, ID3D11HullShader*& gHullShader ,ID3D11DomainShader*& gDomainShader );
 private:
 
 };
 
 
 
-inline void CreateShader::CreateShaders(ID3D11Device* gDevice, ID3D11VertexShader*& gVertexShader, ID3D11PixelShader*& gPixelShader, ID3D11GeometryShader*& gGeomertyShader, ID3D11InputLayout*& gVertexLayout, ID3D11VertexShader*& deferredVertex, ID3D11PixelShader*& deferredPixel)
+inline void CreateShader::CreateShaders(ID3D11Device* gDevice, ID3D11VertexShader*& gVertexShader, ID3D11PixelShader*& gPixelShader, ID3D11GeometryShader*& gGeomertyShader, ID3D11InputLayout*& gVertexLayout, ID3D11VertexShader*& deferredVertex, ID3D11PixelShader*& deferredPixel, ID3D11HullShader*& gHullShader, ID3D11DomainShader*& gDomainShader)
 {
 	//create vertex shader
 	ID3DBlob* pVS = nullptr;
@@ -125,6 +125,44 @@ inline void CreateShader::CreateShaders(ID3D11Device* gDevice, ID3D11VertexShade
 	gDevice->CreatePixelShader(dPS->GetBufferPointer(), dPS->GetBufferSize(), nullptr, &deferredPixel);
 
 	dPS->Release();
+
+	ID3DBlob* pHS = nullptr;
+	D3DCompileFromFile(
+		L"HullS.hlsl", // filename
+		nullptr,		// optional macros
+		nullptr,		// optional include files
+		"main",		// entry point
+		"hs_5_0",		// shader model (target)
+		0,				// shader compile options			// here DEBUGGING OPTIONS
+		0,				// effect compile options
+		&pHS,			// double pointer to ID3DBlob		
+		nullptr			// pointer for Error Blob messages.
+						// how to use the Error blob, see here
+						// https://msdn.microsoft.com/en-us/library/windows/desktop/hh968107(v=vs.85).aspx
+	);
+
+	gDevice->CreateHullShader(pHS->GetBufferPointer(), pHS->GetBufferSize(), nullptr, &gHullShader);
+
+	pHS->Release();
+
+	ID3DBlob* pDS = nullptr;
+	D3DCompileFromFile(
+		L"DomainS.hlsl", // filename
+		nullptr,		// optional macros
+		nullptr,		// optional include files
+		"main",		// entry point
+		"ds_5_0",		// shader model (target)
+		0,				// shader compile options			// here DEBUGGING OPTIONS
+		0,				// effect compile options
+		&pDS,			// double pointer to ID3DBlob		
+		nullptr			// pointer for Error Blob messages.
+						// how to use the Error blob, see here
+						// https://msdn.microsoft.com/en-us/library/windows/desktop/hh968107(v=vs.85).aspx
+	);
+
+	gDevice->CreateDomainShader(pDS->GetBufferPointer(), pDS->GetBufferSize(), nullptr, &gDomainShader);
+
+	pDS->Release();
 }
 
 #endif

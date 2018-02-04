@@ -53,7 +53,7 @@ void DXApp::DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
 		SetViewport();	
 		//3 viewPort
-		CreateShader::CreateShaders(gDevice, gVertexShader, gPixelShader, gGeomertyShader, gVertexLayout, deferredVertex, deferredPixel);
+		CreateShader::CreateShaders(gDevice, gVertexShader, gPixelShader, gGeomertyShader, gVertexLayout, deferredVertex, deferredPixel, gHullShader, gDomainShader);
 		//4. Shaders vertex osv
 
 		CreateTriangleData();		//5. Triangeln. kommer bytas
@@ -447,8 +447,8 @@ void DXApp::FirstDrawPass()
 	gDeviceContext->IASetInputLayout(gVertexLayout);
 
 	gDeviceContext->VSSetShader(this->gVertexShader, nullptr, 0);
-	gDeviceContext->HSSetShader(nullptr, nullptr, 0);
-	gDeviceContext->DSSetShader(nullptr, nullptr, 0);
+	gDeviceContext->HSSetShader(this->gHullShader, nullptr, 0);
+	gDeviceContext->DSSetShader(this->gDomainShader, nullptr, 0);
 	gDeviceContext->GSSetShader(this->gGeomertyShader, nullptr, 0);
 	gDeviceContext->PSSetShader(this->gPixelShader, nullptr, 0);
 
@@ -468,7 +468,7 @@ void DXApp::FirstDrawPass()
 	gDeviceContext->ClearRenderTargetView(graphicsBuffer[2].renderTargetView, Color2);
 	gDeviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 
 	//=====THIS IS THE DRAW FUNCTION=====\\
 

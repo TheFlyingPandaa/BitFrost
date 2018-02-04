@@ -13,7 +13,7 @@ struct GSOutput
 
 struct GS_IN
 {
-	float4 Pos : SV_POSITION;
+	float4 Pos : POSITION;
 	float2 Tex : TEXCOORD;
     //float3 Normal : NORMAL;
 };
