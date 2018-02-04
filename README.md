@@ -1,12 +1,12 @@
 # BitFrost
 The Big TODO: List
 
-**Core techniques :**
+**Core techniques : 1**
 ```diff
 + Deferred Rendering 
 - Skeletal Animation
 ```
-**Geometry :**
+**Geometry : 2**
 ```diff
 + Parsing and rendering an existing model format(OBJ, MD5, etc). //MTL not implemented
 - Displacement mapping using Tessellation hardware.
@@ -14,19 +14,19 @@ The Big TODO: List
 + Level of Detail using Tessellation Hardware.
 - Morph-based vertex animation.
 ```
-**Texturing and Lighting :**
+**Texturing and Lighting : 1**
 ```diff
 - Normal mapping 
 - Screen Space Ambient Occlusion
 - Blend mapping (multi-texturing)
 ```
-**Projection Techniques :**
+**Projection Techniques : 1**
 ```diff
 - Shadow mapping 
 - Dynamic cubic environment mapping (SkyMap)
 - Dynamic paraboloid mapping
 ```
-**Acceleration Techniques :**
+**Acceleration Techniques : 2**
 ```diff
 - View frustum culling against a quadtree 
 - Front to Back rendering 
