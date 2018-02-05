@@ -11,6 +11,8 @@ DXApp::DXApp()
 	secondCube = new RenderObject("r8.obj", L"grass.jpg");
 	secondCube->setPosition(-1, -1, -1);
 	secondCube->setScale(.1f, .1f, .1f);
+	skyMap = new RenderObject("r8.obj", L"dick.jpg", true);
+	skyMap->setScale(10, 10, 10);
 	heightMap = HeightMap();
 }
 
@@ -43,6 +45,7 @@ DXApp::~DXApp()
 
 	delete secondCube;
 	delete renderObject;
+	delete skyMap;
 }
 
 void DXApp::DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
@@ -335,7 +338,7 @@ void DXApp::CreateTriangleData()
 
 	renderObject->loadBuffer(gDevice);
 	secondCube->loadBuffer(gDevice);
-	
+	skyMap->loadBuffer(gDevice);
 
 }
 
@@ -364,6 +367,8 @@ void DXApp::Render()
 
 	renderObject->setMatrix(camView, camProjection);
 	secondCube->setMatrix(camView, camProjection);
+	skyMap->setMatrix(camView, camProjection);
+	skyMap->setPosition(XMVectorGetX(cameraPos), XMVectorGetY(cameraPos), XMVectorGetZ(cameraPos));
 	
 	//gDeviceContext->PSSetShaderResources(0, 1, &cubeTexture.getTexture());
 	//gDeviceContext->PSSetSamplers(0, 1, &cubeTexture.getSampleState());
@@ -444,6 +449,7 @@ void DXApp::DrawGeometry()
 	//gDeviceContext->Draw(6, 0);
 	renderObject->draw(gDeviceContext);
 	secondCube->draw(gDeviceContext);
+	skyMap->draw(gDeviceContext);
 }
 
 

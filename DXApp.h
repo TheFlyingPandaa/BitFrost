@@ -129,6 +129,7 @@ private:
 	//Mesh mesh;
 	RenderObject * renderObject;
 	RenderObject * secondCube;
+	RenderObject * skyMap;
 
 public:
 	IDXGISwapChain* getGSwapChain() const

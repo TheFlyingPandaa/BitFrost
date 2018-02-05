@@ -81,12 +81,12 @@ void RenderObject::setScale(float x, float y, float z)
 
 RenderObject::RenderObject()
 {
-	this->mesh = new Mesh("r8.obj");
+	this->mesh = new Mesh("r8.obj", false);
 }
 
-RenderObject::RenderObject(const char * meshDirr, const LPCWSTR & textureFile)
+RenderObject::RenderObject(const char * meshDirr, const LPCWSTR & textureFile,const bool normalIn)
 {
-	this->mesh = new Mesh(meshDirr);
+	this->mesh = new Mesh(meshDirr, normalIn);
 	if (textureFile != NULL) {
 		this->tex = new Texture();
 		this->textureFile = textureFile;

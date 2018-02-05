@@ -71,12 +71,12 @@ private:
 	int nrOfVertexes;
 	Vertex* m_vertex;
 
-	void loadMesh(const char* fileName);
+	void loadMesh(const char* fileName, const bool normalIn);
 
 public:
 	Mesh();
-	Mesh(const char* fileName);
-	Mesh(const char* fileName, const char * textureName);
+	Mesh(const char* fileName, const bool normalIn);
+	Mesh(const char* fileName, const char * textureName, const bool normalIn);
 	~Mesh();	
 
 	int getNrOfVertexes() const;
