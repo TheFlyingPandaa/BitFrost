@@ -23,6 +23,8 @@ void RenderObject::loadBuffer(ID3D11Device *& device)
 	cBufferDesc.StructureByteStride = 0;
 
 	hr = device->CreateBuffer(&cBufferDesc, nullptr, &constantBuffer);
+
+	this->tex->createTexture(device, this->textureFile);
 }
 
 void RenderObject::draw(ID3D11DeviceContext *& deviceContext) const
@@ -42,23 +44,39 @@ void RenderObject::draw(ID3D11DeviceContext *& deviceContext) const
 	// set resources to shaders
 
 	deviceContext->GSSetConstantBuffers(0, 1, &constantBuffer);
+	deviceContext->PSSetShaderResources(0, 1, &this->tex->getTexture());
+	deviceContext->PSSetSamplers(0, 1, &this->tex->getSampleState());
 
 	deviceContext->Draw(this->mesh->getNrOfVertexes(), 0);
 }
 
 void RenderObject::setMatrix(const XMMATRIX & view, const XMMATRIX & proj)
 {
-	DirectX::XMMATRIX translate = DirectX::XMMatrixTranslation(1, 1, 1);
+	DirectX::XMMATRIX translate = DirectX::XMMatrixTranslation(posX, posY, posZ);
 
 	XMVECTOR quat = XMVECTOR();
 	XMMATRIX rotation = XMMatrixRotationRollPitchYawFromVector(quat);
 
 
-	XMMATRIX scale = XMMatrixScaling(.5f, .5f, .5f);
+	XMMATRIX scale = XMMatrixScaling(scaleX, scaleY, scaleZ);
 	XMMATRIX m_worldMatrix = rotation * scale * translate;
 
 	matrixBuffer.worldSpace = DirectX::XMMatrixTranspose(m_worldMatrix);
 	matrixBuffer.WVP = DirectX::XMMatrixTranspose(m_worldMatrix * view * proj);
+}
+
+void RenderObject::setPosition(float x, float y, float z)
+{
+	posX = x;
+	posY = y;
+	posZ = z;
+}
+
+void RenderObject::setScale(float x, float y, float z)
+{
+	scaleX = x;
+	scaleY = y;
+	scaleZ = z;
 }
 
 RenderObject::RenderObject()
@@ -66,14 +84,28 @@ RenderObject::RenderObject()
 	this->mesh = new Mesh("r8.obj");
 }
 
-RenderObject::RenderObject(const char * meshDirr)
+RenderObject::RenderObject(const char * meshDirr, const LPCWSTR & textureFile)
 {
 	this->mesh = new Mesh(meshDirr);
+	if (textureFile != NULL) {
+		this->tex = new Texture();
+		this->textureFile = textureFile;
+	}
+	else
+		this->tex = nullptr;
+	posX = 0;
+	posY = 0;
+	posZ = 0;
+	scaleX = 1;
+	scaleY = 1;
+	scaleZ = 1;
 }
 
 RenderObject::~RenderObject()
 {
 	delete mesh;
+	if (this->tex != nullptr)
+		delete this->tex;
 
 	this->vertexBuffer->Release();
 	this->constantBuffer->Release();

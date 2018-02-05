@@ -79,7 +79,7 @@ private:
 	ID3D11VertexShader* deferredVertex = nullptr;
 	ID3D11PixelShader* deferredPixel = nullptr;
 
-	Texture cubeTexture;
+	//Texture cubeTexture;
 
 	KeyboardInput gameInput;
 
@@ -112,7 +112,7 @@ private:
 
 	constBuffFrame holdBuffPerFrame;
 
-	ID3D11Buffer* gVertexBuffer = nullptr;
+	//ID3D11Buffer* gVertexBuffer = nullptr;
 
 	XMVECTOR cameraPos;
 	XMVECTOR lookAt;
@@ -128,6 +128,7 @@ private:
 
 	//Mesh mesh;
 	RenderObject * renderObject;
+	RenderObject * secondCube;
 
 public:
 	IDXGISwapChain* getGSwapChain() const

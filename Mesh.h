@@ -15,6 +15,8 @@
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
 
+#include "Texture.h"
+
 using namespace DirectX;
 
 struct Coords
@@ -74,8 +76,9 @@ private:
 public:
 	Mesh();
 	Mesh(const char* fileName);
-	~Mesh();
-	
+	Mesh(const char* fileName, const char * textureName);
+	~Mesh();	
+
 	int getNrOfVertexes() const;
 	Vertex * GetMesh();
 };

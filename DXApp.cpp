@@ -5,7 +5,12 @@
 DXApp::DXApp()
 {
 	//gameInput = KeyboardInput();
-	renderObject = new RenderObject("r8.obj");
+	renderObject = new RenderObject("car.obj", L"dick.jpg");
+	renderObject->setPosition(0.5f, 0, 0.5f);
+	renderObject->setScale(0.01f, 0.01f, 0.01f);
+	secondCube = new RenderObject("r8.obj", L"grass.jpg");
+	secondCube->setPosition(-1, -1, -1);
+	secondCube->setScale(.1f, .1f, .1f);
 	heightMap = HeightMap();
 }
 
@@ -32,10 +37,11 @@ DXApp::~DXApp()
 	
 	
 
-	gVertexBuffer->Release();
+	//gVertexBuffer->Release();
 
 	constPerFrameBuffer->Release();
 
+	delete secondCube;
 	delete renderObject;
 }
 
@@ -66,7 +72,7 @@ void DXApp::DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
 		ShowWindow(wndHandle, nCmdShow);
 
-		cubeTexture.createTexture(gDevice, L"grass.jpg");
+		//cubeTexture.createTexture(gDevice, L"grass.jpg");
 
 	}
 
@@ -266,7 +272,7 @@ void DXApp::CreateTriangleData()
 {
 	
 
-	TriangleVertex triangleVertices[6] =
+	/*TriangleVertex triangleVertices[6] =
 	{
 		-0.5f, 0.5f, 0.0f,	//v0 pos
 		0.0f, 0.0f,	//v0 color
@@ -291,7 +297,7 @@ void DXApp::CreateTriangleData()
 		0.5f, -0.5f, 0.0f, //v2
 		1.0f, 1.0f	//v2 color
 		//1.0f, 1.0f, 1.0f,
-	};
+	};*/
 
 
 
@@ -310,7 +316,7 @@ void DXApp::CreateTriangleData()
 	light.dir = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	light.ambientLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 	light.diffues = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-
+	/*
 	D3D11_BUFFER_DESC bufferDesc;
 	memset(&bufferDesc, 0, sizeof(bufferDesc));
 	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -320,14 +326,15 @@ void DXApp::CreateTriangleData()
 
 	D3D11_SUBRESOURCE_DATA data;
 	data.pSysMem = triangleVertices;
-	
 	//data.pSysMem = mesh.floatArr();
 
 	//Need fix
 	
 	gDevice->CreateBuffer(&bufferDesc, &data, &gVertexBuffer);
+	*/
 
 	renderObject->loadBuffer(gDevice);
+	secondCube->loadBuffer(gDevice);
 	
 
 }
@@ -356,9 +363,10 @@ void DXApp::Render()
 	WVP = worldMatrix * camView * camProjection;
 
 	renderObject->setMatrix(camView, camProjection);
+	secondCube->setMatrix(camView, camProjection);
 	
-	gDeviceContext->PSSetShaderResources(0, 1, &cubeTexture.getTexture());
-	gDeviceContext->PSSetSamplers(0, 1, &cubeTexture.getSampleState());
+	//gDeviceContext->PSSetShaderResources(0, 1, &cubeTexture.getTexture());
+	//gDeviceContext->PSSetSamplers(0, 1, &cubeTexture.getSampleState());
 
 
 	holdBuffPerFrame.light = light;
@@ -433,8 +441,9 @@ HWND DXApp::getWndHandler() const
 
 void DXApp::DrawGeometry()
 {
-	gDeviceContext->Draw(6, 0);
+	//gDeviceContext->Draw(6, 0);
 	renderObject->draw(gDeviceContext);
+	secondCube->draw(gDeviceContext);
 }
 
 
@@ -443,7 +452,7 @@ void DXApp::FirstDrawPass()
 	UINT32 vertexSize = sizeof(float) * amountOfValuesInVertex; //The const (5) is the amount of vertexes
 	UINT32 offset = 0;
 
-	gDeviceContext->IASetVertexBuffers(0, 1, &gVertexBuffer, &vertexSize, &offset);
+	//gDeviceContext->IASetVertexBuffers(0, 1, &gVertexBuffer, &vertexSize, &offset);
 	gDeviceContext->IASetInputLayout(gVertexLayout);
 
 	gDeviceContext->VSSetShader(this->gVertexShader, nullptr, 0);

@@ -13,22 +13,30 @@ class RenderObject
 private:	
 	Mesh * mesh;
 
+
+	LPCWSTR textureFile;
+	Texture * tex;
+
 	ID3D11Buffer * vertexBuffer = nullptr;
 	ID3D11Buffer * constantBuffer = nullptr;
 
 	MatrixBuffert matrixBuffer;
 
 	float posX, posY, posZ;
+	float scaleX, scaleY, scaleZ;
 
 public:
 	RenderObject();
-	RenderObject(const char * meshDirr);
+	RenderObject(const char * meshDirr, const LPCWSTR & textureFile = NULL);
 	~RenderObject();
 
 	void loadBuffer(ID3D11Device *& device);
 	void draw(ID3D11DeviceContext *& deviceContext) const;
 
 	void setMatrix(const XMMATRIX& view, const XMMATRIX& proj);
+
+	void setPosition(float x, float y, float z);
+	void setScale(float x, float y, float z);
 };
 
 #endif // !RENDER_OBJECT_H
