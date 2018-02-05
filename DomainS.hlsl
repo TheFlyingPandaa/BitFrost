@@ -32,7 +32,7 @@ DS_OUTPUT main(
 
     vertexPosition = patch[0].Pos * domain.x + patch[1].Pos * domain.y + patch[2].Pos * domain.z;
     Output.Pos = float4(vertexPosition, 1.0f);
-    Output.Tex = patch[0].Tex * domain.x + patch[1].Tex * domain.y; // TODO: FIX TEXTURES
+    Output.Tex = patch[0].Tex * domain.x + patch[1].Tex * domain.y + patch[2].Tex * domain.z; // TODO: FIX TEXTURES
 
     return Output;
 }

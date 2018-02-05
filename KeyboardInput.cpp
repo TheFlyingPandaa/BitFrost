@@ -54,6 +54,10 @@ void KeyboardInput::GameInput( DIMOUSESTATE & mouseLastState)
 	{
 		//exit(-1); //För insta exit vid alt+shift eller esc key
 	}
+	if (keyboardState[DIK_Q] & 0x80)
+	{
+		speed = 0.001f;
+	}
 	if (keyboardState[DIK_A] & 0x80)
 	{
 		moveLeftRight -= speed;
