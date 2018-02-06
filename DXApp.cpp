@@ -5,12 +5,15 @@
 DXApp::DXApp()
 {
 	//gameInput = KeyboardInput();
-	renderObject = new RenderObject("car.obj", L"dick.jpg");
+	/*renderObject = new RenderObject("r8.obj", L"dick.jpg");
 	renderObject->setPosition(0.5f, 0, 0.5f);
 	renderObject->setScale(0.01f, 0.01f, 0.01f);
 	secondCube = new RenderObject("r8.obj", L"grass.jpg");
 	secondCube->setPosition(-1, -1, -1);
 	secondCube->setScale(.1f, .1f, .1f);
+	*/
+	ORH = new ObjectRenderHandler("Objects");
+	ORH->loadObjects();
 	heightMap = HeightMap();
 }
 
@@ -41,8 +44,10 @@ DXApp::~DXApp()
 
 	constPerFrameBuffer->Release();
 
-	delete secondCube;
-	delete renderObject;
+
+	delete ORH;
+	//delete secondCube;
+	//delete renderObject;
 }
 
 void DXApp::DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
@@ -332,9 +337,9 @@ void DXApp::CreateTriangleData()
 	
 	gDevice->CreateBuffer(&bufferDesc, &data, &gVertexBuffer);
 	*/
-
-	renderObject->loadBuffer(gDevice);
-	secondCube->loadBuffer(gDevice);
+	ORH->loadBuffert(gDevice);
+	//renderObject->loadBuffer(gDevice);
+	//secondCube->loadBuffer(gDevice);
 	
 
 }
@@ -362,8 +367,9 @@ void DXApp::Render()
 	worldMatrix = Scale * Rotation * Translation;
 	WVP = worldMatrix * camView * camProjection;
 
-	renderObject->setMatrix(camView, camProjection);
-	secondCube->setMatrix(camView, camProjection);
+	ORH->setMatrix(camView, camProjection);
+	//renderObject->setMatrix(camView, camProjection);
+	//secondCube->setMatrix(camView, camProjection);
 	
 	//gDeviceContext->PSSetShaderResources(0, 1, &cubeTexture.getTexture());
 	//gDeviceContext->PSSetSamplers(0, 1, &cubeTexture.getSampleState());
@@ -442,8 +448,9 @@ HWND DXApp::getWndHandler() const
 void DXApp::DrawGeometry()
 {
 	//gDeviceContext->Draw(6, 0);
-	renderObject->draw(gDeviceContext);
-	secondCube->draw(gDeviceContext);
+	ORH->render(gDeviceContext);
+	//renderObject->draw(gDeviceContext);
+	//secondCube->draw(gDeviceContext);
 }
 
 

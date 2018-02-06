@@ -26,7 +26,7 @@ void Texture::createTexture(ID3D11Device*& gDevice, LPCWSTR textureName)
 	hr = D3DX11CreateShaderResourceViewFromFile(gDevice, textureName, NULL, NULL, &texture, NULL);
 	if (hr != S_OK)
 	{
-		D3DX11CreateShaderResourceViewFromFile(gDevice, L"dick.jpg", NULL, NULL, &texture, NULL);
+		D3DX11CreateShaderResourceViewFromFile(gDevice, L"Default.png", NULL, NULL, &texture, NULL);
 	}
 
 	gDevice->CreateSamplerState(&sampDesc, &samplerState);

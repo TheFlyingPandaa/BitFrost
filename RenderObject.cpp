@@ -81,18 +81,19 @@ void RenderObject::setScale(float x, float y, float z)
 
 RenderObject::RenderObject()
 {
-	this->mesh = new Mesh("r8.obj");
+	this->mesh = new Mesh(L"r8.obj");
 }
 
-RenderObject::RenderObject(const char * meshDirr, const LPCWSTR & textureFile)
+RenderObject::RenderObject(const wchar_t * meshDirr, LPCWSTR textureFile)
 {
+	
 	this->mesh = new Mesh(meshDirr);
+	this->tex = new Texture();
 	if (textureFile != NULL) {
-		this->tex = new Texture();
 		this->textureFile = textureFile;
 	}
 	else
-		this->tex = nullptr;
+		this->textureFile = L"Default.png";
 	posX = 0;
 	posY = 0;
 	posZ = 0;

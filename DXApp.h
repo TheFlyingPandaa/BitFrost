@@ -25,6 +25,7 @@ using namespace DirectX;
 
 
 #include "RenderObject.h"
+#include "ObjectRenderHandler.h"
 
 const UINT BUFFER_COUNT = 3;
 
@@ -127,8 +128,10 @@ private:
 	//HeightMap heightMap;
 
 	//Mesh mesh;
-	RenderObject * renderObject;
-	RenderObject * secondCube;
+	//RenderObject * renderObject;
+	//RenderObject * secondCube;
+
+	ObjectRenderHandler * ORH;
 
 public:
 	IDXGISwapChain* getGSwapChain() const

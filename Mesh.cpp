@@ -2,7 +2,7 @@
 
 using namespace DirectX;
 
-void Mesh::loadMesh(const char * fileName)
+void Mesh::loadMesh(const wchar_t * fileName)
 {
 	std::vector<Coords*> vertex;
 	std::vector<Faces*> faces;
@@ -152,14 +152,14 @@ Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(const char * fileName)
+Mesh::Mesh(const wchar_t * fileName)
 {
 	this->fileName = fileName;
 	loadMesh(fileName);	
 	
 }
 
-Mesh::Mesh(const char * fileName, const char * textureName)
+Mesh::Mesh(const wchar_t * fileName, const char * textureName)
 {
 	this->fileName = fileName;
 	loadMesh(fileName);
