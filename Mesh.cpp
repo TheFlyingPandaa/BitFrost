@@ -2,7 +2,8 @@
 
 using namespace DirectX;
 
-void Mesh::loadMesh(const wchar_t * fileName)
+
+void Mesh::loadMesh(const wchar_t * fileName, const bool normalIn)
 {
 	std::vector<Coords*> vertex;
 	std::vector<Faces*> faces;
@@ -71,25 +72,48 @@ void Mesh::loadMesh(const wchar_t * fileName)
 		
 	this->m_vertex = new Vertex[faces.size() * 6];
 	this->nrOfVertexes = 0;
-	for (int i = 0; i < faces.size(); i++)
+	if (normalIn == false)
 	{
-		for (int j = 0; j < 3; j++) {
-			m_vertex[this->nrOfVertexes++] = Vertex(vertex[faces[i]->face[j] - 1]->x,
-													vertex[faces[i]->face[j] - 1]->y,
-													vertex[faces[i]->face[j] - 1]->z,
-													texCoord[faces[i]->texCord[j] - 1]->x,
-													texCoord[faces[i]->texCord[j] - 1]->y);
-		}
-		for (int j = 0; j < 3; j++)
+		for (int i = 0; i < faces.size(); i++)
 		{
-			m_vertex[this->nrOfVertexes++] = Vertex(vertex[faces[i]->face[(j + 2) % 4] - 1]->x,
-													vertex[faces[i]->face[(j + 2) % 4] - 1]->y,
-													vertex[faces[i]->face[(j + 2) % 4] - 1]->z,
-													texCoord[faces[i]->texCord[(j + 2) % 4] - 1]->x,
-													texCoord[faces[i]->texCord[(j + 2) % 4] - 1]->y);
+			for (int j = 0; j < 3; j++) {
+				m_vertex[this->nrOfVertexes++] = Vertex(vertex[faces[i]->face[j] - 1]->x,
+					vertex[faces[i]->face[j] - 1]->y,
+					vertex[faces[i]->face[j] - 1]->z,
+					texCoord[faces[i]->texCord[j] - 1]->x,
+					texCoord[faces[i]->texCord[j] - 1]->y);
+			}
+			for (int j = 0; j < 3; j++)
+			{
+				m_vertex[this->nrOfVertexes++] = Vertex(vertex[faces[i]->face[(j + 2) % 4] - 1]->x,
+					vertex[faces[i]->face[(j + 2) % 4] - 1]->y,
+					vertex[faces[i]->face[(j + 2) % 4] - 1]->z,
+					texCoord[faces[i]->texCord[(j + 2) % 4] - 1]->x,
+					texCoord[faces[i]->texCord[(j + 2) % 4] - 1]->y);
+			}
 		}
 	}
-
+	else
+	{
+		for (int i = 0; i < faces.size(); i++)
+		{
+			for (int j = 0; j < 3; j++) {
+				m_vertex[this->nrOfVertexes++] = Vertex(vertex[faces[i]->face[j] - 1]->z,
+					vertex[faces[i]->face[j] - 1]->y,
+					vertex[faces[i]->face[j] - 1]->x,
+					texCoord[faces[i]->texCord[j] - 1]->x,
+					texCoord[faces[i]->texCord[j] - 1]->y);
+			}
+			for (int j = 0; j < 3; j++)
+			{
+				m_vertex[this->nrOfVertexes++] = Vertex(vertex[faces[i]->face[(j + 2) % 4] - 1]->z,
+					vertex[faces[i]->face[(j + 2) % 4] - 1]->y,
+					vertex[faces[i]->face[(j + 2) % 4] - 1]->x,
+					texCoord[faces[i]->texCord[(j + 2) % 4] - 1]->x,
+					texCoord[faces[i]->texCord[(j + 2) % 4] - 1]->y);
+			}
+		}
+	}
 	/*std::ofstream out("Debug.txt");
 	out << "vertex " << vertex.size() << std::endl;
 	for (int i = 0; i < vertex.size(); i++)
@@ -152,17 +176,18 @@ Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(const wchar_t * fileName)
+
+Mesh::Mesh(const wchar_t * fileName, const bool normalIn)
 {
 	this->fileName = fileName;
-	loadMesh(fileName);	
+	loadMesh(fileName,normalIn);
 	
 }
 
-Mesh::Mesh(const wchar_t * fileName, const char * textureName)
+Mesh::Mesh(const wchar_t * fileName, const char * textureName, const bool normalIn)
 {
 	this->fileName = fileName;
-	loadMesh(fileName);
+	loadMesh(fileName, normalIn);
 	
 }
 

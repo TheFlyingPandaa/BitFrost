@@ -54,24 +54,6 @@ void ObjectRenderHandler::loadObjects()
 		}
 	}
 	inFile.close();
-	std::ofstream out("Debug.txt");
-	for (int j = 0; j < i; j++)
-	{
-		
-		out << objNames[j].c_str() << " " << textureNames[j].c_str() << std::endl;
-		for (int k = 0; k < 3; k++)
-		{
-			out << pos[j][k] << " ";
-		}
-		out << std::endl;
-		for (int k = 0; k < 3; k++)
-		{
-			out << scale[j][k] << " ";
-		}
-		out << std::endl;
-	}
-
-	out.close();
 	RenderObject * obj;
 	for (size_t j = 0; j < i; j++)
 	{
@@ -81,10 +63,7 @@ void ObjectRenderHandler::loadObjects()
 			obj->setScale(scale[j][0], scale[j][1], scale[j][2]);
 			this->renderObjects.push_back(obj);
 		}
-		else {
-			std::wstring s = std::wstring(this->textureNames[j].length(), L' ');
-			//std::copy(this->textureNames[j].begin(), this->textureNames[j].end(), s);
-			LPCWSTR str = s.c_str();
+		else {			
 			obj = new RenderObject(this->objNames[j].c_str(), this->textureNames[j].c_str());
 			obj->setPosition(pos[j][0], pos[j][1], pos[j][2]);
 			obj->setScale(scale[j][0], scale[j][1], scale[j][2]);
@@ -96,21 +75,8 @@ void ObjectRenderHandler::loadObjects()
 		delete[] pos[j];
 		delete[] scale[j];
 	}
-
 	delete[] pos;
 	delete[] scale;
-
-	/*
-	obj = new RenderObject("r8.obj");
-	//obj->setPosition(1, 0, 1);
-	//obj->setScale(1, 1, 1);
-	this->renderObjects.push_back(obj);
-
-	obj = new RenderObject("r8.obj");
-	//obj->setPosition(-1, 0, 1);
-	//obj->setScale(1, 1, 1);
-	this->renderObjects.push_back(obj);
-	*/
 }
 
 

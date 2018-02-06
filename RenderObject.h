@@ -27,7 +27,8 @@ private:
 
 public:
 	RenderObject();
-	RenderObject(const wchar_t * meshDirr, LPCWSTR textureFile = NULL);
+
+	RenderObject(const wchar_t * meshDirr, LPCWSTR textureFile = NULL, const bool normalIn = false);
 	~RenderObject();
 
 	void loadBuffer(ID3D11Device *& device);

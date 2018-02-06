@@ -14,6 +14,9 @@ DXApp::DXApp()
 	*/
 	ORH = new ObjectRenderHandler("Objects");
 	ORH->loadObjects();
+
+	skyMap = new RenderObject(L"r8.obj", L"dick.jpg", true);
+	skyMap->setScale(10, 10, 10);
 	heightMap = HeightMap();
 }
 
@@ -46,8 +49,9 @@ DXApp::~DXApp()
 
 
 	delete ORH;
-	//delete secondCube;
-	//delete renderObject;
+
+
+	delete skyMap;
 }
 
 void DXApp::DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
@@ -337,10 +341,10 @@ void DXApp::CreateTriangleData()
 	
 	gDevice->CreateBuffer(&bufferDesc, &data, &gVertexBuffer);
 	*/
+
 	ORH->loadBuffert(gDevice);
-	//renderObject->loadBuffer(gDevice);
-	//secondCube->loadBuffer(gDevice);
-	
+	skyMap->loadBuffer(gDevice);
+
 
 }
 
@@ -367,9 +371,11 @@ void DXApp::Render()
 	worldMatrix = Scale * Rotation * Translation;
 	WVP = worldMatrix * camView * camProjection;
 
+
 	ORH->setMatrix(camView, camProjection);
-	//renderObject->setMatrix(camView, camProjection);
-	//secondCube->setMatrix(camView, camProjection);
+
+	skyMap->setMatrix(camView, camProjection);
+	skyMap->setPosition(XMVectorGetX(cameraPos), XMVectorGetY(cameraPos), XMVectorGetZ(cameraPos));
 	
 	//gDeviceContext->PSSetShaderResources(0, 1, &cubeTexture.getTexture());
 	//gDeviceContext->PSSetSamplers(0, 1, &cubeTexture.getSampleState());
@@ -448,9 +454,11 @@ HWND DXApp::getWndHandler() const
 void DXApp::DrawGeometry()
 {
 	//gDeviceContext->Draw(6, 0);
+
 	ORH->render(gDeviceContext);
-	//renderObject->draw(gDeviceContext);
-	//secondCube->draw(gDeviceContext);
+
+
+	skyMap->draw(gDeviceContext);
 }
 
 

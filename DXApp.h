@@ -132,6 +132,8 @@ private:
 	//RenderObject * secondCube;
 
 	ObjectRenderHandler * ORH;
+	RenderObject * skyMap;
+
 
 public:
 	IDXGISwapChain* getGSwapChain() const
