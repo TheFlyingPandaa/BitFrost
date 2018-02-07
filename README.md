@@ -29,7 +29,7 @@ The Big TODO: List
 **Acceleration Techniques : 2**
 ```diff
 - View frustum culling against a quadtree 
-- Front to Back rendering 
++ Front to Back rendering 
 - Occlusion Culling 
 - Back face culling using Geometry Shader
 ```
