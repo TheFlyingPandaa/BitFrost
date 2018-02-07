@@ -79,6 +79,18 @@ void RenderObject::setScale(float x, float y, float z)
 	scaleZ = z;
 }
 
+XMFLOAT3 * RenderObject::getPos()
+{
+	if (this->position == nullptr)
+		this->position = new XMFLOAT3(posX, posY, posZ);
+	else {
+		this->position->x = posX;
+		this->position->y = posY;
+		this->position->z = posZ;
+	}
+	return this->position;
+}
+
 RenderObject::RenderObject()
 {
 	this->mesh = new Mesh(L"r8.obj", false);
@@ -106,6 +118,8 @@ RenderObject::~RenderObject()
 	delete mesh;
 	if (this->tex != nullptr)
 		delete this->tex;
+	if (this->position != nullptr)
+		delete this->position;
 
 	this->vertexBuffer->Release();
 	this->constantBuffer->Release();

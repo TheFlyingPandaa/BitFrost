@@ -20,6 +20,8 @@ private:
 	ID3D11Buffer * vertexBuffer = nullptr;
 	ID3D11Buffer * constantBuffer = nullptr;
 
+	XMFLOAT3 * position = nullptr;
+
 	MatrixBuffert matrixBuffer;
 
 	float posX, posY, posZ;
@@ -38,6 +40,8 @@ public:
 
 	void setPosition(float x, float y, float z);
 	void setScale(float x, float y, float z);
+
+	XMFLOAT3 * getPos();
 };
 
 #endif // !RENDER_OBJECT_H

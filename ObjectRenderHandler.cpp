@@ -2,6 +2,43 @@
 
 #include <cstringt.h>
 
+
+bool closes(RenderObject * a, RenderObject * b, XMFLOAT3 *& camPos)
+{	
+	XMFLOAT3 * posA = new XMFLOAT3(camPos->x - a->getPos()->x,
+		camPos->y - a->getPos()->y,
+		camPos->z - a->getPos()->z);
+	XMFLOAT3 * posB = new XMFLOAT3(camPos->x - b->getPos()->x,
+		camPos->y - b->getPos()->y,
+		camPos->z - b->getPos()->z);
+	float distA = pow(posA->x, 2) + pow(posA->y, 2) + pow(posA->y, 2);
+	float distB = pow(posB->x, 2) + pow(posB->y, 2) + pow(posB->y, 2);
+
+
+	delete posA;
+	delete posB;
+
+	return distA > distB;
+	
+}
+
+void ObjectRenderHandler::sortByDistance(const DirectX::XMVECTOR & camPos)
+{
+	
+	//closes(new RenderObject(), new RenderObject(), this->camPos);
+	std::sort(this->renderObjects.begin(), this->renderObjects.end(), std::bind(closes, _1, _2, this->camPos));
+}
+
+void ObjectRenderHandler::removeBehind(const DirectX::XMVECTOR & camPos, const DirectX::XMVECTOR & lookAt)
+{
+	/*DirectX::XMFLOAT3 camV, camObjectV;
+	for (size_t i = 0; i < this->renderObjects.size(); i++)
+	{
+		
+	}*/
+}
+				
+
 ObjectRenderHandler::ObjectRenderHandler()
 {
 }
@@ -9,6 +46,7 @@ ObjectRenderHandler::ObjectRenderHandler()
 ObjectRenderHandler::ObjectRenderHandler(const char * objectFile)
 {
 	this->objectFile = objectFile;
+	this->camPos = new XMFLOAT3();
 }
 
 
@@ -18,6 +56,7 @@ ObjectRenderHandler::~ObjectRenderHandler()
 	{
 		delete this->renderObjects[i];
 	}
+	delete this->camPos;
 	delete[] this->objNames;
 	delete[] this->textureNames;
 }
@@ -86,6 +125,15 @@ void ObjectRenderHandler::loadBuffert(ID3D11Device *& device)
 	{
 		this->renderObjects[i]->loadBuffer(device);
 	}
+}
+
+void ObjectRenderHandler::setCamPosition(const DirectX::XMVECTOR & camPos, const DirectX::XMVECTOR & lookAt)
+{
+	this->camPos->x = XMVectorGetX(camPos);
+	this->camPos->y = XMVectorGetY(camPos);
+	this->camPos->z = XMVectorGetZ(camPos);
+	removeBehind(camPos, lookAt);
+	sortByDistance(camPos);
 }
 
 void ObjectRenderHandler::setMatrix(const DirectX::XMMATRIX & view, const DirectX::XMMATRIX & proj)

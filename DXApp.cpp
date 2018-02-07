@@ -371,7 +371,7 @@ void DXApp::Render()
 	worldMatrix = Scale * Rotation * Translation;
 	WVP = worldMatrix * camView * camProjection;
 
-
+	ORH->setCamPosition(cameraPos, lookAt);
 	ORH->setMatrix(camView, camProjection);
 
 	skyMap->setMatrix(camView, camProjection);
