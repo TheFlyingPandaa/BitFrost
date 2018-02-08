@@ -132,7 +132,7 @@ private:
 	//RenderObject * secondCube;
 
 	ObjectRenderHandler * ORH;
-	RenderObject * skyMap;
+	//RenderObject * skyMap;
 
 
 public:

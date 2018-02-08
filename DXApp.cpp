@@ -15,8 +15,8 @@ DXApp::DXApp()
 	ORH = new ObjectRenderHandler("Objects");
 	ORH->loadObjects();
 
-	skyMap = new RenderObject(L"r8.obj", L"dick.jpg", true);
-	skyMap->setScale(10, 10, 10);
+	//skyMap = new RenderObject(L"r8.obj", L"dick.jpg", true);
+	//skyMap->setScale(10, 10, 10);
 	heightMap = HeightMap();
 }
 
@@ -41,7 +41,6 @@ DXApp::~DXApp()
 	constPerFrameBuffer->Release();
 	gExampleBuffer->Release();
 	
-	
 
 	//gVertexBuffer->Release();
 
@@ -51,7 +50,7 @@ DXApp::~DXApp()
 	delete ORH;
 
 
-	delete skyMap;
+	//delete skyMap;
 }
 
 void DXApp::DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
@@ -343,7 +342,7 @@ void DXApp::CreateTriangleData()
 	*/
 
 	ORH->loadBuffert(gDevice);
-	skyMap->loadBuffer(gDevice);
+	//skyMap->loadBuffer(gDevice);
 
 
 }
@@ -374,8 +373,8 @@ void DXApp::Render()
 	ORH->setCamPosition(cameraPos, lookAt);
 	ORH->setMatrix(camView, camProjection);
 
-	skyMap->setMatrix(camView, camProjection);
-	skyMap->setPosition(XMVectorGetX(cameraPos), XMVectorGetY(cameraPos), XMVectorGetZ(cameraPos));
+	//skyMap->setMatrix(camView, camProjection);
+	//skyMap->setPosition(XMVectorGetX(cameraPos), XMVectorGetY(cameraPos), XMVectorGetZ(cameraPos));
 	
 	//gDeviceContext->PSSetShaderResources(0, 1, &cubeTexture.getTexture());
 	//gDeviceContext->PSSetSamplers(0, 1, &cubeTexture.getSampleState());
@@ -396,10 +395,12 @@ void DXApp::Render()
 void DXApp::MovingBuffersToGPU()
 {
 	D3D11_MAPPED_SUBRESOURCE dataPtr;
-	gDeviceContext->Map(gExampleBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
 	// copy memory from CPU to GPU the entire struct
 	globalValues.WVP = XMMatrixTranspose(WVP); // Transponera alltid innna något skickas in i matrisen.
 	globalValues.worldSpace = XMMatrixTranspose(worldMatrix);
+	globalValues.cameraPosition = camTarget;
+	std::cout << XMVectorGetX(camTarget) << " " << XMVectorGetY(camTarget) << " " << XMVectorGetZ(camTarget) << std::endl;
+	gDeviceContext->Map(gExampleBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
 	//Kopierar in det i buffern "constant buffern"
 	memcpy(dataPtr.pData, &globalValues, sizeof(valuesFromCpu));
 	// UnMap constant buffer so that we can use it again in the GPU
@@ -458,7 +459,7 @@ void DXApp::DrawGeometry()
 	ORH->render(gDeviceContext);
 
 
-	skyMap->draw(gDeviceContext);
+	//skyMap->draw(gDeviceContext);
 }
 
 
