@@ -104,6 +104,7 @@ private:
 
 	ID3D11Buffer* gExampleBuffer = nullptr;
 	ID3D11Buffer* constPerFrameBuffer = nullptr;
+	ID3D11Buffer* camBuffer = nullptr;
 
 	XMMATRIX worldMatrix;
 	XMVECTOR camTarget;
@@ -112,6 +113,8 @@ private:
 	Light light;
 
 	constBuffFrame holdBuffPerFrame;
+
+	cameraBuffer camBuff;
 
 	//ID3D11Buffer* gVertexBuffer = nullptr;
 

@@ -30,6 +30,6 @@ The Big TODO: List
 ```diff
 - View frustum culling against a quadtree 
 + Front to Back rendering 
-- Occlusion Culling 
++ Occlusion Culling 
 - Back face culling using Geometry Shader
 ```

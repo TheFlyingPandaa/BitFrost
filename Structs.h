@@ -10,7 +10,6 @@ struct valuesFromCpu
 { 
 	DirectX::XMMATRIX WVP;
 	DirectX::XMMATRIX worldSpace;
-	DirectX::XMVECTOR cameraPosition;
 };
 
 struct Light
@@ -43,6 +42,10 @@ struct TextureRenderTarget
 	ID3D11Texture2D*			texture = nullptr;
 	ID3D11RenderTargetView*		renderTargetView = nullptr;
 	ID3D11ShaderResourceView*	shaderResourceView = nullptr;
+};
+
+struct cameraBuffer {
+	DirectX::XMFLOAT4A cameraPosition;
 };
 
 

@@ -16,8 +16,8 @@ struct VS_OUT
 
 VS_OUT main(VS_IN input, uint id : SV_VertexID)
 {
-    VS_OUT output = (VS_OUT) 0;
-    
+    VS_OUT output = (VS_OUT) 0;    
+ 
     if (id == 0)
     {
         output.Pos = float4(-1, -1, 0, 1);

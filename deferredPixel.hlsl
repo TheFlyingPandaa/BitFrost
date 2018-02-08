@@ -7,7 +7,7 @@ Texture2D gTexPosition : register(t3);
 
 struct Light
 {
-    float3 dir;
+    float3 dir;    
     float4 ambient;
     float4 diffuse;
 };
@@ -32,11 +32,13 @@ float4 main(VS_OUT input) : SV_Target
     float3 normal = gTexNormal.Sample(sampAni, input.Tex).rgb;
     float3 diffuse = gTexDiffuse.Sample(sampAni, input.Tex).rgb;
 
-    if (length(normal) > 0.0f)
-    {
+    
         float3 lightDir = normalize(light.dir);
-        float3 position = gTexPosition.Sample(sampAni, input.Pos).rgb; //float3(1, 1, 1); //float3(view._41, view._42, view._43);
-
+    if (length(normal) > 0.0f && false)
+    {
+       
+        float3 position = gTexPosition.Sample(sampAni, input.Tex).rgb; //float3(1, 1, 1); //float3(view._41, view._42, view._43);
+    
         float lambertian = max(dot(lightDir, normal), 0.0f);
         float specular = 0.0f;
 
@@ -50,10 +52,9 @@ float4 main(VS_OUT input) : SV_Target
         }
         float3 colorLinear = lambertian * diffuse + specular * float3(1.0f, 1.0f, 1.0f);
         pOut = float4(pow(colorLinear, float3(1.0f / 2.2f, 1.0f / 2.2f, 1.0f / 2.2f)), 1.0f);
-    
         return pOut;
     }
 
-    pOut = float4(diffuse, 1.0f);   
+    pOut = float4(diffuse, 1.0f);
     return pOut;
 }

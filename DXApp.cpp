@@ -41,10 +41,11 @@ DXApp::~DXApp()
 	constPerFrameBuffer->Release();
 	gExampleBuffer->Release();
 	
+	camBuffer->Release();
 
 	//gVertexBuffer->Release();
 
-	constPerFrameBuffer->Release();
+	//constPerFrameBuffer->Release();
 
 
 	delete ORH;
@@ -187,6 +188,11 @@ void DXApp::SetViewport()
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
 	gDeviceContext->RSSetViewports(1, &vp);
+	
+	ID3D11RasterizerState * state;
+	gDeviceContext->RSGetState(&state);
+
+	
 }
 
 
@@ -220,6 +226,20 @@ void DXApp::CreateConstantBuffer()
 	exampleBufferDesc.StructureByteStride = 0;
 	hr = 0;
 	hr = gDevice->CreateBuffer(&exampleBufferDesc, nullptr, &constPerFrameBuffer);
+	if (FAILED(hr))
+	{
+		// handle the error, could be fatal or a warning...
+		exit(-1);
+	}
+
+	exampleBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	exampleBufferDesc.ByteWidth = sizeof(cameraBuffer);
+	exampleBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	exampleBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	exampleBufferDesc.MiscFlags = 0;
+	exampleBufferDesc.StructureByteStride = 0;
+	hr = 0;
+	hr = gDevice->CreateBuffer(&exampleBufferDesc, nullptr, &camBuffer);
 	if (FAILED(hr))
 	{
 		// handle the error, could be fatal or a warning...
@@ -398,8 +418,9 @@ void DXApp::MovingBuffersToGPU()
 	// copy memory from CPU to GPU the entire struct
 	globalValues.WVP = XMMatrixTranspose(WVP); // Transponera alltid innna något skickas in i matrisen.
 	globalValues.worldSpace = XMMatrixTranspose(worldMatrix);
-	globalValues.cameraPosition = camTarget;
+	camBuff.cameraPosition = DirectX::XMFLOAT4A(XMVectorGetX(camTarget - cameraPos), XMVectorGetY(camTarget - cameraPos), XMVectorGetZ(camTarget - cameraPos), 1.0f);
 	std::cout << XMVectorGetX(camTarget) << " " << XMVectorGetY(camTarget) << " " << XMVectorGetZ(camTarget) << std::endl;
+
 	gDeviceContext->Map(gExampleBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
 	//Kopierar in det i buffern "constant buffern"
 	memcpy(dataPtr.pData, &globalValues, sizeof(valuesFromCpu));
@@ -407,7 +428,7 @@ void DXApp::MovingBuffersToGPU()
 	gDeviceContext->Unmap(gExampleBuffer, 0);
 	// set resource to Vertex Shader
 	gDeviceContext->GSSetConstantBuffers(0, 1, &gExampleBuffer);
-
+	 
 	//D3D11_MAPPED_SUBRESOURCE dataPtr;
 	gDeviceContext->Map(constPerFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
 	// copy memory from CPU to GPU the entire struct
@@ -417,6 +438,14 @@ void DXApp::MovingBuffersToGPU()
 	gDeviceContext->Unmap(constPerFrameBuffer, 0);
 	// set resource to Vertex Shader
 	gDeviceContext->PSSetConstantBuffers(1, 1, &constPerFrameBuffer);
+
+	gDeviceContext->Map(camBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
+	//Kopierar in det i buffern "constant buffern"
+	memcpy(dataPtr.pData, &camBuff, sizeof(cameraBuffer));
+	// UnMap constant buffer so that we can use it again in the GPU
+	gDeviceContext->Unmap(camBuffer, 0);
+	// set resource to Vertex Shader
+	gDeviceContext->GSSetConstantBuffers(2, 1, &camBuffer);
 }
 
 
