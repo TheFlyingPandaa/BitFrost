@@ -375,7 +375,7 @@ void DXApp::CreateTriangleData()
 
 	light.dir = XMFLOAT3(1.0f, 0.0f, 0.0f);
 	light.pad = float(1);
-	light.ambientLight = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	light.ambientLight = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
 	light.diffues = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	light.Position = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	//light.Position = XMFLOAT3(1, 0, 0);

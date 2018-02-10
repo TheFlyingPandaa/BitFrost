@@ -66,45 +66,47 @@ float4 main(VS_OUT input) : SV_Target
     float3 diffuse = gTexDiffuse.Sample(sampAni, input.Tex).rgb;
 	float3 shadow = gTexShadow.Sample(sampAni, input.Tex).rgb;
 	float3 position = gTexPosition.Sample(sampAni, input.Tex).rgb;
-	normal = normalize(normal);
-	float3 view = normalize(float3(1,1,1) - position);
+	//normal = normalize(normal);
+	//float3 view = normalize(float3(1,1,1) - position);
 
-	float r = reflect(light.dir, normal);
+	//float r = reflect(light.dir, normal);
 
-	pOut = calcPhongLighting(mat, lightCol, normal, -light.dir, view,r);
+	//pOut = calcPhongLighting(mat, lightCol, normal, -light.dir, view,r)
 
-	return float4(position, 1.0f);
+	//return float4(position, 1.0f);
+    float3 lightDir = normalize(float3(500, 500, 0) - position);
 
-  //  
-  //      float3 lightDir = normalize(light.dir);
-  //  if (length(normal) > 0.0f && false)
-  //  {
-  //     
-  //      float3 position = gTexPosition.Sample(sampAni, input.Tex).rgb; //float3(1, 1, 1); //float3(view._41, view._42, view._43);
-  //  
-  //      float lambertian = max(dot(lightDir, normal), 0.0f);
-  //      float specular = 0.0f;
+    float3 finalColor;
 
-		//[flatten]
-  //      if (lambertian > 0.0f)
-  //      {
-  //          float3 viewDir = normalize(-position);
-  //          float3 halfDir = normalize(lightDir + viewDir);
-  //          float specAngle = max(dot(halfDir, normal), 0.0f);
-  //          specular = pow(specAngle, 30.0f);
-  //      }
-  //      float3 colorLinear = lambertian * diffuse + specular * float3(1.0f, 1.0f, 1.0f);
-  //      pOut = float4(pow(colorLinear, float3(1.0f / 2.2f, 1.0f / 2.2f, 1.0f / 2.2f)), 1.0f);
-  //      return pOut;
-  //  }
-
-	/*float3 finalColor;
-
-    finalColor = diffuse * light.ambient;
-    finalColor += saturate(dot(light.dir, normal) * light.diffuse * diffuse);
+    finalColor = diffuse * light.ambient.xyz;
+    finalColor += saturate(dot(lightDir, normal) * light.diffuse.xyz * diffuse);
     
-    return float4(finalColor, 1.0f);*/
+    
+    if (length(normal) > 0.0f )
+    {
+       
+        //float3 position = gTexPosition.Sample(sampAni, input.Tex).rgb; //float3(1, 1, 1); //float3(view._41, view._42, view._43);
+    
+        float lambertian = max(dot(lightDir, normal), 0.0f);
+        float specular = 0.0f;
 
-    /*pOut = float4(normal, 1.0f);
-    return pOut;*/
+		[flatten]
+        if (lambertian > 0.0f)
+        {
+            float3 viewDir = normalize(-position);
+            float3 halfDir = normalize(lightDir + viewDir);
+            float specAngle = max(dot(halfDir, normal), 0.0f);
+            specular = pow(specAngle, 15.0f);
+        }
+        float3 colorLinear = lambertian * diffuse + specular * float3(0.2f, 0.2f, 0.2f);
+        pOut = float4(pow(colorLinear, float3(1.0f / 2.2f, 1.0f / 2.2f, 1.0f / 2.2f)), 1.0f);
+        pOut.xyz = pOut.xyz + diffuse * light.ambient.xyz;
+        return pOut;
+    }
+
+   // diffuse = diffuse * float3(2, 2, 2);
+    pOut = float4(diffuse, 1.0f);
+    pOut.xyz = pOut.xyz + finalColor;
+    //pOut = pOut * light.ambient;
+    return pOut;
 }
