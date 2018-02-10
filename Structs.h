@@ -23,6 +23,7 @@ struct Light
 	float pad;
 	DirectX::XMFLOAT4 ambientLight;
 	DirectX::XMFLOAT4 diffues;
+	DirectX::XMFLOAT4 Position;
 };
 
 struct constBuffFrame
@@ -46,6 +47,7 @@ struct TextureRenderTarget
 
 struct cameraBuffer {
 	DirectX::XMFLOAT4A cameraPosition;
+	DirectX::XMFLOAT3 cam;
 };
 
 

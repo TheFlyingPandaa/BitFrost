@@ -6,9 +6,9 @@ DXApp::DXApp()
 {
 	//gameInput = KeyboardInput();
 	/*renderObject = new RenderObject("r8.obj", L"dick.jpg");
-	renderObject->setPosition(0.5f, 0, 0.5f);
-	renderObject->setScale(0.01f, 0.01f, 0.01f);
-	secondCube = new RenderObject("r8.obj", L"grass.jpg");
+	renderObject->setPosition(0.5f, -2, 0.5f);
+	renderObject->setScale(0.1f, 0.1f, 0.f);*/
+	/*secondCube = new RenderObject("r8.obj", L"grass.jpg");
 	secondCube->setPosition(-1, -1, -1);
 	secondCube->setScale(.1f, .1f, .1f);
 	*/
@@ -69,6 +69,7 @@ void DXApp::DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 		SetViewport();	
 		//3 viewPort
 		CreateShader::CreateShaders(gDevice, gVertexShader, gPixelShader, gGeomertyShader, gVertexLayout, deferredVertex, deferredPixel, gHullShader, gDomainShader);
+		CreateShader::CreateShaders2(gDevice, shadowMapVertexShader, shadowMapPixelShader);
 		//4. Shaders vertex osv
 
 		CreateTriangleData();		//5. Triangeln. kommer bytas
@@ -294,6 +295,37 @@ void DXApp::CreateDepthBuffer() {
 
 	// set the render target as the back buffer
 	gDeviceContext->OMSetRenderTargets(1, &gBackbufferRTV, depthStencilView);
+
+	D3D11_TEXTURE2D_DESC texDesc;
+	texDesc.Width = WINDOW_WIDTH;
+	texDesc.Height = WINDOW_HEIGHT;
+	texDesc.MipLevels = 1;
+	texDesc.ArraySize = 1;
+	texDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+	texDesc.Usage = D3D11_USAGE_DEFAULT;
+	texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+	texDesc.CPUAccessFlags = 0;
+	texDesc.MiscFlags = 0;
+
+	gDevice->CreateTexture2D(&texDesc, NULL, &texShadowMap);
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+	dsvDesc.Flags = 0;
+	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Texture2D.MipSlice = 0;
+
+	gDevice->CreateDepthStencilView(texShadowMap, &dsvDesc, &shadowMapView);
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = texDesc.MipLevels;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+
+	gDevice->CreateShaderResourceView(texShadowMap, &srvDesc, &shadowMapSRV);
 }
 
 void DXApp::CreateTriangleData()
@@ -341,9 +373,12 @@ void DXApp::CreateTriangleData()
 
 	camProjection = XMMatrixPerspectiveFovLH(XM_PI * 0.45f, WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 20.0f);
 
-	light.dir = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	light.ambientLight = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
+	light.dir = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	light.pad = float(1);
+	light.ambientLight = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 	light.diffues = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	light.Position = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	//light.Position = XMFLOAT3(1, 0, 0);
 	/*
 	D3D11_BUFFER_DESC bufferDesc;
 	memset(&bufferDesc, 0, sizeof(bufferDesc));
@@ -446,6 +481,7 @@ void DXApp::MovingBuffersToGPU()
 	gDeviceContext->Unmap(camBuffer, 0);
 	// set resource to Vertex Shader
 	gDeviceContext->GSSetConstantBuffers(2, 1, &camBuffer);
+	gDeviceContext->PSSetConstantBuffers(2, 1, &camBuffer);
 }
 
 
@@ -494,11 +530,24 @@ void DXApp::DrawGeometry()
 
 void DXApp::FirstDrawPass()
 {
+	gDeviceContext->IASetInputLayout(gVertexLayout);
+
+	gDeviceContext->OMSetRenderTargets(0, 0, shadowMapView);
+	gDeviceContext->ClearDepthStencilView(shadowMapView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	gDeviceContext->VSSetShader(this->shadowMapVertexShader, nullptr, 0);
+	gDeviceContext->HSSetShader(nullptr, nullptr, 0);
+	gDeviceContext->DSSetShader(nullptr, nullptr, 0);
+	gDeviceContext->GSSetShader(nullptr, nullptr, 0);
+	gDeviceContext->PSSetShader(this->shadowMapPixelShader, nullptr, 0);
+
+	DrawGeometry();
+
 	UINT32 vertexSize = sizeof(float) * amountOfValuesInVertex; //The const (5) is the amount of vertexes
 	UINT32 offset = 0;
 
 	//gDeviceContext->IASetVertexBuffers(0, 1, &gVertexBuffer, &vertexSize, &offset);
-	gDeviceContext->IASetInputLayout(gVertexLayout);
+	//gDeviceContext->IASetInputLayout(gVertexLayout);
 
 	gDeviceContext->VSSetShader(this->gVertexShader, nullptr, 0);
 	gDeviceContext->HSSetShader(this->gHullShader, nullptr, 0);
@@ -546,6 +595,7 @@ void DXApp::SecondDrawPass()
 	gDeviceContext->PSSetShaderResources(1, 1, &graphicsBuffer[0].shaderResourceView);
 	gDeviceContext->PSSetShaderResources(2, 1, &graphicsBuffer[1].shaderResourceView);
 	gDeviceContext->PSSetShaderResources(3, 1, &graphicsBuffer[2].shaderResourceView);
+	gDeviceContext->PSSetShaderResources(4, 1, &shadowMapSRV);
 
 	
 	gDeviceContext->Draw(4, 0);

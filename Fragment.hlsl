@@ -3,6 +3,7 @@ SamplerState sampAni;
 struct GS_OUT
 {
 	float4 Pos : SV_POSITION;
+	float4 worldPos : PUSS;
 	float2 Tex : TEXCOORD;
     float3 Normal : NORMAL;
 };
@@ -12,6 +13,7 @@ struct Light
     float3 dir;
     float4 ambient;
     float4 diffuse;
+	float3 position;
 };
 
 cbuffer PER_FRAME_BUFF : register(b1)
@@ -43,9 +45,9 @@ PixelOutDeferred PS_main(GS_OUT input) : SV_Target
     PixelOutDeferred pOut;
 
     pOut.diffuse = txDiffuse.Sample(sampAni, input.Tex);    
-    pOut.diffuse = float4(input.Normal, 1.0f);
+   // pOut.diffuse = float4(input.Normal, 1.0f);
     pOut.normal = float4(input.Normal, 1.0f);
-    pOut.position = input.Pos;
+    pOut.position = input.worldPos;
     return pOut;
 
 };

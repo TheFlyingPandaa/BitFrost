@@ -133,6 +133,12 @@ private:
 	//Mesh mesh;
 	//RenderObject * renderObject;
 	//RenderObject * secondCube;
+	ID3D11Texture2D* texShadowMap;
+	ID3D11DepthStencilView* shadowMapView;
+	ID3D11ShaderResourceView* shadowMapSRV = nullptr;
+
+	ID3D11VertexShader* shadowMapVertexShader = nullptr;
+	ID3D11PixelShader* shadowMapPixelShader = nullptr;
 
 	ObjectRenderHandler * ORH;
 	//RenderObject * skyMap;

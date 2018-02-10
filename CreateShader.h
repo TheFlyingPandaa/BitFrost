@@ -12,6 +12,7 @@ public:
 	
 
 	static void CreateShaders(ID3D11Device* gDevice, ID3D11VertexShader*& gVertexShader, ID3D11PixelShader*& gPixelShader, ID3D11GeometryShader*& gGeomertyShader, ID3D11InputLayout*& gVertexLayout, ID3D11VertexShader*& deferredVertex, ID3D11PixelShader*& deferredPixel, ID3D11HullShader*& gHullShader ,ID3D11DomainShader*& gDomainShader );
+	static void CreateShaders2(ID3D11Device* gDevice, ID3D11VertexShader*& gVertexShader, ID3D11PixelShader*& gPixelShader);
 private:
 
 };
@@ -163,6 +164,51 @@ inline void CreateShader::CreateShaders(ID3D11Device* gDevice, ID3D11VertexShade
 	gDevice->CreateDomainShader(pDS->GetBufferPointer(), pDS->GetBufferSize(), nullptr, &gDomainShader);
 
 	pDS->Release();
+}
+
+inline void CreateShader::CreateShaders2(ID3D11Device * gDevice, ID3D11VertexShader *& gVertexShader, ID3D11PixelShader *& gPixelShader)
+{
+	ID3DBlob* pVS = nullptr;
+	D3DCompileFromFile(
+		L"ShadowMapVertexShader.hlsl", // filename
+		nullptr,		// optional macros
+		nullptr,		// optional include files
+		"main",		// entry point
+		"vs_5_0",		// shader model (target)
+		0,				// shader compile options			// here DEBUGGING OPTIONS
+		0,				// effect compile options
+		&pVS,			// double pointer to ID3DBlob		
+		nullptr			// pointer for Error Blob messages.
+						// how to use the Error blob, see here
+						// https://msdn.microsoft.com/en-us/library/windows/desktop/hh968107(v=vs.85).aspx
+	);
+
+	gDevice->CreateVertexShader(pVS->GetBufferPointer(), pVS->GetBufferSize(), nullptr, &gVertexShader);
+
+	
+	pVS->Release();
+
+	//create pixel shader
+	ID3DBlob* pPS = nullptr;
+	D3DCompileFromFile(
+		L"ShadowMapPixelShader.hlsl", // filename
+		nullptr,		// optional macros
+		nullptr,		// optional include files
+		"main",		// entry point
+		"ps_5_0",		// shader model (target)
+		0,				// shader compile options
+		0,				// effect compile options
+		&pPS,			// double pointer to ID3DBlob		
+		nullptr			// pointer for Error Blob messages.
+						// how to use the Error blob, see here
+						// https://msdn.microsoft.com/en-us/library/windows/desktop/hh968107(v=vs.85).aspx
+	);
+
+	gDevice->CreatePixelShader(pPS->GetBufferPointer(), pPS->GetBufferSize(), nullptr, &gPixelShader);
+
+
+	// we do not need anymore this COM object, so we release it.
+	pPS->Release();
 }
 
 #endif

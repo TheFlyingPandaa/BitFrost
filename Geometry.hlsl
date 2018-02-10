@@ -12,6 +12,7 @@ cbuffer CAMERA_BUFFERT : register(b2)
 struct GSOutput
 {
 	float4 pos : SV_POSITION;
+	float4 worldPos : PUSS;
 	float2 Tex : TEXCOORD;
     float3 Normal : NORMAL;
 };
@@ -54,7 +55,7 @@ void GS_main(triangle GS_IN input[3]  ,inout TriangleStream< GSOutput > output)
 		
             element.pos = input[i].Pos;
             element.Tex = input[i].Tex;
-
+			element.worldPos = mul(element.pos, worldSpace);
             element.pos = mul(element.pos, WVP);
             element.Normal = normal;
             //element.Normal = mul(element.Normal, worldSpace);

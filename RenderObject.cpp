@@ -47,6 +47,8 @@ void RenderObject::draw(ID3D11DeviceContext *& deviceContext) const
 	deviceContext->PSSetShaderResources(0, 1, &this->tex->getTexture());
 	deviceContext->PSSetSamplers(0, 1, &this->tex->getSampleState());
 
+	deviceContext->VSSetConstantBuffers(3, 1, &constantBuffer);
+
 	deviceContext->Draw(this->mesh->getNrOfVertexes(), 0);
 }
 
