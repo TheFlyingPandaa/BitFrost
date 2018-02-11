@@ -5,9 +5,9 @@
 DXApp::DXApp()
 {
 	//gameInput = KeyboardInput();
-	/*renderObject = new RenderObject("r8.obj", L"dick.jpg");
+	renderObject = new RenderObject("r8.obj", L"dick.jpg");
 	renderObject->setPosition(0.5f, -2, 0.5f);
-	renderObject->setScale(0.1f, 0.1f, 0.f);*/
+	renderObject->setScale(0.1f, 0.1f, 0.f);
 	/*secondCube = new RenderObject("r8.obj", L"grass.jpg");
 	secondCube->setPosition(-1, -1, -1);
 	secondCube->setScale(.1f, .1f, .1f);
@@ -377,6 +377,12 @@ void DXApp::CreateTriangleData()
 	light.pad = float(1);
 	light.ambientLight = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
 	light.diffues = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+
+	
+	wwo = XMMatrixIdentity();
+
+	wwo = camView * camProjection;
+
 	light.Position = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	//light.Position = XMFLOAT3(1, 0, 0);
 	/*
@@ -397,6 +403,7 @@ void DXApp::CreateTriangleData()
 	*/
 
 	ORH->loadBuffert(gDevice);
+	renderObject->loadBuffer(gDevice);
 	//skyMap->loadBuffer(gDevice);
 
 
@@ -428,6 +435,14 @@ void DXApp::Render()
 	ORH->setCamPosition(cameraPos, lookAt);
 	ORH->setMatrix(camView, camProjection);
 
+	float angle = atan2(renderObject->getPosition().x - XMVectorGetX(cameraPos), renderObject->getPosition().z - XMVectorGetZ(cameraPos)) * (180.0 / 3.14159265359f);
+
+	// Convert rotation into radians.
+	float rotInRad = (float)angle * 0.0174532925f;
+
+	renderObject->setMatrix(camView, camProjection,rotInRad);
+	renderObject->setPosition(2, 0, 2);
+	renderObject->setScale(1, 1, 1);
 	//skyMap->setMatrix(camView, camProjection);
 	//skyMap->setPosition(XMVectorGetX(cameraPos), XMVectorGetY(cameraPos), XMVectorGetZ(cameraPos));
 	
@@ -520,7 +535,7 @@ HWND DXApp::getWndHandler() const
 void DXApp::DrawGeometry()
 {
 	//gDeviceContext->Draw(6, 0);
-
+	renderObject->draw(gDeviceContext);
 	ORH->render(gDeviceContext);
 
 

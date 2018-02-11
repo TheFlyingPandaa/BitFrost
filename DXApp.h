@@ -126,12 +126,13 @@ private:
 	XMMATRIX camProjection;
 
 	XMMATRIX WVP;
+	XMMATRIX wwo;
 
 	DIMOUSESTATE mouseLastState;
 	//HeightMap heightMap;
 
 	//Mesh mesh;
-	//RenderObject * renderObject;
+	RenderObject * renderObject;
 	//RenderObject * secondCube;
 	ID3D11Texture2D* texShadowMap;
 	ID3D11DepthStencilView* shadowMapView;

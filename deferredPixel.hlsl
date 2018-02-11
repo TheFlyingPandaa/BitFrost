@@ -85,8 +85,7 @@ float4 main(VS_OUT input) : SV_Target
     if (length(normal) > 0.0f )
     {
        
-        //float3 position = gTexPosition.Sample(sampAni, input.Tex).rgb; //float3(1, 1, 1); //float3(view._41, view._42, view._43);
-    
+
         float lambertian = max(dot(lightDir, normal), 0.0f);
         float specular = 0.0f;
 

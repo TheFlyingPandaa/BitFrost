@@ -66,17 +66,20 @@ struct Vertex {
 class Mesh
 {
 private:
-	std::wstring fileName;	
+	std::wstring fileName;
+	std::string fileNameS;
 
 	int nrOfVertexes;
 	Vertex* m_vertex;
 
 
 	void loadMesh(const wchar_t* fileName, const bool normalIn);
+	void loadMesh(const char * fileName, const bool normalIn);
 
 public:
 	Mesh();
 	Mesh(const wchar_t* fileName, const bool normalIn);
+	Mesh(const char * fileName, const bool normalIn);
 	Mesh(const wchar_t* fileName, const char * textureName, const bool normalIn);
 	~Mesh();	
 

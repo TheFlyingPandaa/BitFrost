@@ -52,13 +52,21 @@ void RenderObject::draw(ID3D11DeviceContext *& deviceContext) const
 	deviceContext->Draw(this->mesh->getNrOfVertexes(), 0);
 }
 
-void RenderObject::setMatrix(const XMMATRIX & view, const XMMATRIX & proj)
+void RenderObject::setMatrix(const XMMATRIX & view, const XMMATRIX & proj, float radsRot)
 {
 	DirectX::XMMATRIX translate = DirectX::XMMatrixTranslation(posX, posY, posZ);
+	XMMATRIX rotation;
 
-	XMVECTOR quat = XMVECTOR();
-	XMMATRIX rotation = XMMatrixRotationRollPitchYawFromVector(quat);
-
+	if (radsRot == NULL)
+	{
+		XMVECTOR quat = XMVECTOR();
+		rotation = XMMatrixRotationRollPitchYawFromVector(quat);
+	}
+	else
+	{
+		XMVECTOR rotaxis = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+		rotation = XMMatrixRotationAxis(rotaxis, radsRot);
+	}
 
 	XMMATRIX scale = XMMatrixScaling(scaleX, scaleY, scaleZ);
 	XMMATRIX m_worldMatrix = rotation * scale * translate;
@@ -72,6 +80,11 @@ void RenderObject::setPosition(float x, float y, float z)
 	posX = x;
 	posY = y;
 	posZ = z;
+}
+
+XMFLOAT3 RenderObject::getPosition() const
+{
+	return XMFLOAT3(posX,posY,posZ);
 }
 
 void RenderObject::setScale(float x, float y, float z)
@@ -99,6 +112,22 @@ RenderObject::RenderObject()
 }
 
 RenderObject::RenderObject(const wchar_t * meshDirr, LPCWSTR textureFile,const bool normalIn)
+{
+	this->mesh = new Mesh(meshDirr, normalIn);
+	this->tex = new Texture();
+	if (textureFile != NULL) {
+		this->textureFile = textureFile;
+	}
+	else
+		this->textureFile = L"Default.png";
+	posX = 0;
+	posY = 0;
+	posZ = 0;
+	scaleX = 1;
+	scaleY = 1;
+	scaleZ = 1;
+}
+RenderObject::RenderObject(const char * meshDirr, LPCWSTR textureFile, const bool normalIn)
 {
 	this->mesh = new Mesh(meshDirr, normalIn);
 	this->tex = new Texture();
