@@ -5,6 +5,13 @@
 #include <winnt.h>
 
 
+struct computeShader
+{
+	float val;
+	float val1;
+	float val2;
+	float val3;
+};
 
 struct valuesFromCpu
 { 

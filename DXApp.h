@@ -106,6 +106,13 @@ private:
 	ID3D11Buffer* constPerFrameBuffer = nullptr;
 	ID3D11Buffer* camBuffer = nullptr;
 
+	ID3D11Buffer* computeBuffer = nullptr;
+	ID3D11ComputeShader* gComputeShader = nullptr;
+	computeShader computeValuesStore;
+	ID3D11Texture2D* computeTex;
+	ID3D11Buffer* destDataGPUBuffer;
+	ID3D11UnorderedAccessView* destDataGPUBufferView;
+
 	XMMATRIX worldMatrix;
 	XMVECTOR camTarget;
 	XMMATRIX camRotationMatrix;
@@ -142,6 +149,8 @@ private:
 	ID3D11PixelShader* shadowMapPixelShader = nullptr;
 
 	ObjectRenderHandler * ORH;
+
+
 	//RenderObject * skyMap;
 
 

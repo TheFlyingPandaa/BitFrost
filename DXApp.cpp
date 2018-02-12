@@ -42,6 +42,7 @@ DXApp::~DXApp()
 	gExampleBuffer->Release();
 	
 	camBuffer->Release();
+	computeBuffer->Release();
 
 	//gVertexBuffer->Release();
 
@@ -49,6 +50,7 @@ DXApp::~DXApp()
 
 
 	delete ORH;
+	delete renderObject;
 
 
 	//delete skyMap;
@@ -68,6 +70,7 @@ void DXApp::DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
 		SetViewport();	
 		//3 viewPort
+		CreateShader::CreateComputeShader(gDevice, gComputeShader);
 		CreateShader::CreateShaders(gDevice, gVertexShader, gPixelShader, gGeomertyShader, gVertexLayout, deferredVertex, deferredPixel, gHullShader, gDomainShader);
 		CreateShader::CreateShaders2(gDevice, shadowMapVertexShader, shadowMapPixelShader);
 		//4. Shaders vertex osv
@@ -247,6 +250,63 @@ void DXApp::CreateConstantBuffer()
 		exit(-1);
 	}
 
+	//FUCKING BULLSHIT. CONSTANT BUFFERS NEEDS A BYTEWIDTH OF 16 * ->WHATEVER
+	//COMPUTESHADER FROM HERE
+	exampleBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	exampleBufferDesc.ByteWidth = sizeof(computeShader);
+	exampleBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	exampleBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	exampleBufferDesc.MiscFlags = 0;
+	exampleBufferDesc.StructureByteStride = 0;
+	hr = 0;
+	hr = gDevice->CreateBuffer(&exampleBufferDesc, nullptr, &computeBuffer);
+	if (FAILED(hr))
+	{
+		// handle the error, could be fatal or a warning...
+		exit(-1);
+	}
+
+	D3D11_TEXTURE2D_DESC textureDesc{};
+	textureDesc.Width = WINDOW_WIDTH;
+	textureDesc.Height = WINDOW_HEIGHT;
+	textureDesc.MipLevels = 1;
+	textureDesc.ArraySize = 1;
+	textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+	gDevice->CreateTexture2D(&textureDesc, NULL, &computeTex);
+
+	D3D11_BUFFER_DESC descGPUBuffer;
+	ZeroMemory(&descGPUBuffer, sizeof(descGPUBuffer));
+	descGPUBuffer.BindFlags = D3D11_BIND_UNORDERED_ACCESS |
+		D3D11_BIND_SHADER_RESOURCE;
+	descGPUBuffer.ByteWidth = sizeof(computeTex);
+	descGPUBuffer.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+	descGPUBuffer.StructureByteStride = 4;    // We assume the data is in the
+											  // RGBA format, 8 bits per chan
+
+	D3D11_SUBRESOURCE_DATA InitData;
+	InitData.pSysMem = &computeTex;
+	gDevice->CreateBuffer(&descGPUBuffer, &InitData, &destDataGPUBuffer);
+
+	D3D11_BUFFER_DESC descBuf;
+	ZeroMemory(&descBuf, sizeof(descBuf));
+	destDataGPUBuffer->GetDesc(&descBuf);
+
+	D3D11_UNORDERED_ACCESS_VIEW_DESC descView;
+	ZeroMemory(&descView, sizeof(descView));
+	descView.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+	descView.Buffer.FirstElement = 0;
+
+	// Format must be must be DXGI_FORMAT_UNKNOWN, when creating 
+	// a View of a Structured Buffer
+	descView.Format = DXGI_FORMAT_UNKNOWN;
+	descView.Buffer.NumElements = descBuf.ByteWidth / descBuf.StructureByteStride;
+
+	gDevice->CreateUnorderedAccessView(destDataGPUBuffer, &descView, &destDataGPUBufferView);
+
 }
 
 void DXApp::setActiveShaders()
@@ -313,6 +373,7 @@ void DXApp::CreateDepthBuffer() {
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
 	dsvDesc.Flags = 0;
+	
 	dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	dsvDesc.Texture2D.MipSlice = 0;
@@ -326,6 +387,8 @@ void DXApp::CreateDepthBuffer() {
 	srvDesc.Texture2D.MostDetailedMip = 0;
 
 	gDevice->CreateShaderResourceView(texShadowMap, &srvDesc, &shadowMapSRV);
+
+	
 }
 
 void DXApp::CreateTriangleData()
@@ -448,6 +511,30 @@ void DXApp::Render()
 	
 	//gDeviceContext->PSSetShaderResources(0, 1, &cubeTexture.getTexture());
 	//gDeviceContext->PSSetSamplers(0, 1, &cubeTexture.getSampleState());
+	gDeviceContext->CSSetShader(gComputeShader, NULL, 0);
+
+	D3D11_MAPPED_SUBRESOURCE dataPtr;
+	gDeviceContext->Map(computeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
+
+	memcpy(dataPtr.pData, &computeValuesStore, sizeof(computeShader));
+	// UnMap constant buffer so that we can use it again in the GPU
+	
+	// set resource to Vertex Shader
+	
+	gDeviceContext->CSSetConstantBuffers(0, 1, &computeBuffer);
+	gDeviceContext->CSSetUnorderedAccessViews(0,1, &destDataGPUBufferView, NULL);
+
+	computeValuesStore.val = 1;
+	
+	gDeviceContext->Dispatch(1, 1, 1);
+
+	gDeviceContext->Unmap(computeBuffer, 0);
+	gDeviceContext->CSSetShader(NULL, NULL, 0);
+
+	//gDeviceContext->CSGetConstantBuffers();
+
+	
+	
 
 
 	holdBuffPerFrame.light = light;
@@ -497,6 +584,11 @@ void DXApp::MovingBuffersToGPU()
 	// set resource to Vertex Shader
 	gDeviceContext->GSSetConstantBuffers(2, 1, &camBuffer);
 	gDeviceContext->PSSetConstantBuffers(2, 1, &camBuffer);
+
+	//computeShader
+	
+
+
 }
 
 

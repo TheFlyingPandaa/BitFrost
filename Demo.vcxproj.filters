@@ -74,6 +74,9 @@
     <FxCompile Include="ShadowMapPixelShader.hlsl">
       <Filter>shaders</Filter>
     </FxCompile>
+    <FxCompile Include="ComputeShader.hlsl">
+      <Filter>shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DXApp.h">
