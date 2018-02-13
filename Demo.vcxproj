@@ -98,6 +98,7 @@
     <ClCompile Include="HeightMap.cpp" />
     <ClCompile Include="KeyboardInput.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Matrial.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="ObjectRenderHandler.cpp" />
     <ClCompile Include="RenderObject.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="DXApp.h" />
     <ClInclude Include="HeightMap.h" />
     <ClInclude Include="KeyboardInput.h" />
+    <ClInclude Include="Matrial.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="ObjectRenderHandler.h" />
     <ClInclude Include="RenderObject.h" />

@@ -35,6 +35,7 @@ void Mesh::loadMesh(const wchar_t * fileName, const bool normalIn)
 		else if ((*coord[i])[0] == 'v' && (*coord[i])[1] == ' ') {			
 			sscanf(coord[i]->c_str(), "%*s %f %f %f", &tmpX, &tmpY, &tmpZ);
 			vertex.push_back(new Coords(tmpX, tmpY, tmpZ));
+			
 		}
 		else if ((*coord[i])[0] == 'v' && (*coord[i])[1] == 'n') {			
 			sscanf(coord[i]->c_str(), "%*s %f %f %f", &tmpX, &tmpY, &tmpZ);
@@ -114,43 +115,6 @@ void Mesh::loadMesh(const wchar_t * fileName, const bool normalIn)
 			}
 		}
 	}
-	/*std::ofstream out("Debug.txt");
-	out << "vertex " << vertex.size() << std::endl;
-	for (int i = 0; i < vertex.size(); i++)
-	{
-		out << vertex[i]->x << " " << vertex[i]->y << " " << vertex[i]->z << std::endl;
-	}
-	out << "Tex " << texCoord.size() << std::endl;
-	for (int i = 0; i < texCoord.size(); i++)
-	{
-		out << texCoord[i]->x << " " << texCoord[i]->y << std::endl;
-	}
-	out << "normals " << normals.size() << std::endl;
-	for (int i = 0; i < normals.size(); i++)
-	{
-		out << normals[i]->x << " " << normals[i]->y << " " << normals[i]->z << std::endl;
-	}
-	out << "Face " << faces.size() << std::endl;
-	for (int i = 0; i < faces.size(); i++)
-	{
-		
-		if (faces[i]->quad)
-		{
-			for (int j = 0; j < 4; j++)
-			{
-				out << faces[i]->face[j] << " " << faces[i]->texCord[j] << " " << faces[i]->facenum << "/";
-			}
-		}
-		else {
-			for (int j = 0; j < 3; j++)
-			{
-				out << faces[i]->face[j] << " ";
-			}
-		}			
-		out << std::endl;
-	}
-	out << this->nrOfVertexes;
-	out.close();*/
 
 	for (int i = 0; i < faces.size(); i++)
 		delete faces[i];

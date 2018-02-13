@@ -17,6 +17,8 @@
 
 #include "Texture.h"
 
+#include "Matrial.h"
+
 using namespace DirectX;
 
 struct Coords

@@ -1,6 +1,6 @@
 #include "DXApp.h"
 
-
+#include "Matrial.h"
 
 DXApp::DXApp()
 {
@@ -18,6 +18,8 @@ DXApp::DXApp()
 	//skyMap = new RenderObject(L"r8.obj", L"dick.jpg", true);
 	//skyMap->setScale(10, 10, 10);
 	heightMap = HeightMap();
+
+	Matrial m(L"Test.mtl", L"Material");
 }
 
 DXApp::~DXApp()
