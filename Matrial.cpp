@@ -2,12 +2,12 @@
 
 
 
-Matrial::Matrial()
+Material::Material()
 {
 	this->material = new mtl();
 }
 
-Matrial::Matrial(std::wstring mtlPath, std::wstring materialName)
+Material::Material(std::wstring mtlPath, std::wstring materialName)
 {
 	this->material = new mtl();
 	this->path = mtlPath;
@@ -16,14 +16,19 @@ Matrial::Matrial(std::wstring mtlPath, std::wstring materialName)
 
 
 
-Matrial::~Matrial()
+Material::~Material()
 {
-
+	
 	delete material;
 	
 }
 
-void Matrial::loadMtl(std::wstring materialName)
+mtl * Material::getMtl()
+{
+	return material;
+}
+
+void Material::loadMtl(std::wstring materialName)
 {
 	std::wstring buff;
 	wchar_t inputBuff[32];
@@ -32,7 +37,11 @@ void Matrial::loadMtl(std::wstring materialName)
 
 	bool skip = false;
 
+
 	std::wifstream inFile(this->path);
+	if (!inFile.is_open())
+		throw "No .mtl found";
+
 	while (!inFile.eof() && std::getline(inFile, buff))
 	{
 		if (buff[0] == '#'){}
@@ -83,23 +92,5 @@ void Matrial::loadMtl(std::wstring materialName)
 		}
 	}
 	
-	
-	std::wofstream out("debug.txt");
-
-	out << material->name << std::endl;
-	out << material->ns << std::endl;
-	out << material->ka.x << material->ka.y << material->ka.z << material->ka.w << std::endl;
-	out << material->kd.x << material->kd.y << material->kd.z << material->kd.w << std::endl;
-	out << material->ks.x << material->ks.y << material->ks.z << material->ks.w << std::endl;
-	out << material->ke.x << material->ke.y << material->ke.z << material->ke.w << std::endl;
-	out << material->ni << std::endl;
-	out << material->d << std::endl;
-	out << material->ilum << std::endl;
-	out << material->textureName << std::endl;
-
-	out.close();
-	
-
-
 	inFile.close();
 }

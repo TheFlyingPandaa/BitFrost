@@ -8,7 +8,7 @@ The Big TODO: List
 ```
 **Geometry : 2**
 ```diff
-+ Parsing and rendering an existing model format(OBJ, MD5, etc). //MTL not implemented
++ Parsing and rendering an existing model format(OBJ, MD5, etc).
 - Displacement mapping using Tessellation hardware.
 - Height-map terrain rendering, user can walk on the terrainusing WASD keys.
 + Level of Detail using Tessellation Hardware.

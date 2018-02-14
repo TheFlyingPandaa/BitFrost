@@ -15,9 +15,9 @@ private:
 	Mesh * mesh;
 	
 	LPCWSTR textureFile;
-	Texture * tex;
+	Texture ** tex;
 
-	ID3D11Buffer * vertexBuffer = nullptr;
+	ID3D11Buffer ** vertexBuffer = nullptr;
 	ID3D11Buffer * constantBuffer = nullptr;
 
 	XMFLOAT3 * position = nullptr;

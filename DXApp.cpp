@@ -1,11 +1,11 @@
 #include "DXApp.h"
 
-//#include "Matrial.h"
+#include "Matrial.h"
 
 DXApp::DXApp()
 {
 	//gameInput = KeyboardInput();
-	renderObject = new RenderObject("r8.obj", L"dick.jpg");
+	renderObject = new RenderObject(L"r8.obj", L"dick.jpg");
 	renderObject->setPosition(0.5f, -2, 0.5f);
 	renderObject->setScale(0.1f, 0.1f, 0.f);
 	/*secondCube = new RenderObject("r8.obj", L"grass.jpg");
@@ -254,7 +254,6 @@ void DXApp::CreateConstantBuffer()
 
 	//FUCKING BULLSHIT. CONSTANT BUFFERS NEEDS A BYTEWIDTH OF 16 * ->WHATEVER
 	//COMPUTESHADER FROM HERE
-	//CONSTBUFFER
 	exampleBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	exampleBufferDesc.ByteWidth = sizeof(computeShader);
 	exampleBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -500,12 +499,6 @@ void DXApp::Render()
 	ORH->setCamPosition(cameraPos, lookAt);
 	ORH->setMatrix(camView, camProjection);
 
-	//float angle = atan2(renderObject->getPosition().x - XMVectorGetX(cameraPos), renderObject->getPosition().z - XMVectorGetZ(cameraPos)) * (180.0 / 3.14159265359f);
-
-	// Convert rotation into radians.
-	// = (float)angle * 0.0174532925f;
-
-	
 	//skyMap->setMatrix(camView, camProjection);
 	//skyMap->setPosition(XMVectorGetX(cameraPos), XMVectorGetY(cameraPos), XMVectorGetZ(cameraPos));
 	
@@ -515,6 +508,7 @@ void DXApp::Render()
 
 	D3D11_MAPPED_SUBRESOURCE dataPtr;
 	gDeviceContext->Map(computeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
+
 	//computeValuesStore.val = 1;
 	computeValuesStore.output = XMFLOAT2(0,0); //Need Padding
 	computeValuesStore.camPos = XMFLOAT2(XMVectorGetX(cameraPos), XMVectorGetZ(cameraPos));
@@ -549,6 +543,7 @@ void DXApp::Render()
 	renderObject->setMatrix(camView, camProjection, rotInRad);
 	renderObject->setPosition(2, 0, 2);
 	renderObject->setScale(1, 1, 1);
+
 
 	holdBuffPerFrame.light = light;
 
