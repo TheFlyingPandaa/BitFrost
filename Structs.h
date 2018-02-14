@@ -7,10 +7,11 @@
 
 struct computeShader
 {
-	float val;
-	float val1;
-	float val2;
-	float val3;
+	//float val;
+	DirectX::XMFLOAT2 output;
+	DirectX::XMFLOAT2 camPos;
+	DirectX::XMFLOAT2 objectPos;
+	DirectX::XMFLOAT2 padding;
 };
 
 struct valuesFromCpu

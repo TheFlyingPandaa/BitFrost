@@ -1,6 +1,6 @@
 #include "DXApp.h"
 
-#include "Matrial.h"
+//#include "Matrial.h"
 
 DXApp::DXApp()
 {
@@ -19,7 +19,7 @@ DXApp::DXApp()
 	//skyMap->setScale(10, 10, 10);
 	heightMap = HeightMap();
 
-	Matrial m(L"Test.mtl", L"Material");
+	//Matrial m(L"Test.mtl", L"Material");
 }
 
 DXApp::~DXApp()
@@ -254,6 +254,7 @@ void DXApp::CreateConstantBuffer()
 
 	//FUCKING BULLSHIT. CONSTANT BUFFERS NEEDS A BYTEWIDTH OF 16 * ->WHATEVER
 	//COMPUTESHADER FROM HERE
+	//CONSTBUFFER
 	exampleBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	exampleBufferDesc.ByteWidth = sizeof(computeShader);
 	exampleBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -267,48 +268,47 @@ void DXApp::CreateConstantBuffer()
 		// handle the error, could be fatal or a warning...
 		exit(-1);
 	}
+	//OUTPUTBUFFER
+	D3D11_BUFFER_DESC outputDesc;
+	outputDesc.Usage = D3D11_USAGE_DEFAULT;
+	outputDesc.ByteWidth = sizeof(computeShader) * NUM_PARTICLES;
+	outputDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
+	outputDesc.CPUAccessFlags = 0;
+	outputDesc.StructureByteStride = sizeof(computeShader);
+	outputDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 
-	D3D11_TEXTURE2D_DESC textureDesc{};
-	textureDesc.Width = WINDOW_WIDTH;
-	textureDesc.Height = WINDOW_HEIGHT;
-	textureDesc.MipLevels = 1;
-	textureDesc.ArraySize = 1;
-	textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	textureDesc.SampleDesc.Count = 1;
-	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	hr = 0;
+	hr  = gDevice->CreateBuffer(&outputDesc, 0, &computeOutputBuffer);
+	if (FAILED(hr))
+	{
+		// handle the error, could be fatal or a warning...
+		exit(-1);
+	}
+	//SAME SHIT ASS ABOVE BUT FOR OTHER
+	outputDesc.Usage = D3D11_USAGE_STAGING;
+	outputDesc.BindFlags = 0;
+	outputDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
-	gDevice->CreateTexture2D(&textureDesc, NULL, &computeTex);
+	hr = gDevice->CreateBuffer(&outputDesc, 0, &computeReadWriteBuffer);
+	if (FAILED(hr))
+	{
+		// handle the error, could be fatal or a warning...
+		exit(-1);
+	}
 
-	D3D11_BUFFER_DESC descGPUBuffer;
-	ZeroMemory(&descGPUBuffer, sizeof(descGPUBuffer));
-	descGPUBuffer.BindFlags = D3D11_BIND_UNORDERED_ACCESS |
-		D3D11_BIND_SHADER_RESOURCE;
-	descGPUBuffer.ByteWidth = sizeof(computeTex);
-	descGPUBuffer.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-	descGPUBuffer.StructureByteStride = 4;    // We assume the data is in the
-											  // RGBA format, 8 bits per chan
+	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+	uavDesc.Buffer.FirstElement = 0;
+	uavDesc.Buffer.Flags = 0;
+	uavDesc.Buffer.NumElements = NUM_PARTICLES; //Number of "particles"
+	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 
-	D3D11_SUBRESOURCE_DATA InitData;
-	InitData.pSysMem = &computeTex;
-	gDevice->CreateBuffer(&descGPUBuffer, &InitData, &destDataGPUBuffer);
-
-	D3D11_BUFFER_DESC descBuf;
-	ZeroMemory(&descBuf, sizeof(descBuf));
-	destDataGPUBuffer->GetDesc(&descBuf);
-
-	D3D11_UNORDERED_ACCESS_VIEW_DESC descView;
-	ZeroMemory(&descView, sizeof(descView));
-	descView.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-	descView.Buffer.FirstElement = 0;
-
-	// Format must be must be DXGI_FORMAT_UNKNOWN, when creating 
-	// a View of a Structured Buffer
-	descView.Format = DXGI_FORMAT_UNKNOWN;
-	descView.Buffer.NumElements = descBuf.ByteWidth / descBuf.StructureByteStride;
-
-	gDevice->CreateUnorderedAccessView(destDataGPUBuffer, &descView, &destDataGPUBufferView);
-
+	hr = gDevice->CreateUnorderedAccessView(computeOutputBuffer, &uavDesc, &computeBufferUAV);
+	if (FAILED(hr))
+	{
+		// handle the error, could be fatal or a warning...
+		exit(-1);
+	}
 }
 
 void DXApp::setActiveShaders()
@@ -500,14 +500,12 @@ void DXApp::Render()
 	ORH->setCamPosition(cameraPos, lookAt);
 	ORH->setMatrix(camView, camProjection);
 
-	float angle = atan2(renderObject->getPosition().x - XMVectorGetX(cameraPos), renderObject->getPosition().z - XMVectorGetZ(cameraPos)) * (180.0 / 3.14159265359f);
+	//float angle = atan2(renderObject->getPosition().x - XMVectorGetX(cameraPos), renderObject->getPosition().z - XMVectorGetZ(cameraPos)) * (180.0 / 3.14159265359f);
 
 	// Convert rotation into radians.
-	float rotInRad = (float)angle * 0.0174532925f;
+	// = (float)angle * 0.0174532925f;
 
-	renderObject->setMatrix(camView, camProjection,rotInRad);
-	renderObject->setPosition(2, 0, 2);
-	renderObject->setScale(1, 1, 1);
+	
 	//skyMap->setMatrix(camView, camProjection);
 	//skyMap->setPosition(XMVectorGetX(cameraPos), XMVectorGetY(cameraPos), XMVectorGetZ(cameraPos));
 	
@@ -517,27 +515,40 @@ void DXApp::Render()
 
 	D3D11_MAPPED_SUBRESOURCE dataPtr;
 	gDeviceContext->Map(computeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
-
+	//computeValuesStore.val = 1;
+	computeValuesStore.output = XMFLOAT2(0,0); //Need Padding
+	computeValuesStore.camPos = XMFLOAT2(XMVectorGetX(cameraPos), XMVectorGetZ(cameraPos));
+	computeValuesStore.objectPos = XMFLOAT2(renderObject->getPosition().x, renderObject->getPosition().z);
 	memcpy(dataPtr.pData, &computeValuesStore, sizeof(computeShader));
 	// UnMap constant buffer so that we can use it again in the GPU
-	
-	// set resource to Vertex Shader
+	gDeviceContext->Unmap(computeBuffer, 0);
 	
 	gDeviceContext->CSSetConstantBuffers(0, 1, &computeBuffer);
-	gDeviceContext->CSSetUnorderedAccessViews(0,1, &destDataGPUBufferView, NULL);
-
-	computeValuesStore.val = 1;
+	gDeviceContext->CSSetUnorderedAccessViews(0,1, &computeBufferUAV, NULL);
 	
-	gDeviceContext->Dispatch(1, 1, 1);
-
-	gDeviceContext->Unmap(computeBuffer, 0);
+	gDeviceContext->Dispatch(NUM_PARTICLES, 1, 1);
+	
+	ID3D11UnorderedAccessView* nullUAV[] = { NULL };
+	gDeviceContext->CSSetUnorderedAccessViews(0, 1, nullUAV, 0);
 	gDeviceContext->CSSetShader(NULL, NULL, 0);
-
-	//gDeviceContext->CSGetConstantBuffers();
-
 	
-	
+	gDeviceContext->CopyResource(computeReadWriteBuffer, computeOutputBuffer);
 
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	HRESULT hr = gDeviceContext->Map(computeReadWriteBuffer, 0, D3D11_MAP_READ, 0, &mappedResource);
+	float rotInRad = 0;
+	if (SUCCEEDED(hr))
+	{
+		computeShader* dataView = reinterpret_cast<computeShader*>(mappedResource.pData);
+		
+		 rotInRad = dataView[0].output.x;
+
+		gDeviceContext->Unmap(computeReadWriteBuffer, 0);
+	}
+	
+	renderObject->setMatrix(camView, camProjection, rotInRad);
+	renderObject->setPosition(2, 0, 2);
+	renderObject->setScale(1, 1, 1);
 
 	holdBuffPerFrame.light = light;
 

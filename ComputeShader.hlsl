@@ -1,24 +1,27 @@
 cbuffer EXAMPLE_BUFFER : register(b0)
 {
-	float val;
-	float val1;
-	float val2;
-	float val3;
+    float2 output;
+    float2 camPos;
+    float2 objectPos;
+    float2 padding;     //NEED PADDING CUZ 16 * n
 };
 
-struct Pixel
+struct computeShader
 {
-	int colour;
+    float2 output;
+    float2 camPos;
+    float2 objectPos;
+    float2 padding;
 };
 
-RWStructuredBuffer<Pixel> BufferOut : register(u0);
+RWStructuredBuffer<computeShader> BufferOut : register(u0);
 
 [numthreads(1, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
-	for (int i = 0; i < 5; i++)
-	{
-		BufferOut[i].colour = val + 1;
-	}
+    float angle = atan2(objectPos.x - camPos.x, objectPos.y - camPos.y) * (180.0 / 3.14159265359f);
+	// Convert rotation into radians.
+    float rotInRad = (float) angle * 0.0174532925f;
 	
+    BufferOut[DTid.x].output.x = rotInRad;
 }

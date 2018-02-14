@@ -109,9 +109,11 @@ private:
 	ID3D11Buffer* computeBuffer = nullptr;
 	ID3D11ComputeShader* gComputeShader = nullptr;
 	computeShader computeValuesStore;
-	ID3D11Texture2D* computeTex;
-	ID3D11Buffer* destDataGPUBuffer;
-	ID3D11UnorderedAccessView* destDataGPUBufferView;
+	//ID3D11Texture2D* computeTex;
+	int NUM_PARTICLES= 1;
+	ID3D11Buffer* computeReadWriteBuffer;
+	ID3D11Buffer* computeOutputBuffer;
+	ID3D11UnorderedAccessView* computeBufferUAV;
 
 	XMMATRIX worldMatrix;
 	XMVECTOR camTarget;
