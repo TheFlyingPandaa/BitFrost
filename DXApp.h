@@ -148,7 +148,7 @@ private:
 	ID3D11VertexShader* shadowMapVertexShader = nullptr;
 	ID3D11PixelShader* shadowMapPixelShader = nullptr;
 
-	ObjectRenderHandler * ORH;
+	//ObjectRenderHandler * ORH;
 
 
 	//RenderObject * skyMap;
