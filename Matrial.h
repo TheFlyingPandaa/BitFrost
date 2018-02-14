@@ -24,13 +24,15 @@ struct mtl {
 	}
 };
 
-class Matrial
+class Material
 {
 public:
-	Matrial();
-	Matrial(std::wstring mtlPath, std::wstring materialName = L"");
+	Material();
+	Material(std::wstring mtlPath, std::wstring materialName = L"");
 	
-	~Matrial();
+	~Material();
+
+	mtl * getMtl();
 
 private:
 	mtl * material;

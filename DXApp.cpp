@@ -5,15 +5,15 @@
 DXApp::DXApp()
 {
 	//gameInput = KeyboardInput();
-	renderObject = new RenderObject("r8.obj", L"dick.jpg");
+	renderObject = new RenderObject(L"r8.obj", L"dick.jpg");
 	renderObject->setPosition(0.5f, -2, 0.5f);
 	renderObject->setScale(0.1f, 0.1f, 0.f);
 	/*secondCube = new RenderObject("r8.obj", L"grass.jpg");
 	secondCube->setPosition(-1, -1, -1);
 	secondCube->setScale(.1f, .1f, .1f);
 	*/
-	//ORH = new ObjectRenderHandler("Objects");
-	//ORH->loadObjects();
+	ORH = new ObjectRenderHandler("Objects");
+	ORH->loadObjects();
 
 	//skyMap = new RenderObject(L"r8.obj", L"dick.jpg", true);
 	//skyMap->setScale(10, 10, 10);
@@ -51,7 +51,7 @@ DXApp::~DXApp()
 	//constPerFrameBuffer->Release();
 
 
-	//delete ORH;
+	delete ORH;
 	delete renderObject;
 
 
@@ -467,7 +467,7 @@ void DXApp::CreateTriangleData()
 	gDevice->CreateBuffer(&bufferDesc, &data, &gVertexBuffer);
 	*/
 
-	//ORH->loadBuffert(gDevice);
+	ORH->loadBuffert(gDevice);
 	renderObject->loadBuffer(gDevice);
 	//skyMap->loadBuffer(gDevice);
 
@@ -497,8 +497,8 @@ void DXApp::Render()
 	worldMatrix = Scale * Rotation * Translation;
 	WVP = worldMatrix * camView * camProjection;
 
-	//ORH->setCamPosition(cameraPos, lookAt);
-	//ORH->setMatrix(camView, camProjection);
+	ORH->setCamPosition(cameraPos, lookAt);
+	ORH->setMatrix(camView, camProjection);
 
 	float angle = atan2(renderObject->getPosition().x - XMVectorGetX(cameraPos), renderObject->getPosition().z - XMVectorGetZ(cameraPos)) * (180.0 / 3.14159265359f);
 
@@ -630,7 +630,7 @@ void DXApp::DrawGeometry()
 {
 	//gDeviceContext->Draw(6, 0);
 	renderObject->draw(gDeviceContext);
-	//ORH->render(gDeviceContext);
+	ORH->render(gDeviceContext);
 
 
 	//skyMap->draw(gDeviceContext);

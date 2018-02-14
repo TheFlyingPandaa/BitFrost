@@ -69,20 +69,17 @@ struct object {
 	std::wstring objectName;
 	std::wstring materialname;
 
-	std::vector<Coords*> vertex;
 	std::vector<Faces*> faces;
-	std::vector<Coords*> normals;
-	std::vector<TexCoord*> texCoord;
+	
 
 	int nrOfVertexes;
 	Vertex * mesh;
+	Material* mat;
 
 	object(std::wstring objectName) : objectName(objectName) {
 
-		vertex = std::vector<Coords*>();
 		faces = std::vector<Faces*>();
-		normals = std::vector<Coords*>();
-		texCoord = std::vector<TexCoord*>();
+		
 	};
 };
 
@@ -90,14 +87,12 @@ class Mesh
 {
 private:
 	std::wstring fileName;
-	std::string fileNameS;
-
-	int nrOfVertexes;
-	Vertex* m_vertex;
+	std::string fileNameS;	
 
 	std::vector<object*> objects;
 
 	std::wstring mtlLib;
+
 
 	void loadMesh(const wchar_t* fileName, const bool normalIn);
 	void loadMesh(const char * fileName, const bool normalIn);
@@ -111,5 +106,8 @@ public:
 
 	int getNrOfVertexes() const;
 	Vertex * GetMesh();
+
+	std::vector<object*> getObjects();
+	int getNrOfObjects() const;
 };
 #endif // !Mesh.h
