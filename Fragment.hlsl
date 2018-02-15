@@ -1,4 +1,5 @@
 Texture2D txDiffuse : register(t0);
+Texture2D txNormal : register(t1);
 SamplerState sampAni;
 struct GS_OUT
 {
@@ -45,8 +46,8 @@ PixelOutDeferred PS_main(GS_OUT input) : SV_Target
     PixelOutDeferred pOut;
 
     pOut.diffuse = txDiffuse.Sample(sampAni, input.Tex);    
-   // pOut.diffuse = float4(input.Normal, 1.0f);
-    pOut.normal = float4(input.Normal, 1.0f);
+    //pOut.diffuse = float4((input.Normal.x + 1) / 2, (input.Normal.y + 1) / 2, (input.Normal.z + 1) / 2, 1.0f);
+    pOut.normal = float4((input.Normal.x + 1) / 2, (input.Normal.y + 1) / 2, (input.Normal.z + 1) / 2, 1.0f);
     pOut.position = input.worldPos;
     return pOut;
 

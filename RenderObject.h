@@ -16,6 +16,7 @@ private:
 	
 	LPCWSTR textureFile;
 	Texture ** tex;
+	Texture ** normal;
 
 	ID3D11Buffer ** vertexBuffer = nullptr;
 	ID3D11Buffer * constantBuffer = nullptr;

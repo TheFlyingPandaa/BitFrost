@@ -77,7 +77,7 @@ struct object {
 	Material* mat;
 
 	object(std::wstring objectName) : objectName(objectName) {
-
+		
 		faces = std::vector<Faces*>();
 		
 	};

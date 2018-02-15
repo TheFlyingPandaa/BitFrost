@@ -1,6 +1,6 @@
 #include "RenderObject.h"
 
-
+#include <iostream>
 
 void RenderObject::loadBuffer(ID3D11Device *& device)
 {
@@ -29,7 +29,12 @@ void RenderObject::loadBuffer(ID3D11Device *& device)
 
 	for (size_t i = 0; i < this->mesh->getNrOfObjects(); i++)
 	{
-		this->tex[i]->createTexture(device, this->mesh->getObjects()[i]->mat->getMtl()->textureName.c_str());
+		if (this->mesh->getObjects()[i]->mat->getMtl()->textureName != L"")
+			this->tex[i]->createTexture(device, this->mesh->getObjects()[i]->mat->getMtl()->textureName.c_str());
+		if (this->mesh->getObjects()[i]->mat->getMtl()->normal != L"") {
+			this->normal[i]->createTexture(device, this->mesh->getObjects()[i]->mat->getMtl()->normal.c_str());
+			std::wcout << this->mesh->getObjects()[i]->mat->getMtl()->normal << std::endl;
+		}
 	}
 }
 
@@ -55,7 +60,10 @@ void RenderObject::draw(ID3D11DeviceContext *& deviceContext) const
 		deviceContext->GSSetConstantBuffers(0, 1, &constantBuffer);
 		deviceContext->PSSetShaderResources(0, 1, &this->tex[i]->getTexture());
 		deviceContext->PSSetSamplers(0, 1, &this->tex[i]->getSampleState());
-
+		if (this->normal[i] != nullptr) {
+			deviceContext->PSSetShaderResources(1, 1, &this->normal[i]->getTexture());
+			deviceContext->PSSetSamplers(1, 1, &this->normal[i]->getSampleState());
+		}
 		deviceContext->VSSetConstantBuffers(3, 1, &constantBuffer);
 
 		deviceContext->Draw(this->mesh->getNrOfVertexes(), 0);
@@ -125,10 +133,19 @@ RenderObject::RenderObject(const wchar_t * meshDirr, LPCWSTR textureFile,const b
 {
 	this->mesh = new Mesh(meshDirr, normalIn);
 	this->tex = new Texture*[this->mesh->getNrOfObjects()];
+	this->normal = new Texture*[this->mesh->getNrOfObjects()];
 	this->vertexBuffer = new ID3D11Buffer*[this->mesh->getNrOfObjects()];
 	for (size_t i = 0; i < this->mesh->getObjects().size(); i++)
 	{
-		this->tex[i] = new Texture();
+		if (this->mesh->getObjects()[i]->mat->getMtl()->textureName != L"")
+			this->tex[i] = new Texture();
+		else
+			this->tex[i] = nullptr;
+
+		if (this->mesh->getObjects()[i]->mat->getMtl()->normal != L"")
+			this->normal[i] = new Texture();
+		else
+			this->normal[i] = nullptr;
 	}
 	if (textureFile != NULL) {
 		this->textureFile = textureFile;
@@ -146,7 +163,15 @@ RenderObject::RenderObject(const char * meshDirr, LPCWSTR textureFile, const boo
 {
 	this->mesh = new Mesh(meshDirr, normalIn);
 	this->tex = new Texture*[this->mesh->getNrOfObjects()];
+	this->normal = new Texture*[this->mesh->getNrOfObjects()];
 	this->vertexBuffer = new ID3D11Buffer*[this->mesh->getNrOfObjects()];
+	for (size_t i = 0; i < this->mesh->getObjects().size(); i++)
+	{
+		if (this->mesh->getObjects()[i]->mat->getMtl()->textureName != L"")
+			this->tex[i] = new Texture();
+		if (this->mesh->getObjects()[i]->mat->getMtl()->normal != L"")
+			this->normal[i] = new Texture();
+	}
 	if (textureFile != NULL) {
 		this->textureFile = textureFile;
 	}
@@ -169,6 +194,14 @@ RenderObject::~RenderObject()
 	}
 	if (this->tex != nullptr)
 		delete this->tex;
+
+	for (size_t i = 0; i < this->mesh->getNrOfObjects(); i++)
+	{
+		if (this->normal[i] != nullptr)
+			delete this->normal[i];
+	}
+	if (this->normal != nullptr)
+		delete this->normal;
 
 	if (this->position != nullptr)
 		delete this->position;
