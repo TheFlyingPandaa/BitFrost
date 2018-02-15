@@ -162,8 +162,14 @@ RenderObject::RenderObject(const char * meshDirr, LPCWSTR textureFile, const boo
 
 RenderObject::~RenderObject()
 {
+	for (size_t i = 0; i < this->mesh->getNrOfObjects(); i++)
+	{
+		if (this->tex[i] != nullptr)
+			delete this->tex[i];	
+	}
 	if (this->tex != nullptr)
 		delete this->tex;
+
 	if (this->position != nullptr)
 		delete this->position;
 	for (int i = 0; i < this->mesh->getNrOfObjects(); i++)
@@ -172,5 +178,6 @@ RenderObject::~RenderObject()
 	}
 	delete[] this->vertexBuffer;
 	this->constantBuffer->Release();
+
 	delete mesh;
 }

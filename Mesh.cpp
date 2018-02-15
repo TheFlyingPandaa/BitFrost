@@ -347,7 +347,9 @@ Mesh::Mesh(const wchar_t * fileName, const char * textureName, const bool normal
 Mesh::~Mesh()
 {	
 	for (size_t i = 0; i < this->objects.size(); i++)
-	{
+	{	
+		delete this->objects[i]->mat;
 		delete[] this->objects[i]->mesh;
+		delete this->objects[i];
 	}
 }
