@@ -8,6 +8,12 @@ struct MatrixBuffert {
 	DirectX::XMMATRIX WVP;
 	DirectX::XMMATRIX worldSpace;
 };
+struct textureInformationBuffer {
+	BOOL TEXTURE;
+	BOOL NORMAL;
+	BOOL pad1, pad2;
+};
+
 
 class RenderObject
 {
@@ -20,10 +26,12 @@ private:
 
 	ID3D11Buffer ** vertexBuffer = nullptr;
 	ID3D11Buffer * constantBuffer = nullptr;
+	ID3D11Buffer * psConstantBuffer = nullptr;
 
 	XMFLOAT3 * position = nullptr;
 
 	MatrixBuffert matrixBuffer;
+	textureInformationBuffer texInfo;
 
 	float posX, posY, posZ;
 	float scaleX, scaleY, scaleZ;
@@ -36,7 +44,7 @@ public:
 	~RenderObject();
 
 	void loadBuffer(ID3D11Device *& device);
-	void draw(ID3D11DeviceContext *& deviceContext) const;
+	void draw(ID3D11DeviceContext *& deviceContext);
 
 	void setMatrix(const XMMATRIX& view, const XMMATRIX& proj, float radsRot = NULL);
 

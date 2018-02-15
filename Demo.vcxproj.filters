@@ -82,34 +82,34 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CreateShader.h">
+      <Filter>Header Files\Shader</Filter>
+    </ClInclude>
     <ClInclude Include="DXApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Structs.h">
+    <ClInclude Include="HeightMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="KeyboardInput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Matrial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CreateShader.h">
-      <Filter>Header Files\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="HeightMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ObjectRenderHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Matrial.h">
+    <ClInclude Include="RenderObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Structs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

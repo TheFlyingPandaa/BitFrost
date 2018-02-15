@@ -25,6 +25,15 @@ void RenderObject::loadBuffer(ID3D11Device *& device)
 		cBufferDesc.StructureByteStride = 0;
 
 		hr = device->CreateBuffer(&cBufferDesc, nullptr, &constantBuffer);
+
+		cBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		cBufferDesc.ByteWidth = sizeof(textureInformationBuffer);
+		cBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		cBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		cBufferDesc.MiscFlags = 0;
+		cBufferDesc.StructureByteStride = 0;
+		hr = 0;
+		hr = device->CreateBuffer(&cBufferDesc, nullptr, &psConstantBuffer);
 	}
 
 	for (size_t i = 0; i < this->mesh->getNrOfObjects(); i++)
@@ -38,7 +47,7 @@ void RenderObject::loadBuffer(ID3D11Device *& device)
 	}
 }
 
-void RenderObject::draw(ID3D11DeviceContext *& deviceContext) const
+void RenderObject::draw(ID3D11DeviceContext *& deviceContext)
 {
 	UINT32 vertexSize = sizeof(float) * 5;
 	UINT offset = 0;
@@ -49,21 +58,28 @@ void RenderObject::draw(ID3D11DeviceContext *& deviceContext) const
 
 		D3D11_MAPPED_SUBRESOURCE dataPtr;
 		deviceContext->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
-
 		//	Copy memory from CPU to GPU
 		memcpy(dataPtr.pData, &matrixBuffer, sizeof(MatrixBuffert));
-
 		// Unmap constant buffer so that we can use it again in the GPU
 		deviceContext->Unmap(constantBuffer, 0);
 		// set resources to shaders
 
+
+		texInfo.NORMAL = this->normal[i] != nullptr;
+		texInfo.TEXTURE = this->tex[i] != nullptr;
+
+		deviceContext->Map(psConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);	
+		memcpy(dataPtr.pData, &texInfo, sizeof(textureInformationBuffer));		
+		deviceContext->Unmap(psConstantBuffer, 0);
+
 		deviceContext->GSSetConstantBuffers(0, 1, &constantBuffer);
+		deviceContext->PSSetConstantBuffers(2, 1, &psConstantBuffer);
 		deviceContext->PSSetShaderResources(0, 1, &this->tex[i]->getTexture());
-		deviceContext->PSSetSamplers(0, 1, &this->tex[i]->getSampleState());
+		deviceContext->PSSetSamplers(0, 1, &this->tex[i]->getSampleState()); 
 		if (this->normal[i] != nullptr) {
 			deviceContext->PSSetShaderResources(1, 1, &this->normal[i]->getTexture());
 			deviceContext->PSSetSamplers(1, 1, &this->normal[i]->getSampleState());
-		}
+		}		
 		deviceContext->VSSetConstantBuffers(3, 1, &constantBuffer);
 
 		deviceContext->Draw(this->mesh->getNrOfVertexes(), 0);
@@ -211,6 +227,7 @@ RenderObject::~RenderObject()
 	}
 	delete[] this->vertexBuffer;
 	this->constantBuffer->Release();
+	this->psConstantBuffer->Release();
 
 	delete mesh;
 }

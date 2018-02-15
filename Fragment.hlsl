@@ -22,6 +22,13 @@ cbuffer PER_FRAME_BUFF : register(b1)
     Light light;
 };
 
+cbuffer TEXTURE_INFORMATION : register(b2)
+{
+    bool useTex;
+    bool useNormal;
+    bool pad, pad2;    
+};
+
 struct PixelOutDeferred
 {
     float4 diffuse : SV_Target0;
@@ -35,6 +42,9 @@ PixelOutDeferred PS_main(GS_OUT input) : SV_Target
 
     //float4 diffuse = txDiffuse.Sample(sampAni, input.Tex);
 	
+    float3 n = txNormal.Sample(sampAni, input.Tex);
+
+    
 
     //float3 finalColor;
 
@@ -48,6 +58,10 @@ PixelOutDeferred PS_main(GS_OUT input) : SV_Target
     pOut.diffuse = txDiffuse.Sample(sampAni, input.Tex);    
     //pOut.diffuse = float4((input.Normal.x + 1) / 2, (input.Normal.y + 1) / 2, (input.Normal.z + 1) / 2, 1.0f);
     pOut.normal = float4((input.Normal.x + 1) / 2, (input.Normal.y + 1) / 2, (input.Normal.z + 1) / 2, 1.0f);
+    if (useNormal)
+    {
+        pOut.normal = float4(n, 1.0f);
+    }
     pOut.position = input.worldPos;
     return pOut;
 
