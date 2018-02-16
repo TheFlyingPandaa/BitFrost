@@ -67,6 +67,8 @@ void RenderObject::draw(ID3D11DeviceContext *& deviceContext)
 
 		texInfo.NORMAL = this->normal[i] != nullptr;
 		texInfo.TEXTURE = this->tex[i] != nullptr;
+		if (texInfo.NORMAL)
+			texInfo.tangent = XMFLOAT3A(this->mesh->getObjects()[i]->tangents[i].tx, this->mesh->getObjects()[i]->tangents[i].ty, this->mesh->getObjects()[i]->tangents[i].tz);
 
 		deviceContext->Map(psConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);	
 		memcpy(dataPtr.pData, &texInfo, sizeof(textureInformationBuffer));		

@@ -26,7 +26,7 @@ cbuffer TEXTURE_INFORMATION : register(b2)
 {
     bool useTex;
     bool useNormal;
-    bool pad, pad2;    
+    float4 tangent;
 };
 
 struct PixelOutDeferred
@@ -42,7 +42,7 @@ PixelOutDeferred PS_main(GS_OUT input) : SV_Target
 
     //float4 diffuse = txDiffuse.Sample(sampAni, input.Tex);
 	
-    float3 n = txNormal.Sample(sampAni, input.Tex);
+   
 
     
 
@@ -60,7 +60,18 @@ PixelOutDeferred PS_main(GS_OUT input) : SV_Target
     pOut.normal = float4((input.Normal.x + 1) / 2, (input.Normal.y + 1) / 2, (input.Normal.z + 1) / 2, 1.0f);
     if (useNormal)
     {
-        pOut.normal = float4(n, 1.0f);
+        float3 n = txNormal.Sample(sampAni, input.Tex);
+
+        n = (2.0f * n) - 1.0f;
+
+        float3 t = normalize(tangent.xyz - dot(tangent.xyz, input.Normal) * input.Normal);
+
+        float3 biTangent = cross(input.Normal, t.xyz);
+
+        float3x3 texSpace = float3x3(t.xyz, biTangent, input.Normal);
+
+        pOut.normal = float4(normalize(mul(n, texSpace)), 1.0f);
+
     }
     pOut.position = input.worldPos;
     return pOut;

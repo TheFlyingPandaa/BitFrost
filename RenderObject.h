@@ -11,7 +11,7 @@ struct MatrixBuffert {
 struct textureInformationBuffer {
 	BOOL TEXTURE;
 	BOOL NORMAL;
-	BOOL pad1, pad2;
+	DirectX::XMFLOAT3A tangent;
 };
 
 
