@@ -394,6 +394,7 @@ void Mesh::computeTangent(object *& object, const std::vector<Coords*> & vertexe
 				tz = XMVectorGetZ(tangentSum) + tmpTangent[j].z;
 				tangentSum = XMVectorSet(tx, ty, tz, 0.0f);
 
+
 				faceUsing++;
 			}
 		}

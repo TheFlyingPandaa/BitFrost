@@ -79,8 +79,8 @@ float4 main(VS_OUT input) : SV_Target
 
     float3 finalColor;
 
-    finalColor = diffuse * light.ambient.xyz;
-    finalColor += saturate(dot(lightDir, normal) * light.diffuse.xyz * diffuse);
+    finalColor = diffuse * light.ambient.xyz * 0.1f;
+    finalColor += saturate(dot(lightDir, normal) * light.diffuse.xyz /* diffuse*/);
     
     /*
     if (length(normal) > 0.0f )
@@ -102,18 +102,19 @@ float4 main(VS_OUT input) : SV_Target
         pOut = float4(pow(colorLinear, float3(1.0f / 2.2f, 1.0f / 2.2f, 1.0f / 2.2f)), 1.0f);
         pOut.xyz = pOut.xyz + diffuse * light.ambient.xyz;
         return pOut;
-    }*/
+    }
 
-   // diffuse = diffuse * float3(2, 2, 2);
-    //pOut = float4(diffuse, 1.0f);
+    //diffuse = diffuse * float3(2, 2, 2);
+    pOut = float4(diffuse, 1.0f);
 	//pOut = float4(normal, 1.0f);
-	//pOut.xyz = pOut.xyz  +finalColor;
-    //pOut = pOut * light.ambient;
-
+	pOut.xyz = pOut.xyz  +finalColor;
+    pOut = pOut * light.ambient;
+    */
+    //return pOut;
 	
 
-	finalColor = diffuse * light.ambient;
-	finalColor += saturate(dot(light.dir, normal) * light.diffuse * diffuse);
+	//finalColor = diffuse * light.ambient;
+	//finalColor += saturate(dot(light.dir, normal) * light.diffuse * diffuse);
 
     return float4(finalColor, 1.0f);
 }
