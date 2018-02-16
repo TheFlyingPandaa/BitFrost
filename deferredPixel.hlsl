@@ -80,7 +80,7 @@ float4 main(VS_OUT input) : SV_Target
     float3 finalColor;
 
     finalColor = diffuse * light.ambient.xyz * 0.1f;
-    finalColor += saturate(dot(lightDir, normal) * light.diffuse.xyz /* diffuse*/);
+    finalColor += saturate(dot(lightDir, normal) * light.diffuse.xyz * 0.1f  * diffuse);
     
     /*
     if (length(normal) > 0.0f )
