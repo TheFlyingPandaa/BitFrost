@@ -148,6 +148,6 @@ void ObjectRenderHandler::render(ID3D11DeviceContext *& gDevice)
 {
 	for (int i = 0; i < this->renderObjects.size(); i++)
 	{
-		this->renderObjects[i]->draw(gDevice);
+		this->renderObjects[i]->draw(gDevice, camPos);
 	}
 }

@@ -45,10 +45,13 @@ void RenderObject::loadBuffer(ID3D11Device *& device)
 			std::wcout << this->mesh->getObjects()[i]->mat->getMtl()->normal << std::endl;
 		}
 	}
+	lowPolly = new Texture();
+	lowPolly->createTexture(device, L"Default.jpg");
 }
 
-void RenderObject::draw(ID3D11DeviceContext *& deviceContext)
+void RenderObject::draw(ID3D11DeviceContext *& deviceContext, XMFLOAT3 * camView)
 {
+	bool lowPolly = distanceCalc(camView);
 	UINT32 vertexSize = sizeof(float) * 5;
 	UINT offset = 0;
 	for (int i = 0; i < this->mesh->getNrOfObjects(); i++)
@@ -76,7 +79,15 @@ void RenderObject::draw(ID3D11DeviceContext *& deviceContext)
 
 		deviceContext->GSSetConstantBuffers(0, 1, &constantBuffer);
 		deviceContext->PSSetConstantBuffers(2, 1, &psConstantBuffer);
-		deviceContext->PSSetShaderResources(0, 1, &this->tex[i]->getTexture());
+		if (lowPolly)
+		{
+			deviceContext->PSSetShaderResources(0, 1, &this->lowPolly->getTexture());
+		}
+		else
+		{
+			deviceContext->PSSetShaderResources(0, 1, &this->tex[i]->getTexture());
+		}
+		
 		deviceContext->PSSetSamplers(0, 1, &this->tex[i]->getSampleState()); 
 		if (this->normal[i] != nullptr) {
 			deviceContext->PSSetShaderResources(1, 1, &this->normal[i]->getTexture());
@@ -232,4 +243,23 @@ RenderObject::~RenderObject()
 	this->psConstantBuffer->Release();
 
 	delete mesh;
+}
+
+bool RenderObject::distanceCalc(XMFLOAT3 * view)
+{
+	float x = view->x - posX;
+	float y = view->y - posY;
+	float z = view->z - posZ;
+
+	float result = sqrt(pow(x, 2) + pow(y, 2)+ pow(z, 2));
+
+	if (result > 5)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	//return NULL;
 }

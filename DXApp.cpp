@@ -465,7 +465,6 @@ void DXApp::CreateTriangleData()
 	
 	gDevice->CreateBuffer(&bufferDesc, &data, &gVertexBuffer);
 	*/
-
 	ORH->loadBuffert(gDevice);
 	renderObject->loadBuffer(gDevice);
 	//skyMap->loadBuffer(gDevice);
@@ -635,7 +634,7 @@ HWND DXApp::getWndHandler() const
 void DXApp::DrawGeometry()
 {
 	//gDeviceContext->Draw(6, 0);
-	renderObject->draw(gDeviceContext);
+	renderObject->draw(gDeviceContext, new XMFLOAT3(XMVectorGetX(cameraPos), XMVectorGetY(cameraPos), XMVectorGetZ(cameraPos)));
 	ORH->render(gDeviceContext);
 
 

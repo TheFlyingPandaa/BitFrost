@@ -3,6 +3,7 @@
 
 #include "Mesh.h"
 #include <string>
+#include <cmath>
 
 struct MatrixBuffert {
 	DirectX::XMMATRIX WVP;
@@ -24,6 +25,9 @@ private:
 	Texture ** tex;
 	Texture ** normal;
 
+
+	Texture * lowPolly;
+
 	ID3D11Buffer ** vertexBuffer = nullptr;
 	ID3D11Buffer * constantBuffer = nullptr;
 	ID3D11Buffer * psConstantBuffer = nullptr;
@@ -36,6 +40,7 @@ private:
 	float posX, posY, posZ;
 	float scaleX, scaleY, scaleZ;
 
+	bool distanceCalc(XMFLOAT3 * view);
 public:
 	RenderObject();
 
@@ -44,13 +49,15 @@ public:
 	~RenderObject();
 
 	void loadBuffer(ID3D11Device *& device);
-	void draw(ID3D11DeviceContext *& deviceContext);
+	void draw(ID3D11DeviceContext *& deviceContext, XMFLOAT3 * view);
 
 	void setMatrix(const XMMATRIX& view, const XMMATRIX& proj, float radsRot = NULL);
 
 	void setPosition(float x, float y, float z);
 	XMFLOAT3 getPosition() const;
 	void setScale(float x, float y, float z);
+
+	
 
 	XMFLOAT3 * getPos();
 };
