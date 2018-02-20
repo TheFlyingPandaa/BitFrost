@@ -16,13 +16,13 @@ The Big TODO: List
 ```
 **Texturing and Lighting : 1**
 ```diff
-- Normal mapping 
++ Normal mapping //Bobby hella dope
 - Screen Space Ambient Occlusion
 - Blend mapping (multi-texturing)
 ```
 **Projection Techniques : 1**
 ```diff
-- Shadow mapping 
++ Shadow mapping //In other project
 - Dynamic cubic environment mapping (SkyMap)
 - Dynamic paraboloid mapping
 ```
@@ -35,5 +35,5 @@ The Big TODO: List
 ```
 **Other Things : 2**
 ```diff
-+ BillBoarding
++ BillBoarding //In computeShader
 ```
