@@ -4,6 +4,9 @@
 
 void RenderObject::loadBuffer(ID3D11Device *& device)
 {
+	tessInfo.pad = 0;
+	tessInfo.pad2 = 0;
+	tessInfo.pad3 = 0;
 	for (size_t i = 0; i < this->mesh->getNrOfObjects(); i++)
 	{
 		D3D11_BUFFER_DESC bufferDesc;
@@ -34,6 +37,15 @@ void RenderObject::loadBuffer(ID3D11Device *& device)
 		cBufferDesc.StructureByteStride = 0;
 		hr = 0;
 		hr = device->CreateBuffer(&cBufferDesc, nullptr, &psConstantBuffer);
+
+		cBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		cBufferDesc.ByteWidth = sizeof(TessellationFactor);
+		cBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		cBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		cBufferDesc.MiscFlags = 0;
+		cBufferDesc.StructureByteStride = 0;
+		hr = 0;
+		hr = device->CreateBuffer(&cBufferDesc, nullptr, &hullConstantBuffer);
 	}
 
 	for (size_t i = 0; i < this->mesh->getNrOfObjects(); i++)
@@ -67,6 +79,9 @@ void RenderObject::draw(ID3D11DeviceContext *& deviceContext, XMFLOAT3 * camView
 		deviceContext->Unmap(constantBuffer, 0);
 		// set resources to shaders
 
+		tessInfo.tessellationFactor = 0;
+		
+
 
 		texInfo.NORMAL = this->normal[i] != nullptr;
 		texInfo.TEXTURE = this->tex[i] != nullptr;
@@ -81,11 +96,23 @@ void RenderObject::draw(ID3D11DeviceContext *& deviceContext, XMFLOAT3 * camView
 		deviceContext->PSSetConstantBuffers(2, 1, &psConstantBuffer);
 		if (lowPolly)
 		{
+			tessInfo.tessellationFactor = 1;
+			deviceContext->Map(hullConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
+			memcpy(dataPtr.pData, &tessInfo, sizeof(TessellationFactor));
+			deviceContext->Unmap(hullConstantBuffer, 0);
+
 			deviceContext->PSSetShaderResources(0, 1, &this->lowPolly->getTexture());
+			deviceContext->HSSetConstantBuffers(0, 1, &hullConstantBuffer);
 		}
 		else
 		{
+			tessInfo.tessellationFactor = 100;
+			deviceContext->Map(hullConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
+			memcpy(dataPtr.pData, &tessInfo, sizeof(TessellationFactor));
+			deviceContext->Unmap(hullConstantBuffer, 0);
+
 			deviceContext->PSSetShaderResources(0, 1, &this->tex[i]->getTexture());
+			deviceContext->HSSetConstantBuffers(0, 1, &hullConstantBuffer);
 		}
 		
 		deviceContext->PSSetSamplers(0, 1, &this->tex[i]->getSampleState()); 

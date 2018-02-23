@@ -20,6 +20,14 @@ struct HS_CONSTANT_DATA_OUTPUT
     float InsideTessFactor : SV_InsideTessFactor; // e.g. would be Inside[2] for a quad domain
 };
 
+cbuffer TESS_BUFFER : register(b0)
+{
+    float tessellationFactor;
+    float pad;
+    float pad2;
+    float pad3;
+};
+
 #define NUM_CONTROL_POINTS 3
 
 // Patch Constant Function
@@ -29,7 +37,7 @@ HS_CONSTANT_DATA_OUTPUT CalcHSPatchConstants(
 {
     HS_CONSTANT_DATA_OUTPUT Output;
 
-    float tessellationFactor = 15;
+    //float tessellationFactor = 15;
 	// Insert code to compute Output here
     Output.EdgeTessFactor[0] = tessellationFactor;
     Output.EdgeTessFactor[1] = tessellationFactor;

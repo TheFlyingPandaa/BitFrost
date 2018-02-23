@@ -14,6 +14,13 @@ struct textureInformationBuffer {
 	BOOL NORMAL;
 	DirectX::XMFLOAT3A tangent;
 };
+struct TessellationFactor
+{
+	float tessellationFactor;
+	float pad;
+	float pad2;
+	float pad3;
+};
 
 
 class RenderObject
@@ -31,11 +38,13 @@ private:
 	ID3D11Buffer ** vertexBuffer = nullptr;
 	ID3D11Buffer * constantBuffer = nullptr;
 	ID3D11Buffer * psConstantBuffer = nullptr;
+	ID3D11Buffer * hullConstantBuffer = nullptr;
 
 	XMFLOAT3 * position = nullptr;
 
 	MatrixBuffert matrixBuffer;
 	textureInformationBuffer texInfo;
+	TessellationFactor tessInfo;
 
 	float posX, posY, posZ;
 	float scaleX, scaleY, scaleZ;
