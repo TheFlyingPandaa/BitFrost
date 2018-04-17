@@ -34,6 +34,11 @@ cbuffer EXAMPLE_BUFFER : register(b4)
 	float4x4 lightVP;
 };
 
+cbuffer Light_Buffer : register(b9)
+{
+    float4x4 view;
+    float4x4 projection;
+};
 
 struct VS_OUT
 {
@@ -59,40 +64,36 @@ float4 main(VS_OUT input) : SV_Target
 	normal = normalize(normal);
 	
 	
-	float4 lightView = mul(float4(position,1.0f), lightVP ); //Swap if it dose't work
+    float4 lightView = mul(float4(position, 1.0f), mul(view, projection)); // Translate the world position into the view space of the light
 	//lightView.w = 1;
-	lightView.xy /= lightView.w;
+    lightView.xy /= lightView.w; // Get the texture coords of the "object" in the shadow map
 
 
-	float2 smTex = float2(0.5f*lightView.x + 0.5f, -0.5f*lightView.y + 0.5f);
+    float2 smTex = float2(0.5f * lightView.x + 0.5f, -0.5f * lightView.y + 0.5f); // Texcoords are not [-1, 1], change the coords to [0, 1]
 	
 	float depth = lightView.z / lightView.w;
 	float SMAP_SIZE = 400;
 	float dx = 1.0f / SMAP_SIZE;
 	//depth /= lightView.w;
-	float s0;
-	float s1;
-	float s2;
-	float s3;
-	if ((saturate(smTex.x) == smTex.x) && (saturate(smTex.y) == smTex.y))
-	{
-		
 
-		s0 = (gTexShadow.Sample(sampAni, smTex).r + 0.0019 < depth) ? 0.0f : 1.0f;
-		s1 = (gTexShadow.Sample(sampAni, smTex + float2(dx, 0.0f)).r + 0.0019 < depth) ? 0.0f : 1.0f;
-		s2 = (gTexShadow.Sample(sampAni, smTex + float2(0.0f, dx)).r + 0.0019 < depth) ? 0.0f : 1.0f;
-		s3 = (gTexShadow.Sample(sampAni, smTex + float2(dx, dx)).r + 0.0019 < depth) ? 0.0f : 1.0f;
-	}
-    else
-    {
-        return float4(diffuse,1.0f);
-    }
+    
+																		  //posLightH = mul(posLightH, lightProj);					// Translate the view position into the projection space of the light
+    
+  
+     
+    //float depth = posLightH.z / posLightH.w; // Get the actual depth (seen from the camera)
+    //float SHADOW_EPSILON = 0.001f; // Some small value
 
-	float2 texelPos = smTex * SMAP_SIZE;
+    //float angle = max(dot(sunLightToObject, float3(0, -1, 0)), 0.0f);
 
-	float2 lerps = frac(texelPos);
+    
+    if (abs(lightView.x) > 1.0f)							// Check if we are outside the shadow map (we are not in the light)
+        return float4(diffuse.rgb, 1);
+    if (abs(lightView.y) > 1.0f)							// Check if we are outside the shadow map (we are not in the light)
+        return float4(diffuse.rgb, 1);
 
-	float shadowCoeff = lerp(lerp(s0, s1, lerps.x), lerp(s2, s3, lerps.x), lerps.y);
+    float shadowCoeff = (gTexShadow.Sample(sampAni, smTex).r + 0.01f < depth) ? 0.0f : 1.0f; // If the depth from camera is larger than depth from light,
+ 
 	float3 litColor = diffuse.rgb * shadowCoeff;
 
 
@@ -107,6 +108,7 @@ float4 main(VS_OUT input) : SV_Target
     float spec = pow(max(dot(normal, halfDir), 0.0), 62.0);
 		
     float3 specular = spec * 1.0f;
-    return float4(light.ambient.xyz + (specular + diffuse) * shadowCoeff, 1.0);
+
+    return float4(light.ambient.xyz + (diffuse) * shadowCoeff, 1.0);
 
 }

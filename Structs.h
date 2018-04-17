@@ -35,6 +35,12 @@ struct Light
 	DirectX::XMFLOAT4 Position;
 };
 
+
+struct Light_Matrix
+{
+	DirectX::XMFLOAT4X4A view;
+	DirectX::XMFLOAT4X4A projection;
+};
 struct constBuffFrame
 {
 	Light light;

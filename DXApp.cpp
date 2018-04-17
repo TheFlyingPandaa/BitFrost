@@ -42,6 +42,8 @@ DXApp::~DXApp()
 
 	constPerFrameBuffer->Release();
 	gExampleBuffer->Release();
+
+	lightMatrixBuffer->Release();
 	
 	camBuffer->Release();
 	computeBuffer->Release();
@@ -235,6 +237,22 @@ void DXApp::CreateConstantBuffer()
 		// handle the error, could be fatal or a warning...
 		exit(-1);
 	}
+
+	exampleBufferDesc;
+	exampleBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	exampleBufferDesc.ByteWidth = sizeof(Light_Matrix);
+	exampleBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	exampleBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	exampleBufferDesc.MiscFlags = 0;
+	exampleBufferDesc.StructureByteStride = 0;
+	hr = gDevice->CreateBuffer(&exampleBufferDesc, nullptr, &lightMatrixBuffer);
+	if (FAILED(hr))
+	{
+		// handle the error, could be fatal or a warning...
+		exit(-1);
+	}
+
+
 
 	exampleBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	exampleBufferDesc.ByteWidth = sizeof(constBuffFrame);
@@ -437,17 +455,31 @@ void DXApp::CreateTriangleData()
 
 
 
-	XMFLOAT3 cameraStored = XMFLOAT3(0, 0, -2);
-	XMFLOAT3 lookAtStored = XMFLOAT3(0, 0, 0);
-	XMFLOAT3 UP_STORED = XMFLOAT3(0, 1, 0);
+	XMFLOAT4 cameraStored = XMFLOAT4(0, 0, -2.2f, 1.0f);
+	XMFLOAT4 lookAtStored = XMFLOAT4(0, 0, 0, 1.0f);
+	XMFLOAT4 UP_STORED = XMFLOAT4(0, 1, 0, 1.0f);
 
-	cameraPos = XMLoadFloat3(&cameraStored);
-	lookAt = XMLoadFloat3(&lookAtStored);
-	UP = XMLoadFloat3(&UP_STORED);
+	cameraPos = XMLoadFloat4(&cameraStored);
+	lookAt = XMLoadFloat4(&lookAtStored);
+	UP = XMLoadFloat4(&UP_STORED);
 
 	camView = XMMatrixLookAtLH(cameraPos, lookAt, UP);
 
-	camProjection = XMMatrixPerspectiveFovLH(XM_PI * 0.45f, WINDOW_WIDTH / WINDOW_HEIGHT, 0.01f, 20.0f);
+	camProjection = XMMatrixPerspectiveFovLH(XM_PI * 0.5f, WINDOW_WIDTH / WINDOW_HEIGHT, 0.5f, 20.0f);
+
+
+	XMFLOAT4 lightPos = XMFLOAT4(0, 0, -3.2f,1.0f);
+
+	XMVECTOR LIGHTPOSITION = XMLoadFloat4(&lightPos);
+
+
+
+	XMMATRIX lightView = XMMatrixLookAtLH(LIGHTPOSITION, lookAt, UP);
+	XMMATRIX lightProjection = XMMatrixPerspectiveFovLH(XM_PI * 0.5f, WINDOW_WIDTH / WINDOW_HEIGHT, 0.5f, 10.0f);
+
+	XMStoreFloat4x4A(&lightMatrix.view, XMMatrixTranspose(lightView));
+	XMStoreFloat4x4A(&lightMatrix.projection, XMMatrixTranspose(lightProjection));
+
 
 	light.dir = XMFLOAT3(1.0f, 0.0f, 0.0f);
 	light.pad = float(1);
@@ -589,6 +621,19 @@ void DXApp::MovingBuffersToGPU()
 	gDeviceContext->GSSetConstantBuffers(0, 1, &gExampleBuffer);
 	gDeviceContext->VSSetConstantBuffers(4, 1, &gExampleBuffer);
 	 
+
+	gDeviceContext->Map(lightMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
+	//Kopierar in det i buffern "constant buffern"
+	memcpy(dataPtr.pData, &lightMatrix, sizeof(Light_Matrix));
+	// UnMap constant buffer so that we can use it again in the GPU
+	gDeviceContext->Unmap(lightMatrixBuffer, 0);
+	gDeviceContext->VSSetConstantBuffers(9, 1, &lightMatrixBuffer);
+	gDeviceContext->PSSetConstantBuffers(9, 1, &lightMatrixBuffer);
+
+
+
+
+
 	//D3D11_MAPPED_SUBRESOURCE dataPtr;
 	gDeviceContext->Map(constPerFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
 	// copy memory from CPU to GPU the entire struct

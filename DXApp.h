@@ -109,6 +109,9 @@ private:
 	ID3D11Buffer* constPerFrameBuffer = nullptr;
 	ID3D11Buffer* camBuffer = nullptr;
 
+	ID3D11Buffer* lightMatrixBuffer = nullptr;
+	Light_Matrix lightMatrix;
+
 	ID3D11Buffer* computeBuffer = nullptr;
 	ID3D11ComputeShader* gComputeShader = nullptr;
 	computeShader computeValuesStore;
