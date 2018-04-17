@@ -143,6 +143,8 @@ private:
 	//Mesh mesh;
 	RenderObject * renderObject;
 	//RenderObject * secondCube;
+
+
 	ID3D11Texture2D* texShadowMap;
 	ID3D11DepthStencilView* shadowMapView;
 	ID3D11ShaderResourceView* shadowMapSRV = nullptr;
