@@ -562,7 +562,9 @@ void DXApp::MovingBuffersToGPU()
 	// copy memory from CPU to GPU the entire struct
 	globalValues.WVP = XMMatrixTranspose(WVP); // Transponera alltid innna något skickas in i matrisen.
 	globalValues.worldSpace = XMMatrixTranspose(worldMatrix);
-	camBuff.cameraPosition = DirectX::XMFLOAT4A(XMVectorGetX(camTarget - cameraPos), XMVectorGetY(camTarget - cameraPos), XMVectorGetZ(camTarget - cameraPos), 1.0f);
+	//camBuff.cameraPosition = DirectX::XMFLOAT4A(XMVectorGetX(camTarget - cameraPos), XMVectorGetY(camTarget - cameraPos), XMVectorGetZ(camTarget - cameraPos), 1.0f);
+	
+	XMStoreFloat4A(&camBuff.cameraPosition, cameraPos);
 	//std::cout << XMVectorGetX(camTarget) << " " << XMVectorGetY(camTarget) << " " << XMVectorGetZ(camTarget) << std::endl;
 
 	gDeviceContext->Map(gExampleBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
@@ -589,8 +591,8 @@ void DXApp::MovingBuffersToGPU()
 	// UnMap constant buffer so that we can use it again in the GPU
 	gDeviceContext->Unmap(camBuffer, 0);
 	// set resource to Vertex Shader
-	gDeviceContext->GSSetConstantBuffers(2, 1, &camBuffer);
-	gDeviceContext->PSSetConstantBuffers(2, 1, &camBuffer);
+	gDeviceContext->GSSetConstantBuffers(4, 1, &camBuffer);
+	gDeviceContext->PSSetConstantBuffers(4, 1, &camBuffer);
 
 	//computeShader
 	

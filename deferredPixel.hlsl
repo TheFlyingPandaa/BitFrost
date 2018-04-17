@@ -21,7 +21,7 @@ cbuffer PER_FRAME_BUFF : register(b1)
     //float4x4 view;
 };
 
-cbuffer CAMERA_BUFFERT : register(b2)
+cbuffer CAMERA_BUFFERT : register(b4)
 {
 	float4 cameraPosition;
 };
@@ -82,39 +82,17 @@ float4 main(VS_OUT input) : SV_Target
     finalColor = diffuse * light.ambient.xyz * 0.1f;
     finalColor += saturate(dot(lightDir, normal) * light.diffuse.xyz * 0.1f  * diffuse);
     
-    /*
-    if (length(normal) > 0.0f )
-    {
-       
 
-        float lambertian = max(dot(lightDir, normal), 0.0f);
-        float specular = 0.0f;
 
-		[flatten]
-        if (lambertian > 0.0f)
-        {
-            float3 viewDir = normalize(-position);
-            float3 halfDir = normalize(lightDir + viewDir);
-            float specAngle = max(dot(halfDir, normal), 0.0f);
-            specular = pow(specAngle, 15.0f);
-        }
-        float3 colorLinear = lambertian * diffuse + specular * float3(0.2f, 0.2f, 0.2f);
-        pOut = float4(pow(colorLinear, float3(1.0f / 2.2f, 1.0f / 2.2f, 1.0f / 2.2f)), 1.0f);
-        pOut.xyz = pOut.xyz + diffuse * light.ambient.xyz;
-        return pOut;
-    }
+    //float3 sunLightToObject = normalize(-sunDir.xyz);
 
-    //diffuse = diffuse * float3(2, 2, 2);
-    pOut = float4(diffuse, 1.0f);
-	//pOut = float4(normal, 1.0f);
-	pOut.xyz = pOut.xyz  +finalColor;
-    pOut = pOut * light.ambient;
-    */
-    //return pOut;
-	
+    //float3 viewer = normalize(cameraPosition.xyz - wordPos);
 
-	//finalColor = diffuse * light.ambient;
-	//finalColor += saturate(dot(light.dir, normal) * light.diffuse * diffuse);
+    float3 halfWayDir;
+	/*WWWHOOOOOOOOO WE'RE...*/
+   // halfWayDir = normalize(sunLightToObject + viewer);
+
+    //float spec = pow(max(dot(normal, halfWayDir), 0.0f), 32.0f);
 
     return float4(finalColor, 1.0f);
 }

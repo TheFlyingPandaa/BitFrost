@@ -4,7 +4,7 @@ cbuffer EXAMPLE_BUFFER : register(b0)
     float4x4 worldSpace;
 };
 
-cbuffer CAMERA_BUFFERT : register(b2)
+cbuffer CAMERA_BUFFERT : register(b4)
 {
     float4 cameraPosition;
 };
