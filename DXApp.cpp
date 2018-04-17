@@ -60,7 +60,7 @@ DXApp::~DXApp()
 
 void DXApp::DxAppInit(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
-	wndHandle = InitWindow(hInstance); //Skapa fönster
+	wndHandle = InitWindow(hInstance); //Skapa fï¿½nster
 
 	if (wndHandle != NULL)
 	{
@@ -482,7 +482,7 @@ void DXApp::Render()
 	gameInput.GameInput(mouseLastState);
 
 	UpdateCamera(camRotationMatrix, camTarget, cameraPos, camView, UP);
-	//Få saken att rotera
+	//Fï¿½ saken att rotera
 	float rot = 0;
 
 	worldMatrix = XMMatrixIdentity();
@@ -560,7 +560,7 @@ void DXApp::MovingBuffersToGPU()
 {
 	D3D11_MAPPED_SUBRESOURCE dataPtr;
 	// copy memory from CPU to GPU the entire struct
-	globalValues.WVP = XMMatrixTranspose(WVP); // Transponera alltid innna något skickas in i matrisen.
+	globalValues.WVP = XMMatrixTranspose(WVP); // Transponera alltid innna nï¿½got skickas in i matrisen.
 	globalValues.worldSpace = XMMatrixTranspose(worldMatrix);
 	//camBuff.cameraPosition = DirectX::XMFLOAT4A(XMVectorGetX(camTarget - cameraPos), XMVectorGetY(camTarget - cameraPos), XMVectorGetZ(camTarget - cameraPos), 1.0f);
 	
