@@ -37,10 +37,10 @@ void GS_main(triangle GS_IN input[3]  ,inout TriangleStream< GSOutput > output)
 
     //float3 cameraPos = mul(cameraPosition, worldSpace);
 
-    float dott = dot(normalize(cameraPosition.xyz), normal);
+    float dott = dot(normalize(cameraPosition.xyz - ((p0.xyz + p1.xyz + p2.xyz) / 3)), normal);
     
 
-    if (dott - 0.7 < 0){
+    //if (dott > 0){
     
         GSOutput element = (GSOutput) 0;
         for (uint i = 0; i < 3; i++)
@@ -57,5 +57,5 @@ void GS_main(triangle GS_IN input[3]  ,inout TriangleStream< GSOutput > output)
 		
         }
         output.RestartStrip();
-    }
+    //}
 }

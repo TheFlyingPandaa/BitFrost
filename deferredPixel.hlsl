@@ -63,13 +63,13 @@ float4 main(VS_OUT input) : SV_Target
 
     float4 pOut;
     float3 normal = gTexNormal.Sample(sampAni, input.Tex).rgb;
-	normal = float3((normal.x * 2) + 1, (normal.y * 2) + 1, (normal.z * 2) + 1);
+	//normal = float3((normal.x * 2) + 1, (normal.y * 2) + 1, (normal.z * 2) + 1);
     float3 diffuse = gTexDiffuse.Sample(sampAni, input.Tex).rgb;
 	float3 shadow = gTexShadow.Sample(sampAni, input.Tex).rgb;
 	float3 position = gTexPosition.Sample(sampAni, input.Tex).rgb;
 	//normal = normalize(normal);
 	//float3 view = normalize(float3(1,1,1) - position);
-
+    return float4(normal, 1.0f);
 	//float r = reflect(light.dir, normal);
 
 	//pOut = calcPhongLighting(mat, lightCol, normal, -light.dir, view,r)

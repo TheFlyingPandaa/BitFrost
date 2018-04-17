@@ -57,7 +57,8 @@ PixelOutDeferred PS_main(GS_OUT input) : SV_Target
 
     pOut.diffuse = txDiffuse.Sample(sampAni, input.Tex);    
     //pOut.diffuse = float4((input.Normal.x + 1) / 2, (input.Normal.y + 1) / 2, (input.Normal.z + 1) / 2, 1.0f);
-    pOut.normal = float4((input.Normal.x + 1) / 2, (input.Normal.y + 1) / 2, (input.Normal.z + 1) / 2, 1.0f);
+    //pOut.normal = float4((input.Normal.x + 1) / 2, (input.Normal.y + 1) / 2, (input.Normal.z + 1) / 2, 1.0f);
+    pOut.normal = float4(input.Normal, 1.0f);
     if (useNormal)
     {
         float3 n = txNormal.Sample(sampAni, input.Tex);
