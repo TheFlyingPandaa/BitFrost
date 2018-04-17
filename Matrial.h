@@ -17,12 +17,7 @@ struct mtl {
 	int ilum;
 	DirectX::XMFLOAT4A ka, kd, ks, ke;
 	std::wstring textureName;
-	std::wstring normal;
 	mtl() {
-		name = std::wstring(L"");
-		textureName = std::wstring(L"");
-		normal = std::wstring(L"");
-
 		ka = DirectX::XMFLOAT4A();
 		kd = DirectX::XMFLOAT4A();
 		ks = DirectX::XMFLOAT4A();

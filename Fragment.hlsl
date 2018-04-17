@@ -1,5 +1,4 @@
 Texture2D txDiffuse : register(t0);
-Texture2D txNormal : register(t1);
 SamplerState sampAni;
 struct GS_OUT
 {
@@ -22,13 +21,6 @@ cbuffer PER_FRAME_BUFF : register(b1)
     Light light;
 };
 
-cbuffer TEXTURE_INFORMATION : register(b2)
-{
-    bool useTex;
-    bool useNormal;
-    float4 tangent;
-};
-
 struct PixelOutDeferred
 {
     float4 diffuse : SV_Target0;
@@ -42,9 +34,6 @@ PixelOutDeferred PS_main(GS_OUT input) : SV_Target
 
     //float4 diffuse = txDiffuse.Sample(sampAni, input.Tex);
 	
-   
-
-    
 
     //float3 finalColor;
 
@@ -56,23 +45,8 @@ PixelOutDeferred PS_main(GS_OUT input) : SV_Target
     PixelOutDeferred pOut;
 
     pOut.diffuse = txDiffuse.Sample(sampAni, input.Tex);    
-    //pOut.diffuse = float4((input.Normal.x + 1) / 2, (input.Normal.y + 1) / 2, (input.Normal.z + 1) / 2, 1.0f);
-    pOut.normal = float4((input.Normal.x + 1) / 2, (input.Normal.y + 1) / 2, (input.Normal.z + 1) / 2, 1.0f);
-    if (useNormal)
-    {
-        float3 n = txNormal.Sample(sampAni, input.Tex);
-
-        n = (2.0f * n) - 1.0f;
-
-        float3 t = normalize(tangent.xyz - dot(tangent.xyz, input.Normal) * input.Normal);
-
-        float3 biTangent = cross(input.Normal, t.xyz);
-
-        float3x3 texSpace = float3x3(t.xyz, biTangent, input.Normal);
-
-        pOut.normal = float4(normalize(mul(n, texSpace)), 1.0f);
-
-    }
+   // pOut.diffuse = float4(input.Normal, 1.0f);
+    pOut.normal = float4(input.Normal, 1.0f);
     pOut.position = input.worldPos;
     return pOut;
 

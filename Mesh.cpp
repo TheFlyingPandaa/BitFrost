@@ -93,9 +93,7 @@ void Mesh::loadMesh(const wchar_t * fileName, const bool normalIn)
 		this->objects[b]->mat = new Material(this->mtlLib, this->objects[b]->materialname);
 
 		this->objects[b]->mesh = new Vertex[this->objects[b]->faces.size() * 6];
-		this->objects[b]->meshData = new meshdata[this->objects[b]->faces.size() * 6];
 		this->objects[b]->nrOfVertexes = 0;
-		this->objects[b]->nrOfMeshData = 0;
 		if (normalIn == false)
 		{
 			for (int i = 0; i < this->objects[b]->faces.size(); i++)
@@ -106,7 +104,6 @@ void Mesh::loadMesh(const wchar_t * fileName, const bool normalIn)
 						vertex[this->objects[b]->faces[i]->face[j] - 1]->z,
 						texCoord[this->objects[b]->faces[i]->texCord[j] - 1]->x,
 						texCoord[this->objects[b]->faces[i]->texCord[j] - 1]->y);
-					this->objects[b]->meshData[this->objects[b]->nrOfMeshData++] = meshdata(this->objects[b]->faces[i]->face[j] - 1, this->objects[b]->mesh[this->objects[b]->nrOfVertexes]);
 				}
 				for (int j = 0; j < 3; j++)
 				{
@@ -115,7 +112,6 @@ void Mesh::loadMesh(const wchar_t * fileName, const bool normalIn)
 						vertex[this->objects[b]->faces[i]->face[(j + 2) % 4] - 1]->z,
 						texCoord[this->objects[b]->faces[i]->texCord[(j + 2) % 4] - 1]->x,
 						texCoord[this->objects[b]->faces[i]->texCord[(j + 2) % 4] - 1]->y);
-					this->objects[b]->meshData[this->objects[b]->nrOfMeshData++] = meshdata(this->objects[b]->faces[i]->face[(j + 2) % 4] - 1, this->objects[b]->mesh[this->objects[b]->nrOfVertexes]);
 				}
 			}
 		}
@@ -129,7 +125,6 @@ void Mesh::loadMesh(const wchar_t * fileName, const bool normalIn)
 						vertex[this->objects[b]->faces[i]->face[j] - 1]->x,
 						texCoord[this->objects[b]->faces[i]->texCord[j] - 1]->x,
 						texCoord[this->objects[b]->faces[i]->texCord[j] - 1]->y);
-					this->objects[b]->meshData[this->objects[b]->nrOfMeshData++] = meshdata(this->objects[b]->faces[i]->face[j] - 1, this->objects[b]->mesh[this->objects[b]->nrOfVertexes]);
 				}
 				for (int j = 0; j < 3; j++)
 				{
@@ -138,16 +133,9 @@ void Mesh::loadMesh(const wchar_t * fileName, const bool normalIn)
 						vertex[this->objects[b]->faces[i]->face[(j + 2) % 4] - 1]->x,
 						texCoord[this->objects[b]->faces[i]->texCord[(j + 2) % 4] - 1]->x,
 						texCoord[this->objects[b]->faces[i]->texCord[(j + 2) % 4] - 1]->y);
-					this->objects[b]->meshData[this->objects[b]->nrOfMeshData++] = meshdata(this->objects[b]->faces[i]->face[(j + 2) % 4] - 1, this->objects[b]->mesh[this->objects[b]->nrOfVertexes]);
 				}
 			}
-		}
-	}
-	for (int i = 0; i < this->getNrOfObjects(); i++)
-	{
-		if (this->objects[i]->mat->getMtl()->normal != L"") {
-			this->computeTangent(this->objects[i], vertex);
-		}
+		}		
 	}
 	for (int b = 0; b < this->objects.size(); b++)
 	{
@@ -253,9 +241,7 @@ void Mesh::loadMesh(const char * fileName, const bool normalIn)
 		this->objects[b]->mat = new Material(this->mtlLib, this->objects[b]->materialname);
 
 		this->objects[b]->mesh = new Vertex[this->objects[b]->faces.size() * 6];
-		this->objects[b]->meshData = new meshdata[this->objects[b]->faces.size() * 6];
 		this->objects[b]->nrOfVertexes = 0;
-		this->objects[b]->nrOfMeshData = 0;
 		if (normalIn == false)
 		{
 			for (int i = 0; i < this->objects[b]->faces.size(); i++)
@@ -266,7 +252,6 @@ void Mesh::loadMesh(const char * fileName, const bool normalIn)
 						vertex[this->objects[b]->faces[i]->face[j] - 1]->z,
 						texCoord[this->objects[b]->faces[i]->texCord[j] - 1]->x,
 						texCoord[this->objects[b]->faces[i]->texCord[j] - 1]->y);
-					this->objects[b]->meshData[this->objects[b]->nrOfMeshData++] = meshdata(this->objects[b]->faces[i]->face[j] - 1, this->objects[b]->mesh[this->objects[b]->nrOfVertexes]);
 				}
 				for (int j = 0; j < 3; j++)
 				{
@@ -275,7 +260,6 @@ void Mesh::loadMesh(const char * fileName, const bool normalIn)
 						vertex[this->objects[b]->faces[i]->face[(j + 2) % 4] - 1]->z,
 						texCoord[this->objects[b]->faces[i]->texCord[(j + 2) % 4] - 1]->x,
 						texCoord[this->objects[b]->faces[i]->texCord[(j + 2) % 4] - 1]->y);
-					this->objects[b]->meshData[this->objects[b]->nrOfMeshData++] = meshdata(this->objects[b]->faces[i]->face[(j + 2) % 4] - 1, this->objects[b]->mesh[this->objects[b]->nrOfVertexes]);
 				}
 			}
 		}
@@ -289,7 +273,6 @@ void Mesh::loadMesh(const char * fileName, const bool normalIn)
 						vertex[this->objects[b]->faces[i]->face[j] - 1]->x,
 						texCoord[this->objects[b]->faces[i]->texCord[j] - 1]->x,
 						texCoord[this->objects[b]->faces[i]->texCord[j] - 1]->y);
-					this->objects[b]->meshData[this->objects[b]->nrOfMeshData++] = meshdata(this->objects[b]->faces[i]->face[j] - 1, this->objects[b]->mesh[this->objects[b]->nrOfVertexes]);
 				}
 				for (int j = 0; j < 3; j++)
 				{
@@ -298,15 +281,8 @@ void Mesh::loadMesh(const char * fileName, const bool normalIn)
 						vertex[this->objects[b]->faces[i]->face[(j + 2) % 4] - 1]->x,
 						texCoord[this->objects[b]->faces[i]->texCord[(j + 2) % 4] - 1]->x,
 						texCoord[this->objects[b]->faces[i]->texCord[(j + 2) % 4] - 1]->y);
-					this->objects[b]->meshData[this->objects[b]->nrOfMeshData++] = meshdata(this->objects[b]->faces[i]->face[(j + 2) % 4] - 1, this->objects[b]->mesh[this->objects[b]->nrOfVertexes]);
 				}
 			}
-		}
-	}
-	for (int i = 0; i < this->getNrOfObjects(); i++)
-	{
-		if (this->objects[i]->mat->getMtl()->normal != L"") {
-			this->computeTangent(this->objects[i], vertex);
 		}
 	}
 	for (int b = 0; b < this->objects.size(); b++)
@@ -320,102 +296,6 @@ void Mesh::loadMesh(const char * fileName, const bool normalIn)
 		delete vertex[i];
 	for (int i = 0; i < texCoord.size(); i++)
 		delete texCoord[i];
-}
-
-void Mesh::computeTangent(object *& object, const std::vector<Coords*> & vertexes)
-{
-	object->tangents = new Tangents[object->nrOfVertexes];
-
-	std::vector<XMFLOAT3> tmpNormal;
-	XMFLOAT3 unnormalized = XMFLOAT3(0, 0, 0);
-
-	std::vector<XMFLOAT3> tmpTangent;
-	XMFLOAT3 tangent = XMFLOAT3(0, 0, 0);
-	float tcu1, tcv1, tcu2, tcv2;
-
-	float vecX, vecY, vecZ;
-
-	XMVECTOR edge1 = XMVectorSet(0, 0, 0, 0);
-	XMVECTOR edge2 = XMVectorSet(0, 0, 0, 0);
-
-	std::cout << object->nrOfVertexes;
-
-	for (int i = 0; i < object->nrOfVertexes; i += 3)
-	{
-		vecX = object->mesh[i].x - object->mesh[i + 2].x;
-		vecY = object->mesh[i].y - object->mesh[i + 2].y;
-		vecZ = object->mesh[i].z - object->mesh[i + 2].z;
-		edge1 = XMVectorSet(vecX, vecY, vecZ, 0.0f);
-
-		vecX = object->mesh[i].x - object->mesh[i + 1].x;
-		vecY = object->mesh[i].y - object->mesh[i + 1].y;
-		vecZ = object->mesh[i].z - object->mesh[i + 1].z;
-		edge2 = XMVectorSet(vecX, vecY, vecZ, 0.0f);
-
-		XMStoreFloat3(&unnormalized, XMVector3Cross(edge1, edge2));
-
-		tmpNormal.push_back(unnormalized);
-
-		tcu1 = object->mesh[i].u - object->mesh[i + 2].u;
-		tcv1 = object->mesh[i].v - object->mesh[i + 2].v;
-
-		tcu2 = object->mesh[i + 2].u - object->mesh[i + 1].u;
-		tcv2 = object->mesh[i + 2].v - object->mesh[i + 1].v;
-
-		tangent.x = (tcv1 * XMVectorGetX(edge1) - tcv2 * XMVectorGetX(edge2)) * (1.0f / (tcu1 * tcv2 - tcu2 * tcv1));
-		tangent.y = (tcv1 * XMVectorGetY(edge1) - tcv2 * XMVectorGetY(edge2)) * (1.0f / (tcu1 * tcv2 - tcu2 * tcv1));
-		tangent.z = (tcv1 * XMVectorGetZ(edge1) - tcv2 * XMVectorGetZ(edge2)) * (1.0f / (tcu1 * tcv2 - tcu2 * tcv1));
-		
-		tmpTangent.push_back(tangent);
-
-	}
-	XMVECTOR normalSum = XMVectorSet(0, 0, 0, 0);
-	XMVECTOR tangentSum = XMVectorSet(0, 0, 0, 0);
-	int faceUsing = 0;
-	float tx, ty, tz;
-
-	for (int i = 0; i < object->nrOfMeshData; i++)
-	{
-		for (int j = 0; j < object->faces.size(); j++)
-		{
-			if (object->faces[j]->face[0] == object->meshData[i].index ||
-				object->faces[j]->face[1] == object->meshData[i].index ||
-				object->faces[j]->face[2] == object->meshData[i].index ||
-				object->faces[j]->face[3] == object->meshData[i].index)
-			{
-				tx = XMVectorGetX(normalSum) + tmpNormal[j].x;
-				ty = XMVectorGetY(normalSum) + tmpNormal[j].y;
-				tz = XMVectorGetZ(normalSum) + tmpNormal[j].z;
-
-				normalSum = XMVectorSet(tx, ty, tz, 0.0f);
-
-				tx = XMVectorGetX(tangentSum) + tmpTangent[j].x;
-				ty = XMVectorGetY(tangentSum) + tmpTangent[j].y;
-				tz = XMVectorGetZ(tangentSum) + tmpTangent[j].z;
-				tangentSum = XMVectorSet(tx, ty, tz, 0.0f);
-
-
-				faceUsing++;
-			}
-		}
-
-		normalSum = normalSum / faceUsing;		
-		tangentSum = tangentSum / faceUsing;
-
-		normalSum = XMVector3Normalize(normalSum);
-		tangentSum = XMVector3Normalize(tangentSum);
-
-		object->tangents[i].tx = XMVectorGetX(tangentSum);
-		object->tangents[i].ty = XMVectorGetY(tangentSum);
-		object->tangents[i].tz = XMVectorGetZ(tangentSum);
-
-		normalSum = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);		
-		tangentSum = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-		
-		faceUsing = 0;
-
-	}
-
 }
 
 int Mesh::getNrOfVertexes() const
@@ -469,9 +349,6 @@ Mesh::~Mesh()
 	for (size_t i = 0; i < this->objects.size(); i++)
 	{	
 		delete this->objects[i]->mat;
-		if (this->objects[i]->tangents != nullptr)
-			delete this->objects[i]->tangents;
-		delete[] this->objects[i]->meshData;
 		delete[] this->objects[i]->mesh;
 		delete this->objects[i];
 	}

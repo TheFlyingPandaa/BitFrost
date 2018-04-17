@@ -42,6 +42,9 @@ public:
 	HWND InitWindow(HINSTANCE hInstance);
 	HRESULT CreateDirect3DContext();
 	void SetViewport();
+	void SetViewport2();
+	float DEPTH_VIEW = 400;
+
 	void CreateConstantBuffer();
 	void setActiveShaders();
 	void CreateDepthBuffer();
@@ -135,14 +138,14 @@ private:
 	XMMATRIX camProjection;
 
 	XMMATRIX WVP;
-	XMMATRIX wwo;
+	//XMMATRIX wwo;
 
 	DIMOUSESTATE mouseLastState;
 	//HeightMap heightMap;
 
 	//Mesh mesh;
 	RenderObject * renderObject;
-	//RenderObject * secondCube;
+	RenderObject * secondCube;
 	ID3D11Texture2D* texShadowMap;
 	ID3D11DepthStencilView* shadowMapView;
 	ID3D11ShaderResourceView* shadowMapSRV = nullptr;

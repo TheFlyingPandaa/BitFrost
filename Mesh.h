@@ -61,20 +61,8 @@ struct Faces
 struct Vertex {
 	float x, y, z;
 	float u, v;
-	
 	Vertex() {}
 	Vertex(float a, float b, float c, float d, float e) : x(a), y(b), z(c), u(d), v(e) {};
-};
-
-struct Tangents {
-	float tx, ty, tz;
-};
-
-struct meshdata {
-	int index;
-	Vertex vert;	
-	meshdata() {};
-	meshdata(int i, Vertex v) : index(i), vert(v) {};
 };
 
 struct object {
@@ -83,17 +71,13 @@ struct object {
 
 	std::vector<Faces*> faces;
 	
-	Tangents * tangents;
 
 	int nrOfVertexes;
 	Vertex * mesh;
 	Material* mat;
 
-	int nrOfMeshData;
-	meshdata * meshData;
-
 	object(std::wstring objectName) : objectName(objectName) {
-		tangents = nullptr;
+
 		faces = std::vector<Faces*>();
 		
 	};
@@ -112,8 +96,6 @@ private:
 
 	void loadMesh(const wchar_t* fileName, const bool normalIn);
 	void loadMesh(const char * fileName, const bool normalIn);
-
-	void computeTangent(object *& object, const std::vector<Coords*>& vertexes);
 
 public:
 	Mesh();

@@ -18,6 +18,7 @@ struct valuesFromCpu
 { 
 	DirectX::XMMATRIX WVP;
 	DirectX::XMMATRIX worldSpace;
+	DirectX::XMMATRIX wwo;
 };
 
 struct Light

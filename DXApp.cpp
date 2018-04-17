@@ -8,10 +8,10 @@ DXApp::DXApp()
 	renderObject = new RenderObject(L"r8.obj", L"dick.jpg");
 	renderObject->setPosition(0.5f, -2, 0.5f);
 	renderObject->setScale(0.1f, 0.1f, 0.f);
-	/*secondCube = new RenderObject("r8.obj", L"grass.jpg");
+	secondCube = new RenderObject(L"r8.obj", L"grass.jpg");
 	secondCube->setPosition(-1, -1, -1);
-	secondCube->setScale(.1f, .1f, .1f);
-	*/
+	secondCube->setScale(5.1f, 5.1f, 5.1f);
+	
 	ORH = new ObjectRenderHandler("Objects");
 	ORH->loadObjects();
 
@@ -53,6 +53,7 @@ DXApp::~DXApp()
 
 	delete ORH;
 	delete renderObject;
+	delete secondCube;
 
 
 	//delete skyMap;
@@ -199,6 +200,17 @@ void DXApp::SetViewport()
 	gDeviceContext->RSGetState(&state);
 
 	
+}
+
+void DXApp::SetViewport2() {
+	D3D11_VIEWPORT vp;
+	vp.Width = (float)DEPTH_VIEW;
+	vp.Height = (float)DEPTH_VIEW;
+	vp.MinDepth = 0.0f;
+	vp.MaxDepth = 1.0f;
+	vp.TopLeftX = 0;
+	vp.TopLeftY = 0;
+	gDeviceContext->RSSetViewports(1, &vp);
 }
 
 
@@ -358,8 +370,8 @@ void DXApp::CreateDepthBuffer() {
 	gDeviceContext->OMSetRenderTargets(1, &gBackbufferRTV, depthStencilView);
 
 	D3D11_TEXTURE2D_DESC texDesc;
-	texDesc.Width = WINDOW_WIDTH;
-	texDesc.Height = WINDOW_HEIGHT;
+	texDesc.Width = DEPTH_VIEW;
+	texDesc.Height = DEPTH_VIEW;
 	texDesc.MipLevels = 1;
 	texDesc.ArraySize = 1;
 	texDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
@@ -435,19 +447,18 @@ void DXApp::CreateTriangleData()
 
 	camView = XMMatrixLookAtLH(cameraPos, lookAt, UP);
 
-	camProjection = XMMatrixPerspectiveFovLH(XM_PI * 0.45f, WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 20.0f);
+	camProjection = XMMatrixPerspectiveFovLH(XM_PI * 0.45f, WINDOW_WIDTH / WINDOW_HEIGHT, 0.01f, 20.0f);
 
 	light.dir = XMFLOAT3(1.0f, 0.0f, 0.0f);
 	light.pad = float(1);
-	light.ambientLight = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.0f);
+	light.ambientLight = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	light.diffues = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	light.Position = XMFLOAT4(0.0f, 0.0f, -2.0f, 1.0f);
 
 	
-	wwo = XMMatrixIdentity();
 
-	wwo = camView * camProjection;
+	
 
-	light.Position = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	//light.Position = XMFLOAT3(1, 0, 0);
 	/*
 	D3D11_BUFFER_DESC bufferDesc;
@@ -465,8 +476,10 @@ void DXApp::CreateTriangleData()
 	
 	gDevice->CreateBuffer(&bufferDesc, &data, &gVertexBuffer);
 	*/
+
 	ORH->loadBuffert(gDevice);
 	renderObject->loadBuffer(gDevice);
+	secondCube->loadBuffer(gDevice);
 	//skyMap->loadBuffer(gDevice);
 
 
@@ -538,7 +551,9 @@ void DXApp::Render()
 
 		gDeviceContext->Unmap(computeReadWriteBuffer, 0);
 	}
-	
+	secondCube->setMatrix(camView, camProjection);
+	secondCube->setPosition(1, -1, 1);
+	secondCube->setScale(3.1f, 0.1f, 3.1f);
 	renderObject->setMatrix(camView, camProjection, rotInRad);
 	renderObject->setPosition(2, 0, 2);
 	renderObject->setScale(1, 1, 1);
@@ -563,7 +578,7 @@ void DXApp::MovingBuffersToGPU()
 	globalValues.WVP = XMMatrixTranspose(WVP); // Transponera alltid innna något skickas in i matrisen.
 	globalValues.worldSpace = XMMatrixTranspose(worldMatrix);
 	camBuff.cameraPosition = DirectX::XMFLOAT4A(XMVectorGetX(camTarget - cameraPos), XMVectorGetY(camTarget - cameraPos), XMVectorGetZ(camTarget - cameraPos), 1.0f);
-	//std::cout << XMVectorGetX(camTarget) << " " << XMVectorGetY(camTarget) << " " << XMVectorGetZ(camTarget) << std::endl;
+	std::cout << XMVectorGetX(camTarget) << " " << XMVectorGetY(camTarget) << " " << XMVectorGetZ(camTarget) << std::endl;
 
 	gDeviceContext->Map(gExampleBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
 	//Kopierar in det i buffern "constant buffern"
@@ -572,6 +587,7 @@ void DXApp::MovingBuffersToGPU()
 	gDeviceContext->Unmap(gExampleBuffer, 0);
 	// set resource to Vertex Shader
 	gDeviceContext->GSSetConstantBuffers(0, 1, &gExampleBuffer);
+	gDeviceContext->VSSetConstantBuffers(4, 1, &gExampleBuffer);
 	 
 	//D3D11_MAPPED_SUBRESOURCE dataPtr;
 	gDeviceContext->Map(constPerFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
@@ -634,7 +650,9 @@ HWND DXApp::getWndHandler() const
 void DXApp::DrawGeometry()
 {
 	//gDeviceContext->Draw(6, 0);
-	renderObject->draw(gDeviceContext, new XMFLOAT3(XMVectorGetX(cameraPos), XMVectorGetY(cameraPos), XMVectorGetZ(cameraPos)));
+	
+	renderObject->draw(gDeviceContext);
+	//secondCube->draw(gDeviceContext);
 	ORH->render(gDeviceContext);
 
 
@@ -644,8 +662,9 @@ void DXApp::DrawGeometry()
 
 void DXApp::FirstDrawPass()
 {
+	SetViewport2();
 	gDeviceContext->IASetInputLayout(gVertexLayout);
-
+	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	gDeviceContext->OMSetRenderTargets(0, 0, shadowMapView);
 	gDeviceContext->ClearDepthStencilView(shadowMapView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
@@ -662,7 +681,7 @@ void DXApp::FirstDrawPass()
 
 	//gDeviceContext->IASetVertexBuffers(0, 1, &gVertexBuffer, &vertexSize, &offset);
 	//gDeviceContext->IASetInputLayout(gVertexLayout);
-
+	SetViewport();
 	gDeviceContext->VSSetShader(this->gVertexShader, nullptr, 0);
 	gDeviceContext->HSSetShader(this->gHullShader, nullptr, 0);
 	gDeviceContext->DSSetShader(this->gDomainShader, nullptr, 0);

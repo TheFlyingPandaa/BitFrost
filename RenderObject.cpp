@@ -1,12 +1,9 @@
 #include "RenderObject.h"
 
-#include <iostream>
+
 
 void RenderObject::loadBuffer(ID3D11Device *& device)
 {
-	tessInfo.pad = 0;
-	tessInfo.pad2 = 0;
-	tessInfo.pad3 = 0;
 	for (size_t i = 0; i < this->mesh->getNrOfObjects(); i++)
 	{
 		D3D11_BUFFER_DESC bufferDesc;
@@ -28,42 +25,16 @@ void RenderObject::loadBuffer(ID3D11Device *& device)
 		cBufferDesc.StructureByteStride = 0;
 
 		hr = device->CreateBuffer(&cBufferDesc, nullptr, &constantBuffer);
-
-		cBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-		cBufferDesc.ByteWidth = sizeof(textureInformationBuffer);
-		cBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		cBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		cBufferDesc.MiscFlags = 0;
-		cBufferDesc.StructureByteStride = 0;
-		hr = 0;
-		hr = device->CreateBuffer(&cBufferDesc, nullptr, &psConstantBuffer);
-
-		cBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-		cBufferDesc.ByteWidth = sizeof(TessellationFactor);
-		cBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		cBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		cBufferDesc.MiscFlags = 0;
-		cBufferDesc.StructureByteStride = 0;
-		hr = 0;
-		hr = device->CreateBuffer(&cBufferDesc, nullptr, &hullConstantBuffer);
 	}
 
 	for (size_t i = 0; i < this->mesh->getNrOfObjects(); i++)
 	{
-		if (this->mesh->getObjects()[i]->mat->getMtl()->textureName != L"")
-			this->tex[i]->createTexture(device, this->mesh->getObjects()[i]->mat->getMtl()->textureName.c_str());
-		if (this->mesh->getObjects()[i]->mat->getMtl()->normal != L"") {
-			this->normal[i]->createTexture(device, this->mesh->getObjects()[i]->mat->getMtl()->normal.c_str());
-			std::wcout << this->mesh->getObjects()[i]->mat->getMtl()->normal << std::endl;
-		}
+		this->tex[i]->createTexture(device, this->mesh->getObjects()[i]->mat->getMtl()->textureName.c_str());
 	}
-	lowPolly = new Texture();
-	lowPolly->createTexture(device, L"Default.jpg");
 }
 
-void RenderObject::draw(ID3D11DeviceContext *& deviceContext, XMFLOAT3 * camView)
+void RenderObject::draw(ID3D11DeviceContext *& deviceContext) const
 {
-	bool lowPolly = distanceCalc(camView);
 	UINT32 vertexSize = sizeof(float) * 5;
 	UINT offset = 0;
 	for (int i = 0; i < this->mesh->getNrOfObjects(); i++)
@@ -73,54 +44,20 @@ void RenderObject::draw(ID3D11DeviceContext *& deviceContext, XMFLOAT3 * camView
 
 		D3D11_MAPPED_SUBRESOURCE dataPtr;
 		deviceContext->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
+
 		//	Copy memory from CPU to GPU
 		memcpy(dataPtr.pData, &matrixBuffer, sizeof(MatrixBuffert));
+
 		// Unmap constant buffer so that we can use it again in the GPU
 		deviceContext->Unmap(constantBuffer, 0);
 		// set resources to shaders
 
-		tessInfo.tessellationFactor = 0;
-		
-
-
-		texInfo.NORMAL = this->normal[i] != nullptr;
-		texInfo.TEXTURE = this->tex[i] != nullptr;
-		if (texInfo.NORMAL)
-			texInfo.tangent = XMFLOAT3A(this->mesh->getObjects()[i]->tangents[i].tx, this->mesh->getObjects()[i]->tangents[i].ty, this->mesh->getObjects()[i]->tangents[i].tz);
-
-		deviceContext->Map(psConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);	
-		memcpy(dataPtr.pData, &texInfo, sizeof(textureInformationBuffer));		
-		deviceContext->Unmap(psConstantBuffer, 0);
-
 		deviceContext->GSSetConstantBuffers(0, 1, &constantBuffer);
-		deviceContext->PSSetConstantBuffers(2, 1, &psConstantBuffer);
-		if (lowPolly)
-		{
-			tessInfo.tessellationFactor = 1;
-			deviceContext->Map(hullConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
-			memcpy(dataPtr.pData, &tessInfo, sizeof(TessellationFactor));
-			deviceContext->Unmap(hullConstantBuffer, 0);
+		deviceContext->PSSetShaderResources(0, 1, &this->tex[i]->getTexture());
+		deviceContext->PSSetSamplers(0, 1, &this->tex[i]->getSampleState());
 
-			deviceContext->PSSetShaderResources(0, 1, &this->lowPolly->getTexture());
-			deviceContext->HSSetConstantBuffers(0, 1, &hullConstantBuffer);
-		}
-		else
-		{
-			tessInfo.tessellationFactor = 100;
-			deviceContext->Map(hullConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
-			memcpy(dataPtr.pData, &tessInfo, sizeof(TessellationFactor));
-			deviceContext->Unmap(hullConstantBuffer, 0);
-
-			deviceContext->PSSetShaderResources(0, 1, &this->tex[i]->getTexture());
-			deviceContext->HSSetConstantBuffers(0, 1, &hullConstantBuffer);
-		}
-		
-		deviceContext->PSSetSamplers(0, 1, &this->tex[i]->getSampleState()); 
-		if (this->normal[i] != nullptr) {
-			deviceContext->PSSetShaderResources(1, 1, &this->normal[i]->getTexture());
-			deviceContext->PSSetSamplers(1, 1, &this->normal[i]->getSampleState());
-		}		
 		deviceContext->VSSetConstantBuffers(3, 1, &constantBuffer);
+		deviceContext->PSSetConstantBuffers(4, 1, &constantBuffer);
 
 		deviceContext->Draw(this->mesh->getNrOfVertexes(), 0);
 	}
@@ -145,8 +82,25 @@ void RenderObject::setMatrix(const XMMATRIX & view, const XMMATRIX & proj, float
 	XMMATRIX scale = XMMatrixScaling(scaleX, scaleY, scaleZ);
 	XMMATRIX m_worldMatrix = rotation * scale * translate;
 
-	matrixBuffer.worldSpace = DirectX::XMMatrixTranspose(m_worldMatrix);
-	matrixBuffer.WVP = DirectX::XMMatrixTranspose(m_worldMatrix * view * proj);
+	if (first == 0) {
+		lightPos = XMMatrixIdentity();
+		lightPosVP = XMMatrixIdentity();
+
+		matrixBuffer.worldSpace = DirectX::XMMatrixTranspose(m_worldMatrix);
+		matrixBuffer.WVP = DirectX::XMMatrixTranspose(m_worldMatrix * view * proj);
+		lightPos = m_worldMatrix * view * proj;
+		lightPosVP = view * proj;
+		matrixBuffer.wwo = DirectX::XMMatrixTranspose(lightPos);
+		matrixBuffer.lightVP = DirectX::XMMatrixTranspose(lightPosVP);
+		first++;
+	}
+	else{
+		matrixBuffer.worldSpace = DirectX::XMMatrixTranspose(m_worldMatrix);
+		matrixBuffer.WVP = DirectX::XMMatrixTranspose(m_worldMatrix * view * proj);
+		matrixBuffer.wwo = DirectX::XMMatrixTranspose(lightPos);
+		matrixBuffer.lightVP = DirectX::XMMatrixTranspose(lightPosVP);
+
+	}
 }
 
 void RenderObject::setPosition(float x, float y, float z)
@@ -189,19 +143,10 @@ RenderObject::RenderObject(const wchar_t * meshDirr, LPCWSTR textureFile,const b
 {
 	this->mesh = new Mesh(meshDirr, normalIn);
 	this->tex = new Texture*[this->mesh->getNrOfObjects()];
-	this->normal = new Texture*[this->mesh->getNrOfObjects()];
 	this->vertexBuffer = new ID3D11Buffer*[this->mesh->getNrOfObjects()];
 	for (size_t i = 0; i < this->mesh->getObjects().size(); i++)
 	{
-		if (this->mesh->getObjects()[i]->mat->getMtl()->textureName != L"")
-			this->tex[i] = new Texture();
-		else
-			this->tex[i] = nullptr;
-
-		if (this->mesh->getObjects()[i]->mat->getMtl()->normal != L"")
-			this->normal[i] = new Texture();
-		else
-			this->normal[i] = nullptr;
+		this->tex[i] = new Texture();
 	}
 	if (textureFile != NULL) {
 		this->textureFile = textureFile;
@@ -219,15 +164,7 @@ RenderObject::RenderObject(const char * meshDirr, LPCWSTR textureFile, const boo
 {
 	this->mesh = new Mesh(meshDirr, normalIn);
 	this->tex = new Texture*[this->mesh->getNrOfObjects()];
-	this->normal = new Texture*[this->mesh->getNrOfObjects()];
 	this->vertexBuffer = new ID3D11Buffer*[this->mesh->getNrOfObjects()];
-	for (size_t i = 0; i < this->mesh->getObjects().size(); i++)
-	{
-		if (this->mesh->getObjects()[i]->mat->getMtl()->textureName != L"")
-			this->tex[i] = new Texture();
-		if (this->mesh->getObjects()[i]->mat->getMtl()->normal != L"")
-			this->normal[i] = new Texture();
-	}
 	if (textureFile != NULL) {
 		this->textureFile = textureFile;
 	}
@@ -251,14 +188,6 @@ RenderObject::~RenderObject()
 	if (this->tex != nullptr)
 		delete this->tex;
 
-	for (size_t i = 0; i < this->mesh->getNrOfObjects(); i++)
-	{
-		if (this->normal[i] != nullptr)
-			delete this->normal[i];
-	}
-	if (this->normal != nullptr)
-		delete this->normal;
-
 	if (this->position != nullptr)
 		delete this->position;
 	for (int i = 0; i < this->mesh->getNrOfObjects(); i++)
@@ -267,26 +196,6 @@ RenderObject::~RenderObject()
 	}
 	delete[] this->vertexBuffer;
 	this->constantBuffer->Release();
-	this->psConstantBuffer->Release();
 
 	delete mesh;
-}
-
-bool RenderObject::distanceCalc(XMFLOAT3 * view)
-{
-	float x = view->x - posX;
-	float y = view->y - posY;
-	float z = view->z - posZ;
-
-	float result = sqrt(pow(x, 2) + pow(y, 2)+ pow(z, 2));
-
-	if (result > 5)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-	//return NULL;
 }

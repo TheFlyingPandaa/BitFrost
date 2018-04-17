@@ -90,10 +90,6 @@ void Material::loadMtl(std::wstring materialName)
 			swscanf(buff.c_str(), L"%*s %ls", &inputBuff);
 			material->textureName = inputBuff;
 		}
-		else if (buff.substr(0, buff.find(' ')) == L"norm" && !skip) {
-			swscanf(buff.c_str(), L"%*s %ls", &inputBuff);
-			material->normal = inputBuff;
-		}
 	}
 	
 	inFile.close();
