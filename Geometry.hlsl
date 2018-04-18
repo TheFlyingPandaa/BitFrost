@@ -63,16 +63,17 @@ void GS_main(triangle GS_IN input[3]  ,inout TriangleStream< GSOutput > output)
         for (uint i = 0; i < 3; i++)
         {
 		
-            element.pos = input[i].Pos;
+            //element.pos = input[i].Pos;
             element.Tex = input[i].Tex;
-			element.worldPos = mul(element.pos, worldSpace);
-            element.pos = mul(element.pos, WVP);
+            element.worldPos = mul(input[i].Pos, worldSpace);
+            element.pos = mul(input[i].Pos, WVP);
             element.Normal = n;
             //element.Normal = mul(element.Normal, worldSpace);
 
             output.Append(element);
 		
         }
+        
         output.RestartStrip();
     //}
 }
