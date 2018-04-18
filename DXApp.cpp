@@ -468,14 +468,15 @@ void DXApp::CreateTriangleData()
 	camProjection = XMMatrixPerspectiveFovLH(XM_PI * 0.5f, WINDOW_WIDTH / WINDOW_HEIGHT, 0.5f, 20.0f);
 
 
-	XMFLOAT4 lightPos = XMFLOAT4(0, 0, -4.2f,1.0f);
+	XMFLOAT4 lightPos = XMFLOAT4(0, 0, -2.0f,1.0f);
 
 	XMVECTOR LIGHTPOSITION = XMLoadFloat4(&lightPos);
 
 
 
 	XMMATRIX lightView = XMMatrixLookAtLH(LIGHTPOSITION, lookAt, UP);
-	XMMATRIX lightProjection = XMMatrixPerspectiveFovLH(XM_PI * 0.5f, WINDOW_WIDTH / WINDOW_HEIGHT, 0.5f, 20.0f);
+	XMMATRIX lightProjection = XMMatrixPerspectiveFovLH(XM_PI * 0.5f, WINDOW_WIDTH / WINDOW_HEIGHT, 0.5f, 10.0f);
+	lightProjection = XMMatrixOrthographicLH(WINDOW_WIDTH * 0.01, WINDOW_HEIGHT *0.01, 0.5f, 20.0f);
 
 	XMStoreFloat4x4A(&lightMatrix.view, XMMatrixTranspose(lightView));
 	XMStoreFloat4x4A(&lightMatrix.projection, XMMatrixTranspose(lightProjection));

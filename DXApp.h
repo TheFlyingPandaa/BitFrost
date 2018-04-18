@@ -43,7 +43,8 @@ public:
 	HRESULT CreateDirect3DContext();
 	void SetViewport();
 	void SetViewport2();
-	float DEPTH_VIEW = 400;
+	float DEPTH_VIEW = 800;
+	float DEPTH_VIEW2 = DEPTH_VIEW * (WINDOW_WIDTH / WINDOW_HEIGHT);
 
 	void CreateConstantBuffer();
 	void setActiveShaders();
