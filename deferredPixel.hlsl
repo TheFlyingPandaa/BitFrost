@@ -67,7 +67,7 @@ float4 main(VS_OUT input) : SV_Target
     float3 diffuse = gTexDiffuse.Sample(sampAni, input.Tex).rgb;
 	float3 shadow = gTexShadow.Sample(sampAni, input.Tex).rgb;
 	float3 position = gTexPosition.Sample(sampAni, input.Tex).rgb;
-	//normal = normalize(normal);
+	normal = normalize(normal);
 	//float3 view = normalize(float3(1,1,1) - position);
 
     //return float4(position, 1);

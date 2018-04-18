@@ -74,6 +74,7 @@ PixelOutDeferred PS_main(GS_OUT input) : SV_Target
         pOut.normal = float4(normalize(mul(n, texSpace)), 1.0f);
 
     }
+    
     pOut.position = input.worldPos;
     return pOut;
 
