@@ -92,7 +92,7 @@ float4 main(VS_OUT input) : SV_Target
     if (abs(lightView.y) > 1.0f)							// Check if we are outside the shadow map (we are not in the light)
         return float4(diffuse.rgb, 1);
 
-    float shadowCoeff = (gTexShadow.Sample(sampAni, smTex).r + 0.01f < depth) ? 0.0f : 1.0f; // If the depth from camera is larger than depth from light,
+    float shadowCoeff = (gTexShadow.Sample(sampAni, smTex).r + 0.009f < depth) ? 0.5f : 1.0f; // If the depth from camera is larger than depth from light,
  
 	float3 litColor = diffuse.rgb * shadowCoeff;
 
