@@ -564,7 +564,8 @@ void DXApp::MovingBuffersToGPU()
 	globalValues.worldSpace = XMMatrixTranspose(worldMatrix);
 	//camBuff.cameraPosition = DirectX::XMFLOAT4A(XMVectorGetX(camTarget - cameraPos), XMVectorGetY(camTarget - cameraPos), XMVectorGetZ(camTarget - cameraPos), 1.0f);
 	
-	XMStoreFloat4A(&camBuff.cameraPosition, cameraPos);
+	camBuff.cameraPosition = DirectX::XMFLOAT4A(XMVectorGetX(camTarget - cameraPos), XMVectorGetY(camTarget - cameraPos), XMVectorGetZ(camTarget - cameraPos), 1.0f);
+	
 	//std::cout << XMVectorGetX(camTarget) << " " << XMVectorGetY(camTarget) << " " << XMVectorGetZ(camTarget) << std::endl;
 
 	gDeviceContext->Map(gExampleBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);

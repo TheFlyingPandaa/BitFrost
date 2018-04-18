@@ -89,7 +89,7 @@ float4 main(VS_OUT input) : SV_Target
     
     
     float3 viewer = normalize(cameraPosition.xyz - position); // Vector from position to camera
-    float3 lightDirToObject = normalize(float3(10,2,0) - position); // The light dir from position to light
+    float3 lightDirToObject = normalize(float3(1,2,0) - position); // The light dir from position to light
                                         //LIGHT
     float3 diffusee = diffuse * max(dot(normal, lightDirToObject), 0.5f); //calculate the diffuse factor
 		
