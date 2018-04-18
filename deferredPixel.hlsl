@@ -70,6 +70,8 @@ float4 main(VS_OUT input) : SV_Target
 	//normal = normalize(normal);
 	//float3 view = normalize(float3(1,1,1) - position);
 
+    //return float4(position, 1);
+
     //diffuse = diffuse + float3(0.2f, 0.2f, 0.2f);
 
     //return float4(normal.rgb,1);
@@ -88,8 +90,8 @@ float4 main(VS_OUT input) : SV_Target
 
     
     
-    float3 viewer = normalize(cameraPosition.xyz - position); // Vector from position to camera
-    float3 lightDirToObject = normalize(float3(1,2,0) - position); // The light dir from position to light
+    float3 viewer = normalize(position - cameraPosition.xyz); // Vector from position to camera
+    float3 lightDirToObject = normalize(float3(10,2,0) - position); // The light dir from position to light
                                         //LIGHT
     float3 diffusee = diffuse * max(dot(normal, lightDirToObject), 0.5f); //calculate the diffuse factor
 		
@@ -101,6 +103,7 @@ float4 main(VS_OUT input) : SV_Target
 		
 		// final specular
     float3 specular = spec * 0.8;
+    //spec *= -1;
     return float4((specular + diffusee) * float3(1.0f, 1.0f, 1.0f), 1.0);
 
 
