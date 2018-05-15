@@ -64,30 +64,11 @@ float4 main(VS_OUT input) : SV_Target
 
     float4 pOut;
     float3 normal = gTexNormal.Sample(sampAni, input.Tex).rgb;
-	//normal = float3((normal.x * 2) + 1, (normal.y * 2) + 1, (normal.z * 2) + 1);
     float3 diffuse = gTexDiffuse.Sample(sampAni, input.Tex).rgb;
 	float3 shadow = gTexShadow.Sample(sampAni, input.Tex).rgb;
 	float3 position = gTexPosition.Sample(sampAni, input.Tex).rgb;
 	normal = normalize(normal);
-	//float3 view = normalize(float3(1,1,1) - position);
 
-    //return float4(position, 1);
-
-    //diffuse = diffuse + float3(0.2f, 0.2f, 0.2f);
-
-    //return float4(normal.rgb,1);
-
-	//float r = reflect(light.dir, normal);
-
-	//pOut = calcPhongLighting(mat, lightCol, normal, -light.dir, view,r)
-
-	//return float4(position, 1.0f);
-    //float3 lightDir = normalize(float3(500, 500, 0) - position);
-
-    //float3 finalColor;
-
-    //finalColor = diffuse * light.ambient.xyz * 0.1f;
-    //finalColor += saturate(dot(lightDir, normal) * light.diffuse.xyz * 0.1f  * diffuse);
 
     
     
@@ -103,30 +84,7 @@ float4 main(VS_OUT input) : SV_Target
     float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0); // Calculate the "size" of the shineness-reflection of the pixel
 		
 		// final specular
-    float3 specular = spec * 0.8;
+    float3 specular = spec;
     //spec *= -1;
-    return float4((specular + diffusee) * float3(1.0f, 1.0f, 1.0f), 1.0);
-
-
-
-
-
-
-
-
-    /*
-    if (length(normal) > 0.0f )
-    {
-       
-
-
-    //float3 sunLightToObject = normalize(-sunDir.xyz);
-
-    //float3 viewer = normalize(cameraPosition.xyz - wordPos);
-
-    float3 halfWayDir;
-	/*WWWHOOOOOOOOO WE'RE...*/
-   // halfWayDir = normalize(sunLightToObject + viewer);
-
-    //return float4(finalColor, 1.0f);
+    return float4((specular + diffusee), 1.0);
 }
