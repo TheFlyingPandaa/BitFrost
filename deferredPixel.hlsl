@@ -96,19 +96,6 @@ float4 main(VS_OUT input) : SV_Target
  
 	float3 litColor = diffuse.rgb * shadowCoeff;
 
-
-                                //Lightpos
-    float3 lightObj = normalize(float3(0,1,3).xyz - position);
-    float3 viewFromCam = normalize(cameraPosition.xyz - position);
-
-    float3 diffusee = diffuse * max(dot(normal, lightObj), 0.0);
-	
-    float3 halfDir = normalize(lightObj + viewFromCam);
-		
-    float spec = pow(max(dot(normal, halfDir), 0.0), 32.0);
-		
-    float3 specular = spec * 1.0f;
-
     return float4((diffuse) * shadowCoeff, 1.0);
 
 }
