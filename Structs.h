@@ -55,6 +55,7 @@ struct TextureRenderTarget
 
 struct cameraBuffer {
 	DirectX::XMFLOAT4A cameraPosition;
+	DirectX::XMFLOAT4A cameraDirection;
 };
 
 

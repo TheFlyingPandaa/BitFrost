@@ -7,6 +7,7 @@ cbuffer EXAMPLE_BUFFER : register(b0)
 cbuffer CAMERA_BUFFERT : register(b4)
 {
     float4 cameraPosition;
+    float4 cameraDirection;
 };
 
 struct GSOutput
@@ -54,7 +55,7 @@ void GS_main(triangle GS_IN input[3]  ,inout TriangleStream< GSOutput > output)
 
     //float3 cameraPos = mul(cameraPosition, worldSpace);
 
-    float dott = dot(normalize(cameraPosition.xyz), n);
+    float dott = dot(normalize(cameraDirection.xyz), n);
     
 
     if (dott - 0.7 < 0){

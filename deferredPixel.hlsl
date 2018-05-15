@@ -24,6 +24,7 @@ cbuffer PER_FRAME_BUFF : register(b1)
 cbuffer CAMERA_BUFFERT : register(b4)
 {
 	float4 cameraPosition;
+    float4 cameraDirection;
 };
 
 struct VS_OUT
@@ -90,13 +91,13 @@ float4 main(VS_OUT input) : SV_Target
 
     
     
-    float3 viewer = normalize(position - cameraPosition.xyz); // Vector from position to camera
-    float3 lightDirToObject = normalize(float3(10,2,0) - position); // The light dir from position to light
+    float3 posToCamera = normalize(cameraPosition.xyz - position); // Vector from position to camera
+    float3 posToLight = normalize(float3(10,2,0) - position); // The light dir from position to light
                                         //LIGHT
-    float3 diffusee = diffuse * max(dot(normal, lightDirToObject), 0.5f); //calculate the diffuse factor
+    float3 diffusee = diffuse * max(dot(normal, posToLight), 0.5f); //calculate the diffuse factor
 		
 		
-    float3 halfwayDir = normalize(lightDirToObject + viewer); // Create a vector to use to get the specular level
+    float3 halfwayDir = normalize(posToLight + posToCamera); // Create a vector to use to get the specular level
 
 		
     float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0); // Calculate the "size" of the shineness-reflection of the pixel
