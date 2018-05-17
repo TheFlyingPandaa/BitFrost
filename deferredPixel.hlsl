@@ -70,12 +70,12 @@ float4 main(VS_OUT input) : SV_Target
 	normal = normalize(normal);
 
 
-    
+    float3 ambb = diffuse * 0.2;
     
     float3 posToCamera = normalize(cameraPosition.xyz - position); // Vector from position to camera
     float3 posToLight = normalize(float3(10,2,0) - position); // The light dir from position to light
                                         //LIGHT
-    float3 diffusee = diffuse * max(dot(normal, posToLight), 0.5f); //calculate the diffuse factor
+    float3 diffusee = diffuse * max(dot(normal, posToLight), 0.2f); //calculate the diffuse factor
 		
 		
     float3 halfwayDir = normalize(posToLight + posToCamera); // Create a vector to use to get the specular level
@@ -86,5 +86,5 @@ float4 main(VS_OUT input) : SV_Target
 		// final specular
     float3 specular = spec;
     //spec *= -1;
-    return float4((specular + diffusee), 1.0);
+    return float4(ambb + (specular + diffusee), 1.0);
 }
