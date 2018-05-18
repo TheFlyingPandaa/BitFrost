@@ -6,7 +6,7 @@ DXApp::DXApp()
 {
 	//gameInput = KeyboardInput();
 	renderObject = new RenderObject(L"r8.obj", L"dick.jpg");
-	renderObject->setPosition(0.5f, -2, 0.5f);
+	renderObject->setPosition(0.5f, 2, 0.5f);
 	renderObject->setScale(0.1f, 0.1f, 0.f);
 	/*secondCube = new RenderObject("r8.obj", L"grass.jpg");
 	secondCube->setPosition(-1, -1, -1);
@@ -638,7 +638,7 @@ HWND DXApp::getWndHandler() const
 void DXApp::DrawGeometry()
 {
 	//gDeviceContext->Draw(6, 0);
-	renderObject->draw(gDeviceContext, new XMFLOAT3(XMVectorGetX(cameraPos), XMVectorGetY(cameraPos), XMVectorGetZ(cameraPos)));
+	//renderObject->draw(gDeviceContext, new XMFLOAT3(XMVectorGetX(cameraPos), XMVectorGetY(cameraPos), XMVectorGetZ(cameraPos)));
 	ORH->render(gDeviceContext);
 
 
