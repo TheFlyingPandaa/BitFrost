@@ -37,28 +37,17 @@ void GS_main(triangle GS_IN input[3]  ,inout TriangleStream< GSOutput > output)
     float3 v1 = (p2 - p0).xyz;
     float3 n = normalize(cross(v0, v1));
 
-    float4 cameraDir = normalize(cameraDirection);
-    float dott = dot(cameraDir.xyz, n);
-    
-    float4 center = (p0 + p1 + p2) / 3;
-    float4 camToFace = center - cameraPosition;
 
+    GSOutput element = (GSOutput) 0;
+    for (uint i = 0; i < 3; i++)
+    {
+        element.Tex = input[i].Tex;
+        element.worldPos = mul(input[i].Pos, worldSpace);
+        element.pos = mul(input[i].Pos, WVP);
+        element.Normal = n;
 
-    if (dot(camToFace, cameraDirection) > 0)    //checks if the face is behind the camera 
-    {    
-        if (dott - 0.6 < 0)                     //Kollar om face:et är mot kameran 
-        {    
-            GSOutput element = (GSOutput) 0;
-            for (uint i = 0; i < 3; i++)
-            {
-                element.Tex = input[i].Tex;
-                element.worldPos = mul(input[i].Pos, worldSpace);
-                element.pos = mul(input[i].Pos, WVP);
-                element.Normal = n;
-
-                output.Append(element);		
-            }        
-            output.RestartStrip();
-        }
-    }
+        output.Append(element);		
+    }        
+    output.RestartStrip();
+     
 }
