@@ -24,6 +24,7 @@ cbuffer PER_FRAME_BUFF : register(b1)
 cbuffer CAMERA_BUFFERT : register(b2)
 {
 	float4 cameraPosition;
+    float4 cameraDirection;
 };
 
 cbuffer EXAMPLE_BUFFER : register(b4)
@@ -54,7 +55,7 @@ float4 ambientLight = (1.0f, 1.0f, 1.0f, 1.0f);
 
 float4 main(VS_OUT input) : SV_Target
 {
-
+    
 
     float4 pOut;
     float3 normal = gTexNormal.Sample(sampAni, input.Tex).rgb;
@@ -63,9 +64,26 @@ float4 main(VS_OUT input) : SV_Target
 	float3 position = gTexPosition.Sample(sampAni, input.Tex).rgb;
 	normal = normalize(normal);
 	
+
+
+    /*
+    float3 posToCamera = normalize(cameraPosition.xyz - position); // Vector from position to camera
+    float3 posToLight = normalize(float3(10, 2, 0) - position); // The light dir from position to light    
+                                        //LIGHT
+    float3 diffusee = diffuse * max(dot(normal, posToLight), 0.5f); //calculate the diffuse factor
+		
+		
+    float3 halfwayDir = normalize(posToLight + posToCamera); // Create a vector to use to get the specular level
+
+		
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0); // Calculate the "size" of the shineness-reflection of the pixel
+		
+		// final specular
+    float3 specular = spec;
+    */
+
 	
     float4 lightView = mul(float4(position, 1.0f), mul(view, projection)); // Translate the world position into the view space of the light
-	//lightView.w = 1;
     lightView.xy /= lightView.w; // Get the texture coords of the "object" in the shadow map
 
 
@@ -74,17 +92,6 @@ float4 main(VS_OUT input) : SV_Target
 	float depth = lightView.z / lightView.w;
 	float SMAP_SIZE = 400;
 	float dx = 1.0f / SMAP_SIZE;
-	//depth /= lightView.w;
-
-    
-																		  //posLightH = mul(posLightH, lightProj);					// Translate the view position into the projection space of the light
-    
-  
-     
-    //float depth = posLightH.z / posLightH.w; // Get the actual depth (seen from the camera)
-    //float SHADOW_EPSILON = 0.001f; // Some small value
-
-    //float angle = max(dot(sunLightToObject, float3(0, -1, 0)), 0.0f);
 
     
     if (abs(lightView.x) > 1.0f)							// Check if we are outside the shadow map (we are not in the light)
@@ -92,7 +99,7 @@ float4 main(VS_OUT input) : SV_Target
     if (abs(lightView.y) > 1.0f)							// Check if we are outside the shadow map (we are not in the light)
         return float4(diffuse.rgb, 1);
 
-    float shadowCoeff = (gTexShadow.Sample(sampAni, smTex).r + 0.001 < depth) ? 0.5f : 1.0f; // If the depth from camera is larger than depth from light,
+    float shadowCoeff = (gTexShadow.Sample(sampAni, smTex).r + 0.001 < depth) ? 0.2f : 1.0f; // If the depth from camera is larger than depth from light,
  
 	float3 litColor = diffuse.rgb * shadowCoeff;
 
