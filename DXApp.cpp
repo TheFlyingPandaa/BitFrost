@@ -197,9 +197,6 @@ void DXApp::SetViewport()
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
 	gDeviceContext->RSSetViewports(1, &vp);
-	
-	ID3D11RasterizerState * state;
-	gDeviceContext->RSGetState(&state);
 
 	
 }
@@ -596,6 +593,11 @@ void DXApp::Render()
 
 	//=========DRAW TO SCREEN==========\\
 
+
+
+	
+
+
 	MovingBuffersToGPU();
 
 	FirstDrawPass();
@@ -612,7 +614,7 @@ void DXApp::MovingBuffersToGPU()
 	globalValues.worldSpace = XMMatrixTranspose(worldMatrix);
 	camBuff.cameraPosition = DirectX::XMFLOAT4A(XMVectorGetX(cameraPos), XMVectorGetY(cameraPos), XMVectorGetZ(cameraPos), 1.0f);
 	camBuff.cameraDirection = DirectX::XMFLOAT4A(XMVectorGetX(camTarget - cameraPos), XMVectorGetY(camTarget - cameraPos), XMVectorGetZ(camTarget - cameraPos), 1.0f);
-	std::cout << XMVectorGetX(camTarget) << " " << XMVectorGetY(camTarget) << " " << XMVectorGetZ(camTarget) << std::endl;
+	//std::cout << XMVectorGetX(camTarget) << " " << XMVectorGetY(camTarget) << " " << XMVectorGetZ(camTarget) << std::endl;
 
 	gDeviceContext->Map(gExampleBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
 	//Kopierar in det i buffern "constant buffern"
@@ -728,7 +730,19 @@ void DXApp::FirstDrawPass()
 
 	//gDeviceContext->IASetVertexBuffers(0, 1, &gVertexBuffer, &vertexSize, &offset);
 	//gDeviceContext->IASetInputLayout(gVertexLayout);
-	SetViewport();
+	SetViewport();		
+
+	D3D11_RASTERIZER_DESC wfdesc;
+	ZeroMemory(&wfdesc, sizeof(D3D11_RASTERIZER_DESC));
+	wfdesc.CullMode = D3D11_CULL_NONE;
+	if (debugMode)
+		wfdesc.FillMode = D3D11_FILL_WIREFRAME;
+	else
+		wfdesc.FillMode = D3D11_FILL_SOLID;
+	wfdesc.DepthClipEnable = true;
+	gDevice->CreateRasterizerState(&wfdesc, &Rasterizer);
+	gDeviceContext->RSSetState(Rasterizer);
+
 	gDeviceContext->VSSetShader(this->gVertexShader, nullptr, 0);
 	gDeviceContext->HSSetShader(this->gHullShader, nullptr, 0);
 	gDeviceContext->DSSetShader(this->gDomainShader, nullptr, 0);
@@ -756,6 +770,14 @@ void DXApp::FirstDrawPass()
 	//=====THIS IS THE DRAW FUNCTION=====\\
 
 	DrawGeometry();
+
+	wfdesc;
+	ZeroMemory(&wfdesc, sizeof(D3D11_RASTERIZER_DESC));
+	wfdesc.CullMode = D3D11_CULL_NONE;	
+	wfdesc.FillMode = D3D11_FILL_SOLID;
+	wfdesc.DepthClipEnable = true;
+	gDevice->CreateRasterizerState(&wfdesc, &Rasterizer);
+	gDeviceContext->RSSetState(Rasterizer);
 	
 }
 

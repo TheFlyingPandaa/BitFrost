@@ -27,6 +27,7 @@ using namespace DirectX;
 #include "RenderObject.h"
 #include "ObjectRenderHandler.h"
 
+
 const UINT BUFFER_COUNT = 3;
 
 class DXApp
@@ -159,9 +160,11 @@ private:
 
 	ObjectRenderHandler * ORH;
 
+	ID3D11RasterizerState*	Rasterizer;
 
 	//RenderObject * skyMap;
 
+	bool debugMode = true;
 
 public:
 	IDXGISwapChain* getGSwapChain() const

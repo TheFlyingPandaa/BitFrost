@@ -1,6 +1,6 @@
 cbuffer EXAMPLE_BUFFER : register(b0)
 {
-	float4x4 WVP;
+    float4x4 WVP;
     float4x4 worldSpace;
 };
 
@@ -8,63 +8,51 @@ cbuffer CAMERA_BUFFERT : register(b2)
 {
     float4 cameraPosition;
     float4 cameraDirection;
-
 };
 
 struct GSOutput
 {
-	float4 pos : SV_POSITION;
-	float4 worldPos : PUSS;
-	float2 Tex : TEXCOORD;
+    float4 pos : SV_POSITION;
+    float4 worldPos : PUSS;
+    float2 Tex : TEXCOORD;
     float3 Normal : NORMAL;
 };
 
 struct GS_IN
 {
-	float4 Pos : POSITION;
-	float2 Tex : TEXCOORD;
-    //float3 Normal : NORMAL;
+    float4 Pos : POSITION;
+    float2 Tex : TEXCOORD;
 };
 
 [maxvertexcount(3)]
-void GS_main(triangle GS_IN input[3]  ,inout TriangleStream< GSOutput > output)
+void GS_main(triangle GS_IN input[3], inout TriangleStream<GSOutput> output)
 {
-    float4 p0 = input[0].Pos;
-    float4 p1 = input[1].Pos;
-    float4 p2 = input[2].Pos;
-    
-    float3 c1 = mul(p0, worldSpace).xyz;
-    float3 c2 = mul(p1, worldSpace).xyz;
-    float3 c3 = mul(p2, worldSpace).xyz;
 
-    float3 centre = (c1 * c1 * c2) / 3;
-    
-    //normal = float3(1, 1, 1);
-    float3 a1 = mul(p1 - p0, worldSpace).xyz;
-    float3 a2 = mul(p2 - p0, worldSpace).xyz;
-    float3 normal = normalize(cross(a1, a2));
+    float4 p0 = mul(input[0].Pos, worldSpace);
+    float4 p1 = mul(input[1].Pos, worldSpace);
+    float4 p2 = mul(input[2].Pos, worldSpace);
 
-    //float3 cameraPos = mul(cameraPosition, worldSpace);
+    float3 v0 = (p2 - p0).xyz;
+    float3 v1 = (p1 - p0).xyz;
+    float3 n = normalize(cross(v0, v1));
+        
+    float4 center = (p0 + p1 + p2) / 3;
+    float4 camToFace = center - cameraPosition;
 
-    float dott = dot(normalize(cameraDirection.xyz), normal);
-    
 
-    if (dott - 0.7 < 0){
-    
+    if (dot(camToFace.xyz, n) >= 0)    //<--- Backface culling 
+    {     
         GSOutput element = (GSOutput) 0;
         for (uint i = 0; i < 3; i++)
         {
-		
-            element.pos = input[i].Pos;
             element.Tex = input[i].Tex;
-			element.worldPos = mul(element.pos, worldSpace);
-            element.pos = mul(element.pos, WVP);
-            element.Normal = normal;
-            //element.Normal = mul(element.Normal, worldSpace);
+            element.worldPos = mul(input[i].Pos, worldSpace);
+            element.pos = mul(input[i].Pos, WVP);
+            element.Normal = n;
 
             output.Append(element);
-		
         }
         output.RestartStrip();
+        
     }
 }
