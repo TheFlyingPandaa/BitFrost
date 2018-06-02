@@ -549,12 +549,12 @@ void DXApp::Render()
 	gDeviceContext->CSSetShader(gComputeShader, NULL, 0);
 
 	D3D11_MAPPED_SUBRESOURCE dataPtr;
-	gDeviceContext->Map(computeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
 
 	//computeValuesStore.val = 1;
 	computeValuesStore.output = XMFLOAT2(0,0); //Need Padding
 	computeValuesStore.camPos = XMFLOAT2(XMVectorGetX(cameraPos), XMVectorGetZ(cameraPos));
 	computeValuesStore.objectPos = XMFLOAT2(renderObject->getPosition().x, renderObject->getPosition().z);
+	gDeviceContext->Map(computeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
 	memcpy(dataPtr.pData, &computeValuesStore, sizeof(computeShader));
 	// UnMap constant buffer so that we can use it again in the GPU
 	gDeviceContext->Unmap(computeBuffer, 0);
@@ -577,7 +577,7 @@ void DXApp::Render()
 	{
 		computeShader* dataView = reinterpret_cast<computeShader*>(mappedResource.pData);
 		
-		 rotInRad = dataView[0].output.x;
+		rotInRad = dataView[0].output.x;
 
 		gDeviceContext->Unmap(computeReadWriteBuffer, 0);
 	}
@@ -585,6 +585,7 @@ void DXApp::Render()
 	secondCube->setPosition(1, -1, 1);
 	secondCube->setScale(3.1f, 0.1f, 3.1f);
 	renderObject->setMatrix(camView, camProjection, rotInRad);
+	
 	renderObject->setPosition(2, 0, 2);
 	renderObject->setScale(1, 1, 1);
 

@@ -164,7 +164,7 @@ private:
 
 	//RenderObject * skyMap;
 
-	bool debugMode = true;
+	bool debugMode = false;
 
 public:
 	IDXGISwapChain* getGSwapChain() const
