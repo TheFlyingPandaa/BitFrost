@@ -2,12 +2,16 @@
 
 Texture::Texture()
 {
+	texture = nullptr;
+	samplerState = nullptr;
 }
 
 Texture::~Texture()
 {
-	texture->Release();
-	samplerState->Release();
+	if (texture)
+		texture->Release();
+	if (samplerState)
+		samplerState->Release();
 }
 
 void Texture::createTexture(ID3D11Device*& gDevice, LPCWSTR textureName)

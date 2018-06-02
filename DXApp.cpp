@@ -12,6 +12,13 @@ DXApp::DXApp()
 	secondCube->setPosition(-1, -1, -1);
 	secondCube->setScale(5.1f, 5.1f, 5.1f);
 	
+	for (int i = 0; i < NUM_PARTICLES; i++)
+	{
+		particles[i] = new RenderObject(L"particle.obj", L"dick.jpg");
+		particles[i]->setPosition(5 + (i + 1) * 1.5f, 0, 0.5f);		
+		//particles[i]->setScale(0.1f, 0.1f, 0.f);
+	}
+
 	ORH = new ObjectRenderHandler("Objects");
 	ORH->loadObjects();
 
@@ -57,6 +64,10 @@ DXApp::~DXApp()
 	delete renderObject;
 	delete secondCube;
 
+	for (int i = 0; i < NUM_PARTICLES; i++)
+	{
+		delete particles[i];
+	}
 
 	//delete skyMap;
 }
@@ -510,6 +521,10 @@ void DXApp::CreateTriangleData()
 	ORH->loadBuffert(gDevice);
 	renderObject->loadBuffer(gDevice);
 	secondCube->loadBuffer(gDevice);
+	for (int i = 0; i < NUM_PARTICLES; i++)
+	{
+		particles[i]->loadBuffer(gDevice);
+	}
 	//skyMap->loadBuffer(gDevice);
 
 
@@ -551,9 +566,19 @@ void DXApp::Render()
 	D3D11_MAPPED_SUBRESOURCE dataPtr;
 
 	//computeValuesStore.val = 1;
-	computeValuesStore.output = XMFLOAT2(0,0); //Need Padding
-	computeValuesStore.camPos = XMFLOAT2(XMVectorGetX(cameraPos), XMVectorGetZ(cameraPos));
-	computeValuesStore.objectPos = XMFLOAT2(renderObject->getPosition().x, renderObject->getPosition().z);
+	//computeValuesStore.output = XMFLOAT2(0,0); //Need Padding
+	//computeValuesStore.camPos = XMFLOAT2(XMVectorGetX(cameraPos), XMVectorGetZ(cameraPos));
+	//computeValuesStore.objectPos = XMFLOAT2(renderObject->getPosition().x, renderObject->getPosition().z);
+	XMStoreFloat4A(&computeValuesStore.cameraPos, cameraPos);
+	
+	//computeValuesStore.objectPos = XMFLOAT4A(renderObject->getPosition().x, renderObject->getPosition().y, renderObject->getPosition().z, 1.0f);
+
+
+	for (int i = 0; i < NUM_PARTICLES; i++)
+	{
+		computeValuesStore.objectPos[i] = XMFLOAT4A(particles[i]->getPosition().x, particles[i]->getPosition().y, particles[i]->getPosition().z, 1.0f);
+	}
+
 	gDeviceContext->Map(computeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
 	memcpy(dataPtr.pData, &computeValuesStore, sizeof(computeShader));
 	// UnMap constant buffer so that we can use it again in the GPU
@@ -572,31 +597,31 @@ void DXApp::Render()
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	HRESULT hr = gDeviceContext->Map(computeReadWriteBuffer, 0, D3D11_MAP_READ, 0, &mappedResource);
-	float rotInRad = 0;
 	if (SUCCEEDED(hr))
 	{
-		computeShader* dataView = reinterpret_cast<computeShader*>(mappedResource.pData);
+		computeShaderOutput* dataView;
+		dataView = reinterpret_cast<computeShaderOutput*>(mappedResource.pData);
+			
 		
-		rotInRad = dataView[0].output.x;
-
+		for (int i = 0; i < NUM_PARTICLES; i++)
+		{
+			XMMATRIX m = XMLoadFloat3x3(&dataView[i].rotationMatrix);
+			particles[i]->setMatrixWithRot(camView, camProjection, m);
+		}
 		gDeviceContext->Unmap(computeReadWriteBuffer, 0);
 	}
 	secondCube->setMatrix(camView, camProjection);
 	secondCube->setPosition(1, -1, 1);
 	secondCube->setScale(3.1f, 0.1f, 3.1f);
-	renderObject->setMatrix(camView, camProjection, rotInRad);
-	
+	renderObject->setMatrix(camView, camProjection);
 	renderObject->setPosition(2, 0, 2);
 	renderObject->setScale(1, 1, 1);
 
+	
 
 	holdBuffPerFrame.light = light;
 
-	//=========DRAW TO SCREEN==========\\
-
-
-
-	
+	//=========DRAW TO SCREEN==========\\	
 
 
 	MovingBuffersToGPU();
@@ -690,6 +715,7 @@ void DXApp::UpdateCamera(XMMATRIX & camRotationMatrix, XMVECTOR  &camTarget, XMV
 	camTarget = cameraPos + camTarget;
 
 	camView = XMMatrixLookAtLH(cameraPos, camTarget, UP);
+	
 }
 
 HWND DXApp::getWndHandler() const
@@ -702,6 +728,12 @@ void DXApp::DrawGeometry()
 	//gDeviceContext->Draw(6, 0);
 	
 	renderObject->draw(gDeviceContext);
+
+	for (int i = 0; i < NUM_PARTICLES; i++)
+	{
+		particles[i]->draw(gDeviceContext);
+	}
+
 	//secondCube->draw(gDeviceContext);
 	ORH->render(gDeviceContext);
 

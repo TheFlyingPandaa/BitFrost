@@ -44,6 +44,7 @@ public:
 	void draw(ID3D11DeviceContext *& deviceContext) const;
 
 	void setMatrix(const XMMATRIX& view, const XMMATRIX& proj, float radsRot = NULL);
+	void setMatrixWithRot(const XMMATRIX& view, const XMMATRIX& proj, const XMMATRIX& rotMatrix);
 
 	void setPosition(float x, float y, float z);
 	XMFLOAT3 getPosition() const;
