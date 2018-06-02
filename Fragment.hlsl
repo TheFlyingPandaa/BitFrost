@@ -3,9 +3,9 @@ Texture2D txNormal : register(t1);
 SamplerState sampAni;
 struct GS_OUT
 {
-	float4 Pos : SV_POSITION;
-	float4 worldPos : PUSS;
-	float2 Tex : TEXCOORD;
+    float4 pos : SV_POSITION;
+    float4 worldPos : PUSS;
+    float2 Tex : TEXCOORD;
     float3 Normal : NORMAL;
 };
 
@@ -58,18 +58,16 @@ PixelOutDeferred PS_main(GS_OUT input) : SV_Target
     pOut.diffuse = txDiffuse.Sample(sampAni, input.Tex);    
     //pOut.diffuse = float4((input.Normal.x + 1) / 2, (input.Normal.y + 1) / 2, (input.Normal.z + 1) / 2, 1.0f);
     //pOut.normal = float4((input.Normal.x + 1) / 2, (input.Normal.y + 1) / 2, (input.Normal.z + 1) / 2, 1.0f);
-    pOut.normal = normalize(float4(input.Normal,1.0f));
+    pOut.normal = float4(input.Normal, 1.0f);
     if (useNormal)
     {
         float3 n = txNormal.Sample(sampAni, input.Tex);
 
-        n = (2.0f * n) - 1.0f;
+        n = (2.0f * n) - 1.0f;        
 
-        float3 t = normalize(tangent.xyz - dot(tangent.xyz, input.Normal) * input.Normal);
+        float3 biTangent = cross(input.Normal, tangent.xyz);
 
-        float3 biTangent = cross(input.Normal, t.xyz);
-
-        float3x3 texSpace = float3x3(t.xyz, biTangent, input.Normal);
+        float3x3 texSpace = float3x3(tangent.xyz, biTangent, input.Normal);
 
         pOut.normal = float4(normalize(mul(n, texSpace)), 1.0f);
 
