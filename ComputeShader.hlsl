@@ -1,27 +1,22 @@
 cbuffer EXAMPLE_BUFFER : register(b0)
 {
-    float2 output;
-    float2 camPos;
-    float2 objectPos;
-    float2 padding;     //NEED PADDING CUZ 16 * n
+    float4      cameraPos;
+    float4      objectPosition[100]; 
 };
 
 struct computeShader
 {
-    float2 output;
-    float2 camPos;
-    float2 objectPos;
-    float2 padding;
+    float3x3 rotationMatrix;
 };
 
 RWStructuredBuffer<computeShader> BufferOut : register(u0);
 
-[numthreads(1, 1, 1)]
+[numthreads(100, 1, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
 {
-    float angle = atan2(objectPos.x - camPos.x, objectPos.y - camPos.y) * (180.0 / 3.14159265359f);
-	// Convert rotation into radians.
-    float rotInRad = (float) angle * 0.0174532925f;
-	
-    BufferOut[DTid.x].output.x = rotInRad;
+    float3 dir = normalize(objectPosition[DTid.x].xyz - cameraPos.xyz);
+    float3 right = normalize(cross(dir.xyz, float3(0, 1, 0)));
+    float3 up =     normalize(cross(dir.xyz, right.xyz));
+    
+    BufferOut[DTid.x].rotationMatrix = float3x3(right, up, dir);
 }

@@ -43,6 +43,7 @@ void RenderObject::draw(ID3D11DeviceContext *& deviceContext) const
 		deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer[i], &vertexSize, &offset);
 
 		D3D11_MAPPED_SUBRESOURCE dataPtr;
+		
 		deviceContext->Map(constantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
 
 		//	Copy memory from CPU to GPU
@@ -103,6 +104,38 @@ void RenderObject::setMatrix(const XMMATRIX & view, const XMMATRIX & proj, float
 	}
 }
 
+void RenderObject::setMatrixWithRot(const XMMATRIX & view, const XMMATRIX & proj, const XMMATRIX & rotMatrix)
+{
+	DirectX::XMMATRIX translate = DirectX::XMMatrixTranslation(posX, posY, posZ);
+	XMMATRIX rotation = rotMatrix;
+
+
+	
+
+	XMMATRIX scale = XMMatrixScaling(scaleX, scaleY, scaleZ);
+	XMMATRIX m_worldMatrix = rotation * scale * translate;
+
+	if (first == 0) {
+		lightPos = XMMatrixIdentity();
+		lightPosVP = XMMatrixIdentity();
+
+		matrixBuffer.worldSpace = DirectX::XMMatrixTranspose(m_worldMatrix);
+		matrixBuffer.WVP = DirectX::XMMatrixTranspose(m_worldMatrix * view * proj);
+		lightPos = m_worldMatrix * view * proj;
+		lightPosVP = view * proj;
+		matrixBuffer.wwo = DirectX::XMMatrixTranspose(lightPos);
+		matrixBuffer.lightVP = DirectX::XMMatrixTranspose(lightPosVP);
+		first++;
+	}
+	else {
+		matrixBuffer.worldSpace = DirectX::XMMatrixTranspose(m_worldMatrix);
+		matrixBuffer.WVP = DirectX::XMMatrixTranspose(m_worldMatrix * view * proj);
+		matrixBuffer.wwo = DirectX::XMMatrixTranspose(lightPos);
+		matrixBuffer.lightVP = DirectX::XMMatrixTranspose(lightPosVP);
+
+	}
+}
+
 void RenderObject::setPosition(float x, float y, float z)
 {
 	posX = x;
@@ -144,6 +177,8 @@ RenderObject::RenderObject(const wchar_t * meshDirr, LPCWSTR textureFile,const b
 	this->mesh = new Mesh(meshDirr, normalIn);
 	this->tex = new Texture*[this->mesh->getNrOfObjects()];
 	this->vertexBuffer = new ID3D11Buffer*[this->mesh->getNrOfObjects()];
+	for (int i = 0; i < this->mesh->getNrOfObjects(); i++)
+		this->vertexBuffer[i] = nullptr;
 	for (size_t i = 0; i < this->mesh->getObjects().size(); i++)
 	{
 		this->tex[i] = new Texture();
@@ -165,6 +200,8 @@ RenderObject::RenderObject(const char * meshDirr, LPCWSTR textureFile, const boo
 	this->mesh = new Mesh(meshDirr, normalIn);
 	this->tex = new Texture*[this->mesh->getNrOfObjects()];
 	this->vertexBuffer = new ID3D11Buffer*[this->mesh->getNrOfObjects()];
+	for (int i = 0; i < this->mesh->getNrOfObjects(); i++)
+		this->vertexBuffer[i] = nullptr;
 	if (textureFile != NULL) {
 		this->textureFile = textureFile;
 	}
@@ -192,10 +229,12 @@ RenderObject::~RenderObject()
 		delete this->position;
 	for (int i = 0; i < this->mesh->getNrOfObjects(); i++)
 	{
+		if (vertexBuffer[i])
 		this->vertexBuffer[i]->Release();
 	}
 	delete[] this->vertexBuffer;
-	this->constantBuffer->Release();
+	if (this->constantBuffer)
+		this->constantBuffer->Release();
 
 	delete mesh;
 }

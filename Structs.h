@@ -8,10 +8,13 @@
 struct computeShader
 {
 	//float val;
-	DirectX::XMFLOAT2 output;
-	DirectX::XMFLOAT2 camPos;
-	DirectX::XMFLOAT2 objectPos;
-	DirectX::XMFLOAT2 padding;
+	DirectX::XMFLOAT4A		cameraPos;
+	DirectX::XMFLOAT4A		objectPos[100];
+};
+
+struct computeShaderOutput
+{
+	DirectX::XMFLOAT3X3	rotationMatrix;
 };
 
 struct valuesFromCpu

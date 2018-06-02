@@ -29,6 +29,7 @@ using namespace DirectX;
 
 
 const UINT BUFFER_COUNT = 3;
+const int NUM_PARTICLES= 10;//max 100
 
 class DXApp
 {
@@ -118,7 +119,6 @@ private:
 	ID3D11ComputeShader* gComputeShader = nullptr;
 	computeShader computeValuesStore;
 	//ID3D11Texture2D* computeTex;
-	int NUM_PARTICLES= 1;
 	ID3D11Buffer* computeReadWriteBuffer;
 	ID3D11Buffer* computeOutputBuffer;
 	ID3D11UnorderedAccessView* computeBufferUAV;
@@ -150,6 +150,7 @@ private:
 
 	//Mesh mesh;
 	RenderObject * renderObject;
+	RenderObject * particles[NUM_PARTICLES];
 	RenderObject * secondCube;
 	ID3D11Texture2D* texShadowMap;
 	ID3D11DepthStencilView* shadowMapView;
