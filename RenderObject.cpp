@@ -106,7 +106,7 @@ void RenderObject::draw(ID3D11DeviceContext *& deviceContext, XMFLOAT3 * camView
 		}
 		else
 		{
-			tessInfo.tessellationFactor = 100;
+			tessInfo.tessellationFactor = 10;
 			deviceContext->Map(hullConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &dataPtr);
 			memcpy(dataPtr.pData, &tessInfo, sizeof(TessellationFactor));
 			deviceContext->Unmap(hullConstantBuffer, 0);

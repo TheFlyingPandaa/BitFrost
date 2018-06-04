@@ -154,6 +154,10 @@ private:
 
 	ObjectRenderHandler * ORH;
 
+	ID3D11RasterizerState*	Rasterizer;
+
+	bool debugMode = true;
+
 
 	//RenderObject * skyMap;
 

@@ -667,6 +667,17 @@ void DXApp::FirstDrawPass()
 	//gDeviceContext->IASetVertexBuffers(0, 1, &gVertexBuffer, &vertexSize, &offset);
 	//gDeviceContext->IASetInputLayout(gVertexLayout);
 
+	D3D11_RASTERIZER_DESC wfdesc;
+	ZeroMemory(&wfdesc, sizeof(D3D11_RASTERIZER_DESC));
+	wfdesc.CullMode = D3D11_CULL_NONE;
+	if (debugMode)
+		wfdesc.FillMode = D3D11_FILL_WIREFRAME;
+	else
+		wfdesc.FillMode = D3D11_FILL_SOLID;
+	wfdesc.DepthClipEnable = true;
+	gDevice->CreateRasterizerState(&wfdesc, &Rasterizer);
+	gDeviceContext->RSSetState(Rasterizer);
+
 	gDeviceContext->VSSetShader(this->gVertexShader, nullptr, 0);
 	gDeviceContext->HSSetShader(this->gHullShader, nullptr, 0);
 	gDeviceContext->DSSetShader(this->gDomainShader, nullptr, 0);
@@ -694,7 +705,14 @@ void DXApp::FirstDrawPass()
 	//=====THIS IS THE DRAW FUNCTION=====\\
 
 	DrawGeometry();
-	
+
+	wfdesc;
+	ZeroMemory(&wfdesc, sizeof(D3D11_RASTERIZER_DESC));
+	wfdesc.CullMode = D3D11_CULL_NONE;
+	wfdesc.FillMode = D3D11_FILL_SOLID;
+	wfdesc.DepthClipEnable = true;
+	gDevice->CreateRasterizerState(&wfdesc, &Rasterizer);
+	gDeviceContext->RSSetState(Rasterizer);
 }
 
 void DXApp::SecondDrawPass()

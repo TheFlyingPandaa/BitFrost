@@ -37,17 +37,21 @@ void GS_main(triangle GS_IN input[3]  ,inout TriangleStream< GSOutput > output)
     float3 v1 = (p2 - p0).xyz;
     float3 n = normalize(cross(v0, v1));
 
+    float4 pointToCamera = cameraPosition - p0;
 
-    GSOutput element = (GSOutput) 0;
-    for (uint i = 0; i < 3; i++)
+
+    if (dot(pointToCamera.xyz, n) >= 0)    //<--- Backface culling 
     {
-        element.Tex = input[i].Tex;
-        element.worldPos = mul(input[i].Pos, worldSpace);
-        element.pos = mul(input[i].Pos, WVP);
-        element.Normal = n;
+        GSOutput element = (GSOutput) 0;
+        for (uint i = 0; i < 3; i++)
+        {
+            element.Tex = input[i].Tex;
+            element.worldPos = mul(input[i].Pos, worldSpace);
+            element.pos = mul(input[i].Pos, WVP);
+            element.Normal = n;
 
-        output.Append(element);		
-    }        
-    output.RestartStrip();
-     
+            output.Append(element);
+        }
+        output.RestartStrip();
+    }
 }

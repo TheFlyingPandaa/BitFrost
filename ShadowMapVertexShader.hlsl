@@ -1,6 +1,6 @@
 cbuffer EXAMPLE_BUFFER : register(b3)
 {
-	float4x4 WVP;
+	float4x4 LWVP;
 	float4x4 worldSpace;
 };
 
@@ -23,7 +23,7 @@ VS_OUT main( VS_IN input) : SV_POSITION
 {
 	VS_OUT output = (VS_OUT)0;
 	
-	output.Pos = mul(float4(input.Pos, 1.0f), WVP);
+    output.Pos = mul(float4(input.Pos, 1.0f), LWVP);
 
 	return output;
 }
